@@ -6,14 +6,47 @@ import {
   StickyNote,
 } from 'lucide-react'
 
-// import TablePreview from '../../components/TablePreview'
+import TablePreview from '../components/TablePreview'
 import ChartComponent from '../components/ChartComponent'
 
 import './styles.css'
 import Header from '../components/Header'
 import MenuAside from '../components/MenuAside'
+import { useCallback } from 'react'
+import useDashboardContext from '../hook/useDashboardContext.tsx'
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+import useTablePreview from '../hook/useTablePreviewAux.tsx'
 
 export default function Dashboard() {
+  const { transactions } = useDashboardContext()
+  const { handleGetAllTransactions } = useTablePreview()
+
+  const getMonth = useCallback(() => {
+    if (transactions.length > 0) {
+      const monthNames = [
+        'Janeiro',
+        'Fevereiro',
+        'Março',
+        'Abril',
+        'Maio',
+        'Junho',
+        'Julho',
+        'Agosto',
+        'Setembro',
+        'Outubro',
+        'Novembro',
+        'Dezembro',
+      ]
+
+      return monthNames[
+        Number(transactions[3].formatted_date.split('/')[1]) - 1
+      ]
+    }
+
+    return ''
+  }, [transactions])
+
   function getGreeting() {
     const now = new Date()
     const hour = now.getHours()
@@ -128,23 +161,53 @@ export default function Dashboard() {
               <div className="flex flex-col bg-white rounded-xl px-3 py-6 sm:p-6  lg:col-span-2 lg:row-span-2">
                 <div className="flex flex-none justify-between items-center mb-4">
                   <h2 className="text-base md:text-lg lg:text-xl font-semibold text-gray">
-                    Julho
+                    {getMonth() ? (
+                      getMonth()
+                    ) : (
+                      <Skeleton height={20} width={100} />
+                    )}
                   </h2>
                   <div className="flex flex-1 items-center justify-center pr-20">
-                    <button className="text-sm md:text-md lg:text-lg font-semibold text-gray">
+                    <button
+                      className="text-sm md:text-md lg:text-lg font-semibold text-gray"
+                      onClick={() => {
+                        const date = new Date(
+                          `${transactions[0].date}T00:00:00`,
+                        )
+                        date.setHours(0, 0, 0)
+                        const teste = new Date(date.setDate(date.getDate() - 4))
+                        teste.setHours(0, 0, 0)
+                        handleGetAllTransactions(teste)
+                      }}
+                    >
                       &lt;
                     </button>
                     <span className="text-sm md:text-md lg:text-lg font-semibold text-gray mx-2">
-                      27/jul a 2/ago
+                      {transactions.length > 0 ? (
+                        `${transactions[0].formatted_date} a ${transactions[transactions.length - 1].formatted_date}`
+                      ) : (
+                        <Skeleton height={20} width={100} />
+                      )}
                     </span>
-                    <button className="text-sm md:text-md lg:text-lg font-semibold text-gray">
+                    <button
+                      className="text-sm md:text-md lg:text-lg font-semibold text-gray"
+                      onClick={() => {
+                        const date = new Date(
+                          `${transactions[transactions.length - 1].date}T00:00:00`,
+                        )
+                        date.setHours(0, 0, 0)
+                        const teste = new Date(date.setDate(date.getDate() + 4))
+                        teste.setHours(0, 0, 0)
+                        handleGetAllTransactions(teste)
+                      }}
+                    >
                       &gt;
                     </button>
                   </div>
                 </div>
 
                 <div className="table-preview-area flex flex-auto py-6 relative">
-                  {/* <TablePreview /> */}
+                  <TablePreview />
                 </div>
 
                 <div className="flex flex-none justify-end items-end text-right mt-4">

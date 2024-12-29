@@ -1,0 +1,36 @@
+.card-miniinfo {
+    overflow-y: auto;
+    -ms-overflow-style: none; 
+    scrollbar-width: none;
+}
+
+.button-config {
+    display: none;
+
+    div {
+        display: none;
+    }
+}
+
+.button-config:hover {
+    div {
+        display: block;
+    }
+}
+
+.description {
+    overflow-x: auto;
+    -ms-overflow-style: none; 
+    scrollbar-width: none;
+    white-space: nowrap;
+}
+
+.transaction-area:hover {
+    .button-config {
+        display: flex;
+    }
+}
+
+.purple {
+    color: purple;
+}

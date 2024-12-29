@@ -5,12 +5,7 @@ const Header = () => {
     <header className="fixed z-40 w-full h-24 top-0">
       <div className="w-full h-24 flex bg-white py-4">
         <div className="hidden xl:flex w-52 h-full justify-center items-center">
-          {/* <Image */}
-          {/*  src="/assets/logo.svg" */}
-          {/*  alt="EliMoney" */}
-          {/*  width={120} */}
-          {/*  height={40} */}
-          {/* /> */}
+          <img src="/assets/logo.svg" alt="EliMoney" width={120} height={40} />
         </div>
 
         <div className="w-full flex justify-between items-center px-6 md:px-10">
