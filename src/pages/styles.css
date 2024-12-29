@@ -1,0 +1,29 @@
+@media(max-width: 1140px) {
+    .average-spending-area {
+        overflow-x: auto;
+        -ms-overflow-style: none; 
+        scrollbar-width: none;
+    }
+
+    .average-spending-area::-webkit-scrollbar {
+        display: none;
+    }
+
+    .average-info {
+        width: 340px;
+        flex-shrink: 0;
+    }
+
+    .table-preview-area {
+        overflow-x: auto;
+        -ms-overflow-style: none; 
+        scrollbar-width: none;
+    }
+}
+
+@media(max-width: 480px) {
+    .average-info {
+        width: 100%;
+        flex-shrink: 0;
+    }
+}
