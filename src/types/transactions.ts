@@ -10,6 +10,7 @@ export type IItem = {
   category: string
   shared?: IShared
   createdAt: string
+  transaction_day: string
 }
 
 interface IRow {

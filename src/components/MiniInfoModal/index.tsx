@@ -192,7 +192,13 @@ const MiniInfoModal: React.FC<IParams> = ({
 
                         <div className="absolute bottom-5 right-0 mt-2 w-28 bg-white shadow-md rounded-lg">
                           <button
-                            onClick={() => {}}
+                            onClick={() =>
+                              setOpenModal({
+                                isOpen: true,
+                                item,
+                                type: 'edit',
+                              })
+                            }
                             className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50"
                           >
                             Editar
@@ -202,7 +208,7 @@ const MiniInfoModal: React.FC<IParams> = ({
                               setOpenModal({
                                 isOpen: true,
                                 item,
-                                type,
+                                type: 'delete',
                               })
                             }
                             className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50"

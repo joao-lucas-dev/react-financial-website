@@ -15,7 +15,7 @@ export default function useMiniInfoAux() {
   const scrollDescriptionRefs = useRef<(HTMLParagraphElement | null)[]>([])
   const modalRef = useRef<HTMLDivElement>(null)
 
-  const { setTransactions } = useDashboardContext()
+  const { setTransactions, transactions } = useDashboardContext()
 
   const [value, setValue] = useState({
     formattedValue: '',
@@ -161,8 +161,14 @@ export default function useMiniInfoAux() {
 
         const data = await response.json()
 
+        const startDate = new Date(`${transactions[0].date}T00:00:00`)
+
+        const endDate = new Date(
+          `${transactions[transactions.length - 1].date}T00:00:00`,
+        )
+
         const response2 = await fetch(
-          'http://localhost:8080/transactions/preview',
+          `http://localhost:8080/transactions/preview?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
           {
             method: 'GET',
             headers: {
@@ -182,6 +188,7 @@ export default function useMiniInfoAux() {
             price: value.formattedValue,
             category: 'outros',
             createdAt: new Date().toLocaleString('pt-BR'),
+            transaction_day: transactionDay.toLocaleString('pt-BR'),
           },
         ])
 
@@ -193,7 +200,7 @@ export default function useMiniInfoAux() {
         console.log(err)
       }
     },
-    [value.formattedValue, value.originalValue, setTransactions],
+    [value.formattedValue, value.originalValue, setTransactions, transactions],
   )
 
   const handleOnKeyDown = useCallback(

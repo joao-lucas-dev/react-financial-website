@@ -4,6 +4,8 @@ import {
   MoveDownLeft,
   MoveUpRight,
   StickyNote,
+  ChevronRight,
+  ChevronLeft,
 } from 'lucide-react'
 
 import TablePreview from '../components/TablePreview'
@@ -46,6 +48,36 @@ export default function Dashboard() {
 
     return ''
   }, [transactions])
+
+  const getNextWeek = useCallback(
+    async (isBeforeWeek: boolean) => {
+      let date
+      let newDate
+
+      if (isBeforeWeek) {
+        date = new Date(`${transactions[0].date}T00:00:00`)
+        date.setHours(0, 0, 0)
+        newDate = new Date(date.setDate(date.getDate() - 4))
+      } else {
+        date = new Date(
+          `${transactions[transactions.length - 1].date}T00:00:00`,
+        )
+        date.setHours(0, 0, 0)
+        newDate = new Date(date.setDate(date.getDate() + 4))
+      }
+      newDate.setHours(0, 0, 0)
+
+      await handleGetAllTransactions(newDate)
+    },
+    [handleGetAllTransactions, transactions],
+  )
+
+  const getToday = useCallback(async () => {
+    const date = new Date()
+    date.setHours(0, 0, 0)
+
+    await handleGetAllTransactions(date)
+  }, [handleGetAllTransactions])
 
   function getGreeting() {
     const now = new Date()
@@ -160,7 +192,7 @@ export default function Dashboard() {
             <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6 pb-24">
               <div className="flex flex-col bg-white rounded-xl px-3 py-6 sm:p-6  lg:col-span-2 lg:row-span-2">
                 <div className="flex flex-none justify-between items-center mb-4">
-                  <h2 className="text-base md:text-lg lg:text-xl font-semibold text-gray">
+                  <h2 className="text-base md:text-lg lg:text-xl font-semibold text-gray w-24">
                     {getMonth() ? (
                       getMonth()
                     ) : (
@@ -169,20 +201,12 @@ export default function Dashboard() {
                   </h2>
                   <div className="flex flex-1 items-center justify-center pr-20">
                     <button
-                      className="text-sm md:text-md lg:text-lg font-semibold text-gray"
-                      onClick={() => {
-                        const date = new Date(
-                          `${transactions[0].date}T00:00:00`,
-                        )
-                        date.setHours(0, 0, 0)
-                        const teste = new Date(date.setDate(date.getDate() - 4))
-                        teste.setHours(0, 0, 0)
-                        handleGetAllTransactions(teste)
-                      }}
+                      className="text-xl md:text-md lg:text-lg font-semibold text-gray"
+                      onClick={() => getNextWeek(true)}
                     >
-                      &lt;
+                      <ChevronLeft />
                     </button>
-                    <span className="text-sm md:text-md lg:text-lg font-semibold text-gray mx-2">
+                    <span className="text-xl md:text-md lg:text-lg font-semibold text-gray mx-2">
                       {transactions.length > 0 ? (
                         `${transactions[0].formatted_date} a ${transactions[transactions.length - 1].formatted_date}`
                       ) : (
@@ -191,18 +215,13 @@ export default function Dashboard() {
                     </span>
                     <button
                       className="text-sm md:text-md lg:text-lg font-semibold text-gray"
-                      onClick={() => {
-                        const date = new Date(
-                          `${transactions[transactions.length - 1].date}T00:00:00`,
-                        )
-                        date.setHours(0, 0, 0)
-                        const teste = new Date(date.setDate(date.getDate() + 4))
-                        teste.setHours(0, 0, 0)
-                        handleGetAllTransactions(teste)
-                      }}
+                      onClick={() => getNextWeek(false)}
                     >
-                      &gt;
+                      <ChevronRight />
                     </button>
+                  </div>
+                  <div>
+                    <button onClick={() => getToday()}>Hoje</button>
                   </div>
                 </div>
 

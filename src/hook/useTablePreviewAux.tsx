@@ -4,7 +4,7 @@ import { ITransaction } from '../types/transactions'
 import useDashboardContext from './useDashboardContext'
 
 export default function useTablePreview() {
-  const { setTransactions } = useDashboardContext()
+  const { setTransactions, transactions } = useDashboardContext()
 
   const handleGetAllTransactions = useCallback(
     async (date = new Date()) => {
@@ -50,12 +50,14 @@ export default function useTablePreview() {
           method: 'DELETE',
         })
 
-        await handleGetAllTransactions()
+        const date = new Date(`${transactions[3].date}T00:00:00`)
+
+        await handleGetAllTransactions(date)
       } catch (err) {
         console.log(err)
       }
     },
-    [handleGetAllTransactions],
+    [handleGetAllTransactions, transactions],
   )
 
   return {
