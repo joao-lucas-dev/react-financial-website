@@ -1,62 +1,55 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  Dispatch,
-  SetStateAction,
-} from 'react'
-import { ITransaction, IItem } from '../../types/transactions'
+import React, { useEffect, useRef, Dispatch, SetStateAction } from 'react'
+import { ITransaction } from '../../types/transactions'
 
 import CategoryIcon from '../CategoryIcon'
 import './styles.css'
 import { EllipsisVertical } from 'lucide-react'
-import useMiniInfoAux from '../../hook/useMiniInfoAux'
+import useMiniInfoAux from '../../hooks/useMiniInfoAux'
 
 interface IParams {
-  item: ITransaction
+  handleCreateTransaction: (
+    value: { formattedValue: string; originalValue: number },
+    setValue: React.Dispatch<
+      React.SetStateAction<{ formattedValue: string; originalValue: number }>
+    >,
+  ) => Promise<void>
+  transactions: ITransaction[]
   type: 'incomes' | 'outcomes' | 'dailies'
   isMiniInfoVisible: boolean
   setOpenModal: Dispatch<
     SetStateAction<{
       isOpen: boolean
-      item: IItem
+      transaction: ITransaction
       type: string
     }>
   >
 }
 
-const MiniInfoModal: React.FC<IParams> = ({
-  item,
+const MiniInfoModal = ({
+  transactions,
   type,
   isMiniInfoVisible,
   setOpenModal,
-}) => {
-  const [miniInfoTransactions, setMiniInfoTransactions] = useState<IItem[]>(
-    item[type].transactions,
-  )
-
+  handleCreateTransaction,
+}: IParams) => {
   const {
     handleMouseEnter,
     handleMouseLeave,
     scrollDescriptionRefs,
     handleChange,
     value,
+    setValue,
     checkIfClipped,
     modalRef,
     isClipped,
     findTextColor,
     handleOnKeyDown,
-    handleCreateTransaction,
   } = useMiniInfoAux()
 
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (item[type].transactions !== miniInfoTransactions) {
-      setMiniInfoTransactions(item[type].transactions)
-    }
-
     if (scrollRef.current) {
       scrollRef.current.scrollTop = 0
     }
@@ -70,7 +63,7 @@ const MiniInfoModal: React.FC<IParams> = ({
       window.removeEventListener('scroll', checkIfClipped)
       window.removeEventListener('resize', checkIfClipped)
     }
-  }, [isMiniInfoVisible, checkIfClipped, item, miniInfoTransactions, type])
+  }, [isMiniInfoVisible, checkIfClipped, type])
 
   return (
     <div
@@ -91,17 +84,13 @@ const MiniInfoModal: React.FC<IParams> = ({
             onChange={handleChange}
             inputMode="numeric"
             onKeyDown={(event) =>
-              handleOnKeyDown(
-                event,
-                type,
-                item,
-                setMiniInfoTransactions,
-                miniInfoTransactions,
-              )
+              handleOnKeyDown(event, async () => {
+                await handleCreateTransaction(value, setValue)
+              })
             }
           />
         </div>
-        {miniInfoTransactions && miniInfoTransactions.length > 0 ? (
+        {transactions && transactions.length > 0 ? (
           <div>
             <div className="flex items-center p-4">
               <img
@@ -114,20 +103,17 @@ const MiniInfoModal: React.FC<IParams> = ({
               <div className="ml-2 flex flex-col items-start">
                 <p className="font-semibold text-sm">João</p>
                 <p className="text-gray-500 text-xs font-light">
-                  {
-                    miniInfoTransactions[miniInfoTransactions.length - 1]
-                      .createdAt
-                  }
+                  {transactions[transactions.length - 1].createdAt}
                 </p>
               </div>
             </div>
 
-            {miniInfoTransactions.map((item, index) => {
+            {transactions.map((transaction, index) => {
               handleMouseLeave(index)
 
               return (
-                <div key={item.id}>
-                  {item.shared && (
+                <div key={transaction.id}>
+                  {transaction.shared && (
                     <>
                       <div className="flex justify-center items-center mt-4 px-4">
                         <div className="w-3 h-px bg-zinc-300 mb-6" />
@@ -143,7 +129,7 @@ const MiniInfoModal: React.FC<IParams> = ({
                         <div className="ml-2 flex flex-col items-start">
                           <p className="font-semibold text-sm">Kátja Santos</p>
                           <p className="text-gray-500 text-xs font-light">
-                            {item.createdAt}
+                            {transaction.createdAt}
                           </p>
                         </div>
                         <div className="flex flex-auto justify-center items-center">
@@ -161,7 +147,7 @@ const MiniInfoModal: React.FC<IParams> = ({
                     onMouseLeave={() => handleMouseLeave(index)}
                   >
                     <div className="flex h-full">
-                      <CategoryIcon category={item.category} />
+                      <CategoryIcon category={transaction.category} />
                     </div>
 
                     <div className="flex flex-1">
@@ -171,13 +157,13 @@ const MiniInfoModal: React.FC<IParams> = ({
                         }}
                         className="px-4 max-w-32 description"
                       >
-                        {item.description}
+                        {transaction.description}
                       </p>
                     </div>
 
                     <div className="flex">
                       <p className={`${findTextColor(type)} text-end`}>
-                        {type === 'incomes' ? '+' : '-'} {item.price}
+                        {type === 'incomes' ? '+' : '-'} {transaction.price}
                       </p>
                     </div>
 
@@ -195,7 +181,7 @@ const MiniInfoModal: React.FC<IParams> = ({
                             onClick={() =>
                               setOpenModal({
                                 isOpen: true,
-                                item,
+                                transaction,
                                 type: 'edit',
                               })
                             }
@@ -207,7 +193,7 @@ const MiniInfoModal: React.FC<IParams> = ({
                             onClick={() =>
                               setOpenModal({
                                 isOpen: true,
-                                item,
+                                transaction,
                                 type: 'delete',
                               })
                             }
@@ -236,14 +222,7 @@ const MiniInfoModal: React.FC<IParams> = ({
 
       <div className="py-2 px-4">
         <button
-          onClick={() =>
-            handleCreateTransaction(
-              type,
-              item,
-              setMiniInfoTransactions,
-              miniInfoTransactions,
-            )
-          }
+          onClick={() => handleCreateTransaction(value, setValue)}
           className="w-full h-8 bg-primary hover:bg-orange-400 rounded-lg text-center text-white font-semibold text-md"
         >
           Adicionar

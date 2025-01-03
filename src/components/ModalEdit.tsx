@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useCallback, useEffect } from 'react'
-import { IItem } from '../types/transactions.ts'
+import { ITransaction } from '../types/transactions.ts'
 import Input from './Input.tsx'
 import Button from './Button.tsx'
 import { X } from 'lucide-react'
@@ -11,13 +11,13 @@ import SelectInput from './SelectInput.tsx'
 interface IParams {
   openModal: {
     isOpen: boolean
-    item: IItem
+    transaction: ITransaction
     type: string
   }
   setOpenModal: React.Dispatch<
     React.SetStateAction<{
       isOpen: boolean
-      item: IItem
+      transaction: ITransaction
       type: string
     }>
   >
@@ -45,14 +45,16 @@ const ModalEdit = ({ openModal, setOpenModal }: IParams) => {
   })
 
   useEffect(() => {
-    setValue('description', openModal.item.description)
-    setValue('price', openModal.item.price)
+    setValue('description', openModal.transaction.description)
+    setValue('price', openModal.transaction.price)
     setValue(
       'transaction_day',
-      new Date(openModal.item.transaction_day).toISOString().split('T')[0],
+      new Date(openModal.transaction.transaction_day)
+        .toISOString()
+        .split('T')[0],
     )
-    setValue('category', openModal.item.category)
-  }, [openModal.item, setValue])
+    setValue('category', openModal.transaction.category)
+  }, [openModal.transaction, setValue])
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -73,7 +75,8 @@ const ModalEdit = ({ openModal, setOpenModal }: IParams) => {
   )
 
   const handleUpdate = (data: ModalEditData) => {
-    // const formattedPrice = Number(data.price.replace(/\D/g, '')) / 100
+    const formattedPrice = Number(data.price.replace(/\D/g, '')) / 100
+    console.log(formattedPrice)
   }
 
   return (
@@ -85,7 +88,7 @@ const ModalEdit = ({ openModal, setOpenModal }: IParams) => {
             onClick={() => {
               setOpenModal({
                 isOpen: false,
-                item: {} as IItem,
+                transaction: {} as ITransaction,
                 type: '',
               })
             }}

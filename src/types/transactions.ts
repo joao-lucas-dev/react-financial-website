@@ -3,7 +3,7 @@ interface IShared {
   profileImage: string
 }
 
-export type IItem = {
+export type ITransaction = {
   id: string
   description: string
   price: string
@@ -13,21 +13,20 @@ export type IItem = {
   transaction_day: string
 }
 
-interface IRow {
+interface IColumn {
   valueFormatted: string
   value: number
-  color?: string
-  transactions: IItem[]
+  transactions: ITransaction[]
 }
 
-export type ITransaction = {
+export type IRow = {
   id: number
   formatted_date: string
   date: string
   isToday?: boolean
-  incomes: IRow
-  outcomes: IRow
-  dailies: IRow
+  incomes: IColumn
+  outcomes: IColumn
+  dailies: IColumn
   total: {
     valueFormatted: string
     value: number

@@ -1,101 +1,126 @@
-import { useEffect, useState, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import MiniInfoModal from '../MiniInfoModal'
 
 import 'react-loading-skeleton/dist/skeleton.css'
 import './styles.css'
 import TableSkeleton from '../TableSkeleton'
 import ModalDelete from '../ModalDelete'
-import useDashboardContext from '../../hook/useDashboardContext'
-import useTablePreviewAux from '../../hook/useTablePreviewAux'
-import { ITransaction, IItem } from '../../types/transactions'
+import useTablePreviewAux from '../../hooks/useTablePreviewAux'
+import { IRow, ITransaction } from '../../types/transactions'
 import ModalEdit from '../ModalEdit'
 
-const TablePreview: React.FC = () => {
-  const { transactions } = useDashboardContext()
-  const { findTotalColor, handleGetAllTransactions, handleDeleteTransaction } =
-    useTablePreviewAux()
+interface IParams {
+  rows: IRow[]
+  handleCreateTransaction: (
+    type: 'incomes' | 'outcomes' | 'dailies',
+    row: IRow,
+    value: { formattedValue: string; originalValue: number },
+    setValue: React.Dispatch<
+      React.SetStateAction<{ formattedValue: string; originalValue: number }>
+    >,
+  ) => void
+  handleDeleteTransaction: (id: string) => Promise<void>
+}
+
+const TablePreview = ({
+  rows,
+  handleCreateTransaction,
+  handleDeleteTransaction,
+}: IParams) => {
+  const { findTotalColor } = useTablePreviewAux()
   const [isMiniInfoVisible, setIsMiniInfoVisible] = useState(false)
   const [openModal, setOpenModal] = useState({
     isOpen: false,
-    item: {} as IItem,
+    transaction: {} as ITransaction,
     type: '',
   })
 
-  useEffect(() => {
-    handleGetAllTransactions()
-  }, [handleGetAllTransactions])
-
   const memoizedTransactions = useMemo(() => {
-    return transactions.map((item: ITransaction) => {
-      const color = findTotalColor(item)
+    return rows.map((row: IRow) => {
+      const color = findTotalColor(row)
 
       const today = new Date()
       today.setHours(0, 0, 0)
-      const transactionDate = new Date(`${item.date}T00:00:00`)
+      const transactionDate = new Date(`${row.date}T00:00:00`)
 
       if (transactionDate.toDateString() === today.toDateString()) {
-        item.isToday = true
+        row.isToday = true
       }
 
       return (
-        <tr key={item.formatted_date} className="relative">
+        <tr key={row.formatted_date} className="relative">
           <td
-            className={`${item.isToday ? 'bg-grayWhite' : 'bg-white'} sticky left-0 z-auto sm:relative border-b-1 p-2 border-lineGray text-sm text-center group`}
+            className={`${row.isToday ? 'bg-grayWhite' : 'bg-white'} sticky left-0 z-auto sm:relative border-b-1 p-2 border-lineGray text-sm text-center group`}
           >
-            {item.formatted_date}
+            {row.formatted_date}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${item.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border`}
             onMouseEnter={() => setIsMiniInfoVisible(!isMiniInfoVisible)}
             onMouseLeave={() => setIsMiniInfoVisible(!isMiniInfoVisible)}
           >
-            {item.incomes.valueFormatted}
+            {row.incomes.valueFormatted}
             <MiniInfoModal
-              item={item}
+              handleCreateTransaction={(value, setValue) =>
+                handleCreateTransaction('incomes', row, value, setValue)
+              }
+              transactions={row.incomes.transactions}
               type="incomes"
               isMiniInfoVisible={isMiniInfoVisible}
               setOpenModal={setOpenModal}
             />
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${item.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border`}
             onMouseEnter={() => setIsMiniInfoVisible(!isMiniInfoVisible)}
             onMouseLeave={() => setIsMiniInfoVisible(!isMiniInfoVisible)}
           >
-            {item.outcomes.valueFormatted}
+            {row.outcomes.valueFormatted}
             <MiniInfoModal
-              item={item}
+              handleCreateTransaction={(value, setValue) =>
+                handleCreateTransaction('outcomes', row, value, setValue)
+              }
+              transactions={row.outcomes.transactions}
               type="outcomes"
               isMiniInfoVisible={isMiniInfoVisible}
               setOpenModal={setOpenModal}
             />
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${item.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border`}
             onMouseEnter={() => setIsMiniInfoVisible(!isMiniInfoVisible)}
             onMouseLeave={() => setIsMiniInfoVisible(!isMiniInfoVisible)}
           >
-            {item.dailies.valueFormatted}
+            {row.dailies.valueFormatted}
             <MiniInfoModal
-              item={item}
+              handleCreateTransaction={(value, setValue) =>
+                handleCreateTransaction('dailies', row, value, setValue)
+              }
+              transactions={row.dailies.transactions}
               type="dailies"
               isMiniInfoVisible={isMiniInfoVisible}
               setOpenModal={setOpenModal}
             />
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray ${color} ${item.isToday ? 'bg-grayWhite' : ''} font-semibold text-sm text-center`}
+            className={`border-b-1 p-2 border-lineGray ${color} ${row.isToday ? 'bg-grayWhite' : ''} font-semibold text-sm text-center`}
           >
-            {item.total.valueFormatted}
+            {row.total.valueFormatted}
           </td>
         </tr>
       )
     })
-  }, [transactions, findTotalColor, isMiniInfoVisible, setOpenModal])
+  }, [
+    rows,
+    findTotalColor,
+    isMiniInfoVisible,
+    setOpenModal,
+    handleCreateTransaction,
+  ])
 
   return (
     <>
-      {transactions.length > 0 ? (
+      {rows.length > 0 ? (
         <table className="min-w-640 sm:w-full h-full text-left rounded-lg">
           <thead>
             <tr>

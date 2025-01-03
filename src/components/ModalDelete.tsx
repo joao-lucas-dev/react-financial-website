@@ -1,20 +1,20 @@
 import React from 'react'
-import { IItem } from '../types/transactions.ts'
+import { ITransaction } from '../types/transactions.ts'
 
 interface IParams {
   openModal: {
     isOpen: boolean
-    item: IItem
+    transaction: ITransaction
     type: string
   }
   setOpenModal: React.Dispatch<
     React.SetStateAction<{
       isOpen: boolean
-      item: IItem
+      transaction: ITransaction
       type: string
     }>
   >
-  handleDeleteTransaction: (id: string) => void
+  handleDeleteTransaction: (id: string) => Promise<void>
 }
 
 const ModalDelete = ({
@@ -34,7 +34,7 @@ const ModalDelete = ({
             onClick={() =>
               setOpenModal({
                 isOpen: false,
-                item: {} as IItem,
+                transaction: {} as ITransaction,
                 type: '',
               })
             }
@@ -44,10 +44,10 @@ const ModalDelete = ({
           </button>
           <button
             onClick={async () => {
-              await handleDeleteTransaction(openModal.item.id)
+              await handleDeleteTransaction(openModal.transaction.id)
               setOpenModal({
                 isOpen: false,
-                item: {} as IItem,
+                transaction: {} as ITransaction,
                 type: '',
               })
             }}
