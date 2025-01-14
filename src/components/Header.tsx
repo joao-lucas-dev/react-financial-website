@@ -20,35 +20,6 @@ const Header = () => {
             <div className="hidden md:flex w-12 h-12 bg-lightGray rounded-full p-1 justify-center items-center">
               <BellDot size={25} className="text-gray" />
             </div>
-            <div>
-              {/* {false ? (
-                <>
-                  <div className="hidden md:block">
-                    <Image
-                      src=""
-                      alt="User avatar"
-                      width={56}
-                      height={56}
-                      className="rounded-full  ml-6"
-                    />
-                  </div>
-                  <div className="block md:hidden">
-                    <Image
-                      src=""
-                      alt="User avatar"
-                      width={36}
-                      height={36}
-                      className="rounded-full"
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="block md:hidden w-14 h-14 rounded-full bg-lightGray ml-6" />
-                  <div className="hidden md:block w-9 h-9 rounded-full bg-lightGray" />
-                </>
-              )} */}
-            </div>
           </div>
         </div>
       </div>

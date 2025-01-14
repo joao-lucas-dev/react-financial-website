@@ -106,7 +106,7 @@ export default function useMiniInfoAux() {
   }, [])
 
   const findTextColor = useCallback((type: string) => {
-    if (type === 'incomes') {
+    if (type === 'income') {
       return 'green'
     } else {
       return 'red'

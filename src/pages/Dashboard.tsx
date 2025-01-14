@@ -6,6 +6,7 @@ import {
   StickyNote,
   ChevronRight,
   ChevronLeft,
+  Calendar,
 } from 'lucide-react'
 
 import TablePreview from '../components/TablePreview'
@@ -25,11 +26,10 @@ export default function Dashboard() {
     handleGetPreviewTransactions,
     handleCreateTransaction,
     handleDeleteTransaction,
+    handleUpdateTransaction,
   } = useTransactions()
-  const { getMonth, getGreeting, getNextWeek, getToday } = useDashboard(
-    rows,
-    handleGetPreviewTransactions,
-  )
+  const { getMonth, getGreeting, getNextWeek, getToday, hasToday } =
+    useDashboard(rows, handleGetPreviewTransactions)
 
   return (
     <div className="w-full h-full">
@@ -129,7 +129,7 @@ export default function Dashboard() {
             </div>
 
             <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6 pb-24">
-              <div className="flex flex-col bg-white rounded-xl px-3 py-6 sm:p-6  lg:col-span-2 lg:row-span-2">
+              <div className="flex flex-col bg-white rounded-xl px-6 py-6 sm:p-6  lg:col-span-2 lg:row-span-2">
                 <div className="flex flex-none justify-between items-center mb-4">
                   <h2 className="text-base md:text-lg lg:text-xl font-semibold text-gray w-24">
                     {getMonth ? (
@@ -160,7 +160,14 @@ export default function Dashboard() {
                     </button>
                   </div>
                   <div>
-                    <button onClick={() => getToday()}>Hoje</button>
+                    <button
+                      disabled={hasToday()}
+                      className="bg-primary px-4 py-1 text-white rounded-lg disabled:bg-orange-300 flex justify-center items-center"
+                      onClick={() => getToday()}
+                    >
+                      <Calendar size={16} className="mr-2" />
+                      Hoje
+                    </button>
                   </div>
                 </div>
 
@@ -169,6 +176,7 @@ export default function Dashboard() {
                     rows={rows}
                     handleCreateTransaction={handleCreateTransaction}
                     handleDeleteTransaction={handleDeleteTransaction}
+                    handleUpdateTransaction={handleUpdateTransaction}
                   />
                 </div>
 

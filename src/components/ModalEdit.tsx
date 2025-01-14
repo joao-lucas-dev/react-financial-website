@@ -21,6 +21,7 @@ interface IParams {
       type: string
     }>
   >
+  handleUpdateTransaction: (updateTransaction: ITransaction) => Promise<void>
 }
 
 const modalEditSchema = z.object({
@@ -34,7 +35,11 @@ const modalEditSchema = z.object({
 
 type ModalEditData = z.infer<typeof modalEditSchema>
 
-const ModalEdit = ({ openModal, setOpenModal }: IParams) => {
+const ModalEdit = ({
+  openModal,
+  setOpenModal,
+  handleUpdateTransaction,
+}: IParams) => {
   const {
     register,
     handleSubmit,
@@ -46,14 +51,14 @@ const ModalEdit = ({ openModal, setOpenModal }: IParams) => {
 
   useEffect(() => {
     setValue('description', openModal.transaction.description)
-    setValue('price', openModal.transaction.price)
+    setValue('price', String(openModal.transaction.price))
     setValue(
       'transaction_day',
       new Date(openModal.transaction.transaction_day)
         .toISOString()
         .split('T')[0],
     )
-    setValue('category', openModal.transaction.category)
+    setValue('category', String(openModal.transaction.categoryId))
   }, [openModal.transaction, setValue])
 
   const handleChange = useCallback(
@@ -74,10 +79,31 @@ const ModalEdit = ({ openModal, setOpenModal }: IParams) => {
     [setValue],
   )
 
-  const handleUpdate = (data: ModalEditData) => {
-    const formattedPrice = Number(data.price.replace(/\D/g, '')) / 100
-    console.log(formattedPrice)
-  }
+  const handleUpdate = useCallback(
+    async (data: ModalEditData) => {
+      try {
+        const updatedTransaction = {
+          ...openModal.transaction,
+          description: data.description,
+          price: Number(data.price.replace(/\D/g, '')) / 100,
+          category_id: Number(data.category),
+          transaction_day: new Date(`${data.transaction_day}T00:00:00`),
+          shared_id: null,
+        } as ITransaction
+
+        await handleUpdateTransaction(updatedTransaction)
+
+        setOpenModal({
+          isOpen: false,
+          transaction: {} as ITransaction,
+          type: '',
+        })
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    [handleUpdateTransaction, openModal.transaction, setOpenModal],
+  )
 
   return (
     <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -127,7 +153,7 @@ const ModalEdit = ({ openModal, setOpenModal }: IParams) => {
               </div>
             </div>
 
-            <SelectInput label="Categoria" />
+            <SelectInput label="Categoria" {...register('category')} />
             <span className="text-red-500 my-4 text-sm">
               {errors.category?.message}
             </span>

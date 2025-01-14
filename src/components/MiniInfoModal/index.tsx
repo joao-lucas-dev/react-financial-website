@@ -15,7 +15,7 @@ interface IParams {
     >,
   ) => Promise<void>
   transactions: ITransaction[]
-  type: 'incomes' | 'outcomes' | 'dailies'
+  type: 'income' | 'outcome' | 'daily'
   isMiniInfoVisible: boolean
   setOpenModal: Dispatch<
     SetStateAction<{
@@ -63,7 +63,7 @@ const MiniInfoModal = ({
       window.removeEventListener('scroll', checkIfClipped)
       window.removeEventListener('resize', checkIfClipped)
     }
-  }, [isMiniInfoVisible, checkIfClipped, type])
+  }, [isMiniInfoVisible, checkIfClipped])
 
   return (
     <div
@@ -91,23 +91,7 @@ const MiniInfoModal = ({
           />
         </div>
         {transactions && transactions.length > 0 ? (
-          <div>
-            <div className="flex items-center p-4">
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/147/147142.png"
-                width={32}
-                height={32}
-                alt="Profile image"
-                className="rounded-full"
-              />
-              <div className="ml-2 flex flex-col items-start">
-                <p className="font-semibold text-sm">João</p>
-                <p className="text-gray-500 text-xs font-light">
-                  {transactions[transactions.length - 1].createdAt}
-                </p>
-              </div>
-            </div>
-
+          <>
             {transactions.map((transaction, index) => {
               handleMouseLeave(index)
 
@@ -147,7 +131,7 @@ const MiniInfoModal = ({
                     onMouseLeave={() => handleMouseLeave(index)}
                   >
                     <div className="flex h-full">
-                      <CategoryIcon category={transaction.category} />
+                      <CategoryIcon categoryId={transaction.categoryId} />
                     </div>
 
                     <div className="flex flex-1">
@@ -163,7 +147,7 @@ const MiniInfoModal = ({
 
                     <div className="flex">
                       <p className={`${findTextColor(type)} text-end`}>
-                        {type === 'incomes' ? '+' : '-'} {transaction.price}
+                        {type === 'income' ? '+' : '-'} {transaction.price}
                       </p>
                     </div>
 
@@ -181,7 +165,10 @@ const MiniInfoModal = ({
                             onClick={() =>
                               setOpenModal({
                                 isOpen: true,
-                                transaction,
+                                transaction: {
+                                  ...transaction,
+                                  type,
+                                },
                                 type: 'edit',
                               })
                             }
@@ -208,7 +195,7 @@ const MiniInfoModal = ({
                 </div>
               )
             })}
-          </div>
+          </>
         ) : (
           <div className="flex justify-center items-center p-4">
             <h1>Não há transações</h1>

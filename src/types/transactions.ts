@@ -6,11 +6,12 @@ interface IShared {
 export type ITransaction = {
   id: string
   description: string
-  price: string
-  category: string
+  price: string | number
+  categoryId: number
   shared?: IShared
-  createdAt: string
-  transaction_day: string
+  createdAt?: string
+  transaction_day: string | Date
+  type?: 'income' | 'outcome' | 'daily'
 }
 
 interface IColumn {

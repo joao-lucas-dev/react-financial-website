@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useCallback, useState } from 'react'
-import { IRow } from '../types/transactions.ts'
+import { IRow, ITransaction } from '../types/transactions.ts'
 import api from '../api/axiosInstance.ts'
 
 export default function useTransactions() {
@@ -77,11 +77,28 @@ export default function useTransactions() {
     [rows, handleGetPreviewTransactions],
   )
 
+  const handleUpdateTransaction = useCallback(
+    async (updateTransaction: ITransaction) => {
+      try {
+        await api.put(
+          `/transactions/update/${updateTransaction.id}`,
+          updateTransaction,
+        )
+
+        await handleGetPreviewTransactions(new Date(`${rows[3].date}T00:00:00`))
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [rows, handleGetPreviewTransactions],
+  )
+
   return {
     rows,
     setRows,
     handleGetPreviewTransactions,
     handleDeleteTransaction,
     handleCreateTransaction,
+    handleUpdateTransaction,
   }
 }

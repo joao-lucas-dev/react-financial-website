@@ -55,6 +55,16 @@ export default function useDashboard(
     }
   }, [])
 
+  const hasToday = useCallback(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0)
+
+    return rows.some(
+      (row) =>
+        new Date(`${row.date}T00:00`).toDateString() === today.toDateString(),
+    )
+  }, [rows])
+
   useEffect(() => {
     handleGetPreviewTransactions()
   }, [handleGetPreviewTransactions])
@@ -64,5 +74,6 @@ export default function useDashboard(
     getNextWeek,
     getToday,
     getGreeting,
+    hasToday,
   }
 }

@@ -18,7 +18,8 @@ interface IParams {
     setValue: React.Dispatch<
       React.SetStateAction<{ formattedValue: string; originalValue: number }>
     >,
-  ) => void
+  ) => Promise<void>
+  handleUpdateTransaction: (updateTransaction: ITransaction) => Promise<void>
   handleDeleteTransaction: (id: string) => Promise<void>
 }
 
@@ -26,6 +27,7 @@ const TablePreview = ({
   rows,
   handleCreateTransaction,
   handleDeleteTransaction,
+  handleUpdateTransaction,
 }: IParams) => {
   const { findTotalColor } = useTablePreviewAux()
   const [isMiniInfoVisible, setIsMiniInfoVisible] = useState(false)
@@ -65,7 +67,7 @@ const TablePreview = ({
                 handleCreateTransaction('incomes', row, value, setValue)
               }
               transactions={row.incomes.transactions}
-              type="incomes"
+              type="income"
               isMiniInfoVisible={isMiniInfoVisible}
               setOpenModal={setOpenModal}
             />
@@ -81,7 +83,7 @@ const TablePreview = ({
                 handleCreateTransaction('outcomes', row, value, setValue)
               }
               transactions={row.outcomes.transactions}
-              type="outcomes"
+              type="outcome"
               isMiniInfoVisible={isMiniInfoVisible}
               setOpenModal={setOpenModal}
             />
@@ -97,7 +99,7 @@ const TablePreview = ({
                 handleCreateTransaction('dailies', row, value, setValue)
               }
               transactions={row.dailies.transactions}
-              type="dailies"
+              type="daily"
               isMiniInfoVisible={isMiniInfoVisible}
               setOpenModal={setOpenModal}
             />
@@ -151,7 +153,11 @@ const TablePreview = ({
         <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white w-96 rounded-lg shadow-lg p-6 relative">
             {openModal.type === 'edit' ? (
-              <ModalEdit openModal={openModal} setOpenModal={setOpenModal} />
+              <ModalEdit
+                openModal={openModal}
+                setOpenModal={setOpenModal}
+                handleUpdateTransaction={handleUpdateTransaction}
+              />
             ) : (
               <ModalDelete
                 setOpenModal={setOpenModal}
