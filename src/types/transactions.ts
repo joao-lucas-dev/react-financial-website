@@ -3,11 +3,18 @@ interface IShared {
   profileImage: string
 }
 
+export type ICategory = {
+  id: string
+  name: string
+  iconName: string
+  color: string
+}
+
 export type ITransaction = {
   id: string
   description: string
   price: string | number
-  categoryId: number
+  category: ICategory
   shared?: IShared
   createdAt?: string
   transaction_day: string | Date

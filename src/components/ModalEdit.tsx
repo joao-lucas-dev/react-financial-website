@@ -58,7 +58,7 @@ const ModalEdit = ({
         .toISOString()
         .split('T')[0],
     )
-    setValue('category', String(openModal.transaction.categoryId))
+    setValue('category', String(openModal.transaction.category.id))
   }, [openModal.transaction, setValue])
 
   const handleChange = useCallback(

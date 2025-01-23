@@ -1,6 +1,7 @@
-import React, { FC, forwardRef } from 'react'
-import { categoryIcons } from '../common/constants'
-import CategoryIcon from './CategoryIcon.tsx'
+import React, { FC, forwardRef, useEffect, useState } from 'react'
+import api from '../api/axiosInstance.ts'
+import CategoryIcon from './CategoryIcon'
+import { ICategory } from '../types/transactions.ts'
 
 interface CustomSelectProps
   extends React.SelectHTMLAttributes<HTMLSelectElement> {
@@ -11,7 +12,18 @@ const SelectInput: FC<CustomSelectProps> = forwardRef<
   HTMLSelectElement,
   CustomSelectProps
 >(({ label, ...props }, ref) => {
-  return (
+  const [categories, setCategories] = useState([])
+
+  const getCategories = async () => {
+    const { data } = await api.get('/categories')
+    setCategories(data)
+  }
+
+  useEffect(() => {
+    getCategories()
+  }, [getCategories])
+
+  return categories.length > 0 ? (
     <div className="w-full flex flex-col mt-4">
       <label className="text-md font-semibold text-gray">{label}</label>
       <select
@@ -19,13 +31,19 @@ const SelectInput: FC<CustomSelectProps> = forwardRef<
         ref={ref}
         {...props}
       >
-        {Array.from(categoryIcons.entries()).map(([key, category]) => (
-          <option key={key} value={key} className="flex items-center">
-            <CategoryIcon categoryId={key} /> {category.name}
+        {categories.map((category: ICategory) => (
+          <option
+            key={category.id}
+            value={category.id}
+            className="flex items-center"
+          >
+            <CategoryIcon category={category} /> {category.name}
           </option>
         ))}
       </select>
     </div>
+  ) : (
+    <></>
   )
 })
 

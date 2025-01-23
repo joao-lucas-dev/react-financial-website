@@ -1,10 +1,11 @@
 import { useCallback, useEffect } from 'react'
 import { monthRemap } from '../common/constants'
 import { IRow } from '../types/transactions'
+import { DateTime } from 'luxon'
 
 export default function useDashboard(
   rows: IRow[],
-  handleGetPreviewTransactions: (date?: Date) => Promise<void>,
+  handleGetPreviewTransactions: (date?: DateTime) => Promise<void>,
 ) {
   const getMonth = useCallback(() => {
     if (rows.length > 0) {
@@ -16,19 +17,13 @@ export default function useDashboard(
 
   const getNextWeek = useCallback(
     async (isBeforeWeek: boolean) => {
-      let date
       let newDate
 
       if (isBeforeWeek) {
-        date = new Date(`${rows[0].date}T00:00:00`)
-        date.setHours(0, 0, 0)
-        newDate = new Date(date.setDate(date.getDate() - 4))
+        newDate = DateTime.fromISO(rows[0].date).minus({ days: 4 })
       } else {
-        date = new Date(`${rows[rows.length - 1].date}T00:00:00`)
-        date.setHours(0, 0, 0)
-        newDate = new Date(date.setDate(date.getDate() + 4))
+        newDate = DateTime.fromISO(rows[rows.length - 1].date).plus({ days: 4 })
       }
-      newDate.setHours(0, 0, 0)
 
       await handleGetPreviewTransactions(newDate)
     },
@@ -36,10 +31,7 @@ export default function useDashboard(
   )
 
   const getToday = useCallback(async () => {
-    const date = new Date()
-    date.setHours(0, 0, 0)
-
-    await handleGetPreviewTransactions(date)
+    await handleGetPreviewTransactions()
   }, [handleGetPreviewTransactions])
 
   const getGreeting = useCallback(() => {

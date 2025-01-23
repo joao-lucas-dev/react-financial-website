@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, Dispatch, SetStateAction } from 'react'
 import { ITransaction } from '../../types/transactions'
 
-import CategoryIcon from '../CategoryIcon'
+import Index from '../CategoryIcon'
 import './styles.css'
 import { EllipsisVertical } from 'lucide-react'
 import useMiniInfoAux from '../../hooks/useMiniInfoAux'
@@ -131,7 +131,7 @@ const MiniInfoModal = ({
                     onMouseLeave={() => handleMouseLeave(index)}
                   >
                     <div className="flex h-full">
-                      <CategoryIcon categoryId={transaction.categoryId} />
+                      <Index category={transaction.category} />
                     </div>
 
                     <div className="flex flex-1">

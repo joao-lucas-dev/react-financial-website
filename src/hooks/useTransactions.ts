@@ -1,19 +1,28 @@
 import { Dispatch, SetStateAction, useCallback, useState } from 'react'
 import { IRow, ITransaction } from '../types/transactions.ts'
+import { DateTime } from 'luxon'
 import api from '../api/axiosInstance.ts'
 
 export default function useTransactions() {
   const [rows, setRows] = useState<IRow[]>([])
 
   const handleGetPreviewTransactions = useCallback(
-    async (date = new Date()) => {
-      const startDate = new Date(date.setDate(date.getDate() - 3))
-
-      const endDate = new Date(date.setDate(date.getDate() + 6))
+    async (date = DateTime.now()) => {
+      console.log(date)
+      const startDate = date.minus({ days: 3 }).startOf('day')
+      const endDate = date.plus({ days: 3 }).endOf('day')
+      // console.log(startDate)
+      // console.log(endDate)
 
       try {
         const { data } = await api.get(
-          `/transactions/preview?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
+          `/transactions/preview?startDate=${startDate}&endDate=${endDate}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            },
+          },
         )
         setRows(data)
       } catch (err) {
@@ -36,10 +45,13 @@ export default function useTransactions() {
       >,
     ) => {
       try {
-        const year = new Date(row.date).getFullYear()
-        const transactionDay = new Date(
-          `${year}-${row.formatted_date.split('/')[1]}-${row.formatted_date.split('/')[0]}T00:00`,
-        )
+        const now = DateTime.now()
+        const transactionDay = DateTime.fromISO(row.date).set({
+          hour: now.hour,
+          minute: now.minute,
+          second: now.second,
+          millisecond: now.millisecond,
+        })
 
         await api.post('/transactions/create', {
           description: 'Insira uma descrição',
@@ -51,7 +63,9 @@ export default function useTransactions() {
           transaction_day: transactionDay,
         })
 
-        await handleGetPreviewTransactions(new Date(`${rows[3].date}T00:00:00`))
+        await handleGetPreviewTransactions(
+          DateTime.fromISO(rows[3].date) as DateTime,
+        )
 
         setValue({
           formattedValue: '',
@@ -69,7 +83,9 @@ export default function useTransactions() {
       try {
         await api.delete(`/transactions/delete/${id}`)
 
-        await handleGetPreviewTransactions(new Date(`${rows[3].date}T00:00:00`))
+        await handleGetPreviewTransactions(
+          DateTime.fromISO(rows[3].date) as DateTime,
+        )
       } catch (err) {
         console.log(err)
       }
@@ -85,7 +101,9 @@ export default function useTransactions() {
           updateTransaction,
         )
 
-        await handleGetPreviewTransactions(new Date(`${rows[3].date}T00:00:00`))
+        await handleGetPreviewTransactions(
+          DateTime.fromISO(rows[3].date) as DateTime,
+        )
       } catch (err) {
         console.log(err)
       }

@@ -19,6 +19,7 @@ import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import useDashboard from '../hooks/useDashboard.ts'
 import useTransactions from '../hooks/useTransactions.ts'
+import CountUp from '../components/CountUp.tsx'
 
 export default function Dashboard() {
   const {
@@ -80,7 +81,7 @@ export default function Dashboard() {
                   <div className="ml-4">
                     <h3 className="text-xs text-gray">Total de entradas</h3>
                     <span className="text-xl font-semibold text-green-600 mt-4">
-                      R$ 1.000.000
+                      <CountUp valueNumber={100000} />
                     </span>
                   </div>
                   <div className="ml-8 flex items-end">
@@ -98,7 +99,7 @@ export default function Dashboard() {
                   <div className="ml-4">
                     <h3 className="text-xs text-gray">Total de saídas</h3>
                     <span className="text-xl font-semibold text-red-600 mt-4">
-                      R$ 500.000
+                      <CountUp valueNumber={50000} />
                     </span>
                   </div>
                   <div className="ml-8 flex items-end">
@@ -116,7 +117,7 @@ export default function Dashboard() {
                   <div className="ml-4">
                     <h3 className="text-xs text-gray">Média Diária</h3>
                     <span className="text-xl font-semibold text-purple-600 mt-4">
-                      R$ 7.500
+                      <CountUp valueNumber={7500} />
                     </span>
                   </div>
                   <div className="ml-8 flex items-end ">
