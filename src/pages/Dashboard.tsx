@@ -20,17 +20,19 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import useDashboard from '../hooks/useDashboard.ts'
 import useTransactions from '../hooks/useTransactions.ts'
 import CountUp from '../components/CountUp.tsx'
+import useCategories from '../hooks/useCategories.ts'
 
 export default function Dashboard() {
+  const { chartCategories, handleGetChartCategories } = useCategories()
   const {
     rows,
     handleGetPreviewTransactions,
     handleCreateTransaction,
     handleDeleteTransaction,
     handleUpdateTransaction,
-  } = useTransactions()
+  } = useTransactions(handleGetChartCategories)
   const { getMonth, getGreeting, getNextWeek, getToday, hasToday } =
-    useDashboard(rows, handleGetPreviewTransactions)
+    useDashboard(rows, handleGetPreviewTransactions, handleGetChartCategories)
 
   return (
     <div className="w-full h-full">
@@ -237,10 +239,8 @@ export default function Dashboard() {
               </div>
 
               <div className="w-full h-96 bg-white rounded-xl px-3 py-6 sm:p-6">
-                <h1 className="text-lg font-bold text-gray">
-                  Gastos por categorias
-                </h1>
-                <ChartComponent />
+                <h1 className="text-lg font-bold text-gray">Categorias</h1>
+                <ChartComponent categories={chartCategories} />
               </div>
             </div>
           </div>

@@ -3,16 +3,15 @@ import { IRow, ITransaction } from '../types/transactions.ts'
 import { DateTime } from 'luxon'
 import api from '../api/axiosInstance.ts'
 
-export default function useTransactions() {
+export default function useTransactions(
+  handleGetChartCategories: () => Promise<void>,
+) {
   const [rows, setRows] = useState<IRow[]>([])
 
   const handleGetPreviewTransactions = useCallback(
     async (date = DateTime.now()) => {
-      console.log(date)
       const startDate = date.minus({ days: 3 }).startOf('day')
       const endDate = date.plus({ days: 3 }).endOf('day')
-      // console.log(startDate)
-      // console.log(endDate)
 
       try {
         const { data } = await api.get(
@@ -20,16 +19,17 @@ export default function useTransactions() {
           {
             headers: {
               'Content-Type': 'application/json',
-              Timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             },
           },
         )
         setRows(data)
+        await handleGetChartCategories()
       } catch (err) {
         console.log(err)
       }
     },
-    [setRows],
+    [setRows, handleGetChartCategories],
   )
 
   const handleCreateTransaction = useCallback(
@@ -75,7 +75,7 @@ export default function useTransactions() {
         console.log(err)
       }
     },
-    [rows, handleGetPreviewTransactions],
+    [rows, handleGetPreviewTransactions, handleGetChartCategories],
   )
 
   const handleDeleteTransaction = useCallback(

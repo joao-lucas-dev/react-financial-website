@@ -6,6 +6,7 @@ import { DateTime } from 'luxon'
 export default function useDashboard(
   rows: IRow[],
   handleGetPreviewTransactions: (date?: DateTime) => Promise<void>,
+  handleGetChartCategories: () => Promise<void>,
 ) {
   const getMonth = useCallback(() => {
     if (rows.length > 0) {
@@ -59,7 +60,8 @@ export default function useDashboard(
 
   useEffect(() => {
     handleGetPreviewTransactions()
-  }, [handleGetPreviewTransactions])
+    handleGetChartCategories()
+  }, [])
 
   return {
     getMonth,
