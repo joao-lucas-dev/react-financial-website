@@ -30,9 +30,16 @@ export default function Dashboard() {
     handleCreateTransaction,
     handleDeleteTransaction,
     handleUpdateTransaction,
+    handleGetOverviewTransactions,
+    overview,
   } = useTransactions(handleGetChartCategories)
   const { getMonth, getGreeting, getNextWeek, getToday, hasToday } =
-    useDashboard(rows, handleGetPreviewTransactions, handleGetChartCategories)
+    useDashboard(
+      rows,
+      handleGetPreviewTransactions,
+      handleGetChartCategories,
+      handleGetOverviewTransactions,
+    )
 
   return (
     <div className="w-full h-full">
@@ -83,12 +90,15 @@ export default function Dashboard() {
                   <div className="ml-4">
                     <h3 className="text-xs text-gray">Total de entradas</h3>
                     <span className="text-xl font-semibold text-green-600 mt-4">
-                      <CountUp valueNumber={100000} />
+                      <CountUp valueNumber={overview?.income?.total} />
                     </span>
                   </div>
                   <div className="ml-8 flex items-end">
                     <span className="flex justify-center items-center bg-green-200 text-green-600 rounded-full w-16 h-6 text-xs px-4 py-2">
-                      +1,29%
+                      {overview?.income?.percentage >= 0
+                        ? `+${overview?.income?.percentage}`
+                        : overview?.income?.percentage}
+                      %
                     </span>
                   </div>
                 </div>
@@ -101,12 +111,15 @@ export default function Dashboard() {
                   <div className="ml-4">
                     <h3 className="text-xs text-gray">Total de saídas</h3>
                     <span className="text-xl font-semibold text-red-600 mt-4">
-                      <CountUp valueNumber={50000} />
+                      <CountUp valueNumber={overview?.outcome?.total} />
                     </span>
                   </div>
                   <div className="ml-8 flex items-end">
                     <span className="flex justify-center items-center bg-red-200 text-red-600 rounded-full w-16 h-6 text-xs px-4 py-2">
-                      +1,29%
+                      {overview?.outcome?.percentage >= 0
+                        ? `+${overview?.outcome?.percentage}`
+                        : overview?.outcome?.percentage}
+                      %
                     </span>
                   </div>
                 </div>
@@ -119,12 +132,15 @@ export default function Dashboard() {
                   <div className="ml-4">
                     <h3 className="text-xs text-gray">Média Diária</h3>
                     <span className="text-xl font-semibold text-purple-600 mt-4">
-                      <CountUp valueNumber={7500} />
+                      <CountUp valueNumber={overview?.daily?.total} />
                     </span>
                   </div>
                   <div className="ml-8 flex items-end ">
                     <span className="flex justify-center items-center bg-purple-200 text-purple-600 rounded-full w-16 h-6 text-xs px-4 py-2">
-                      +1,29%
+                      {overview?.daily?.percentage >= 0
+                        ? `+${overview?.daily?.percentage}`
+                        : overview?.daily?.percentage}
+                      %
                     </span>
                   </div>
                 </div>

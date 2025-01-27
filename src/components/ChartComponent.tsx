@@ -12,12 +12,16 @@ const DonutChart = ({ categories }: IParams) => {
     maintainAspectRatio: false,
   }
 
-  return categories ? (
+  return (
     <div className="h-full py-3">
-      <Doughnut data={categories} options={options} />
+      {categories && categories.labels.length > 0 ? (
+        <Doughnut data={categories} options={options} />
+      ) : (
+        <h3 className="flex justify-center items-center h-full">
+          Sem categorias
+        </h3>
+      )}
     </div>
-  ) : (
-    <></>
   )
 }
 

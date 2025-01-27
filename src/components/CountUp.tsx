@@ -6,7 +6,6 @@ interface IParams {
 
 const CountUp = ({ valueNumber }: IParams) => {
   const [value, setValue] = useState(0)
-  // const targetValue = 100000
   const duration = 800
   const fps = 60
 

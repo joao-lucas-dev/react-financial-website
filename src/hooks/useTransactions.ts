@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useCallback, useState } from 'react'
-import { IRow, ITransaction } from '../types/transactions.ts'
+import { IOverview, IRow, ITransaction } from '../types/transactions.ts'
 import { DateTime } from 'luxon'
 import api from '../api/axiosInstance.ts'
 
@@ -7,6 +7,43 @@ export default function useTransactions(
   handleGetChartCategories: () => Promise<void>,
 ) {
   const [rows, setRows] = useState<IRow[]>([])
+  const [overview, setOverview] = useState<IOverview>({
+    income: {
+      total: 0,
+      type: 'income',
+      percentage: 0,
+    },
+    outcome: {
+      total: 0,
+      type: 'outcome',
+      percentage: 0,
+    },
+    daily: {
+      total: 0,
+      type: 'daily',
+      percentage: 0,
+    },
+  })
+
+  const handleGetOverviewTransactions = useCallback(async () => {
+    const date = DateTime.now()
+    const startDate = date.startOf('month')
+    const endDate = date.endOf('month')
+
+    try {
+      const { data } = await api.get(
+        `/transactions/overview?startDate=${startDate}&endDate=${endDate}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+      setOverview(data)
+    } catch (err) {
+      console.log(err)
+    }
+  }, [setOverview])
 
   const handleGetPreviewTransactions = useCallback(
     async (date = DateTime.now()) => {
@@ -24,12 +61,11 @@ export default function useTransactions(
           },
         )
         setRows(data)
-        await handleGetChartCategories()
       } catch (err) {
         console.log(err)
       }
     },
-    [setRows, handleGetChartCategories],
+    [setRows],
   )
 
   const handleCreateTransaction = useCallback(
@@ -63,9 +99,17 @@ export default function useTransactions(
           transaction_day: transactionDay,
         })
 
-        await handleGetPreviewTransactions(
-          DateTime.fromISO(rows[3].date) as DateTime,
+        const promises = []
+
+        promises.push(
+          handleGetPreviewTransactions(
+            DateTime.fromISO(rows[3].date) as DateTime,
+          ),
         )
+        promises.push(await handleGetChartCategories())
+        promises.push(await handleGetOverviewTransactions())
+
+        await Promise.all(promises)
 
         setValue({
           formattedValue: '',
@@ -75,7 +119,12 @@ export default function useTransactions(
         console.log(err)
       }
     },
-    [rows, handleGetPreviewTransactions, handleGetChartCategories],
+    [
+      rows,
+      handleGetPreviewTransactions,
+      handleGetChartCategories,
+      handleGetOverviewTransactions,
+    ],
   )
 
   const handleDeleteTransaction = useCallback(
@@ -83,14 +132,27 @@ export default function useTransactions(
       try {
         await api.delete(`/transactions/delete/${id}`)
 
-        await handleGetPreviewTransactions(
-          DateTime.fromISO(rows[3].date) as DateTime,
+        const promises = []
+
+        promises.push(
+          handleGetPreviewTransactions(
+            DateTime.fromISO(rows[3].date) as DateTime,
+          ),
         )
+        promises.push(await handleGetChartCategories())
+        promises.push(await handleGetOverviewTransactions())
+
+        await Promise.all(promises)
       } catch (err) {
         console.log(err)
       }
     },
-    [rows, handleGetPreviewTransactions],
+    [
+      rows,
+      handleGetPreviewTransactions,
+      handleGetChartCategories,
+      handleGetOverviewTransactions,
+    ],
   )
 
   const handleUpdateTransaction = useCallback(
@@ -101,14 +163,27 @@ export default function useTransactions(
           updateTransaction,
         )
 
-        await handleGetPreviewTransactions(
-          DateTime.fromISO(rows[3].date) as DateTime,
+        const promises = []
+
+        promises.push(
+          handleGetPreviewTransactions(
+            DateTime.fromISO(rows[3].date) as DateTime,
+          ),
         )
+        promises.push(await handleGetChartCategories())
+        promises.push(await handleGetOverviewTransactions())
+
+        await Promise.all(promises)
       } catch (err) {
         console.log(err)
       }
     },
-    [rows, handleGetPreviewTransactions],
+    [
+      rows,
+      handleGetPreviewTransactions,
+      handleGetChartCategories,
+      handleGetOverviewTransactions,
+    ],
   )
 
   return {
@@ -118,5 +193,7 @@ export default function useTransactions(
     handleDeleteTransaction,
     handleCreateTransaction,
     handleUpdateTransaction,
+    handleGetOverviewTransactions,
+    overview,
   }
 }

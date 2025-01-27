@@ -1,3 +1,15 @@
+export type IType = {
+  total: number
+  type: 'income' | 'outcome' | 'daily'
+  percentage: number
+}
+
+export interface IOverview {
+  income: IType
+  outcome: IType
+  daily: IType
+}
+
 interface IShared {
   name: string
   profileImage: string
