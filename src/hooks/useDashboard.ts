@@ -8,6 +8,7 @@ export default function useDashboard(
   handleGetPreviewTransactions: (date?: DateTime) => Promise<void>,
   handleGetChartCategories: () => Promise<void>,
   handleGetOverviewTransactions: () => Promise<void>,
+  handleGetBalance: () => Promise<void>,
 ) {
   const getMonth = useCallback(() => {
     if (rows.length > 0) {
@@ -63,6 +64,7 @@ export default function useDashboard(
     handleGetPreviewTransactions()
     handleGetChartCategories()
     handleGetOverviewTransactions()
+    handleGetBalance()
   }, [])
 
   return {

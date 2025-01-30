@@ -24,6 +24,24 @@ export default function useTransactions(
       percentage: 0,
     },
   })
+  const [balance, setBalance] = useState(0)
+
+  const handleGetBalance = useCallback(async () => {
+    try {
+      const date = DateTime.now()
+
+      const { data } = await api.get(`/transactions/balance?date=${date}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+      })
+
+      setBalance(data.balance)
+    } catch (err) {
+      console.log(err)
+    }
+  }, [setBalance])
 
   const handleGetOverviewTransactions = useCallback(async () => {
     const date = DateTime.now()
@@ -92,7 +110,7 @@ export default function useTransactions(
         await api.post('/transactions/create', {
           description: 'Insira uma descrição',
           price: value.originalValue,
-          category_id: 4,
+          category_id: type === 'incomes' ? 10 : 4,
           type:
             type === 'dailies' ? 'daily' : type.substring(0, type.length - 1),
           shared_id: null,
@@ -108,6 +126,7 @@ export default function useTransactions(
         )
         promises.push(await handleGetChartCategories())
         promises.push(await handleGetOverviewTransactions())
+        promises.push(await handleGetBalance())
 
         await Promise.all(promises)
 
@@ -124,6 +143,7 @@ export default function useTransactions(
       handleGetPreviewTransactions,
       handleGetChartCategories,
       handleGetOverviewTransactions,
+      handleGetBalance,
     ],
   )
 
@@ -141,6 +161,7 @@ export default function useTransactions(
         )
         promises.push(await handleGetChartCategories())
         promises.push(await handleGetOverviewTransactions())
+        promises.push(await handleGetBalance())
 
         await Promise.all(promises)
       } catch (err) {
@@ -152,6 +173,7 @@ export default function useTransactions(
       handleGetPreviewTransactions,
       handleGetChartCategories,
       handleGetOverviewTransactions,
+      handleGetBalance,
     ],
   )
 
@@ -172,6 +194,7 @@ export default function useTransactions(
         )
         promises.push(await handleGetChartCategories())
         promises.push(await handleGetOverviewTransactions())
+        promises.push(await handleGetBalance())
 
         await Promise.all(promises)
       } catch (err) {
@@ -183,6 +206,7 @@ export default function useTransactions(
       handleGetPreviewTransactions,
       handleGetChartCategories,
       handleGetOverviewTransactions,
+      handleGetBalance,
     ],
   )
 
@@ -195,5 +219,7 @@ export default function useTransactions(
     handleUpdateTransaction,
     handleGetOverviewTransactions,
     overview,
+    handleGetBalance,
+    balance,
   }
 }

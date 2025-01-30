@@ -16,7 +16,6 @@ interface IParams {
   ) => Promise<void>
   transactions: ITransaction[]
   type: 'income' | 'outcome' | 'daily'
-  isMiniInfoVisible: boolean
   setOpenModal: Dispatch<
     SetStateAction<{
       isOpen: boolean
@@ -29,7 +28,6 @@ interface IParams {
 const MiniInfoModal = ({
   transactions,
   type,
-  isMiniInfoVisible,
   setOpenModal,
   handleCreateTransaction,
 }: IParams) => {
@@ -63,7 +61,7 @@ const MiniInfoModal = ({
       window.removeEventListener('scroll', checkIfClipped)
       window.removeEventListener('resize', checkIfClipped)
     }
-  }, [isMiniInfoVisible, checkIfClipped])
+  }, [checkIfClipped])
 
   return (
     <div

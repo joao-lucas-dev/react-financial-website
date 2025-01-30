@@ -30,7 +30,6 @@ const TablePreview = ({
   handleUpdateTransaction,
 }: IParams) => {
   const { findTotalColor } = useTablePreviewAux()
-  const [isMiniInfoVisible, setIsMiniInfoVisible] = useState(false)
   const [openModal, setOpenModal] = useState({
     isOpen: false,
     transaction: {} as ITransaction,
@@ -52,14 +51,12 @@ const TablePreview = ({
       return (
         <tr key={row.formatted_date} className="relative">
           <td
-            className={`${row.isToday ? 'bg-grayWhite' : 'bg-white'} sticky left-0 z-auto sm:relative border-b-1 p-2 border-lineGray text-sm text-center group`}
+            className={`${row.isToday ? 'bg-grayWhite' : 'bg-white'} sticky left-0 z-auto sm:relative border-b-1 p-2 border-lineGray text-sm text-center`}
           >
             {row.formatted_date}
           </td>
           <td
             className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border`}
-            onMouseEnter={() => setIsMiniInfoVisible(!isMiniInfoVisible)}
-            onMouseLeave={() => setIsMiniInfoVisible(!isMiniInfoVisible)}
           >
             {row.incomes.valueFormatted}
             <MiniInfoModal
@@ -68,14 +65,11 @@ const TablePreview = ({
               }
               transactions={row.incomes.transactions}
               type="income"
-              isMiniInfoVisible={isMiniInfoVisible}
               setOpenModal={setOpenModal}
             />
           </td>
           <td
             className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border`}
-            onMouseEnter={() => setIsMiniInfoVisible(!isMiniInfoVisible)}
-            onMouseLeave={() => setIsMiniInfoVisible(!isMiniInfoVisible)}
           >
             {row.outcomes.valueFormatted}
             <MiniInfoModal
@@ -84,14 +78,11 @@ const TablePreview = ({
               }
               transactions={row.outcomes.transactions}
               type="outcome"
-              isMiniInfoVisible={isMiniInfoVisible}
               setOpenModal={setOpenModal}
             />
           </td>
           <td
             className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border`}
-            onMouseEnter={() => setIsMiniInfoVisible(!isMiniInfoVisible)}
-            onMouseLeave={() => setIsMiniInfoVisible(!isMiniInfoVisible)}
           >
             {row.dailies.valueFormatted}
             <MiniInfoModal
@@ -100,7 +91,6 @@ const TablePreview = ({
               }
               transactions={row.dailies.transactions}
               type="daily"
-              isMiniInfoVisible={isMiniInfoVisible}
               setOpenModal={setOpenModal}
             />
           </td>
@@ -112,13 +102,7 @@ const TablePreview = ({
         </tr>
       )
     })
-  }, [
-    rows,
-    findTotalColor,
-    isMiniInfoVisible,
-    setOpenModal,
-    handleCreateTransaction,
-  ])
+  }, [rows, findTotalColor, setOpenModal, handleCreateTransaction])
 
   return (
     <>

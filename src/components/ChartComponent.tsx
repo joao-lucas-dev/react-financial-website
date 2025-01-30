@@ -2,14 +2,35 @@ import { Doughnut } from 'react-chartjs-2'
 import 'chart.js/auto'
 import { ChartData } from '../types/categories.ts'
 
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  ChartOptions,
+} from 'chart.js'
+ChartJS.register(ArcElement, Tooltip, Legend)
+
 interface IParams {
   categories: ChartData | null
 }
 
 const DonutChart = ({ categories }: IParams) => {
-  const options = {
+  const options: ChartOptions<'doughnut'> = {
     responsive: true,
     maintainAspectRatio: false,
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            const value = context.raw as number
+            return `R$ ${value.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+            })}`
+          },
+        },
+      },
+    },
   }
 
   return (

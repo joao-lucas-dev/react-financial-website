@@ -5,7 +5,28 @@ import { useState } from 'react'
 import { ChartData, CategoryData } from '../types/categories.ts'
 
 export default function useCategories() {
-  const [chartCategories, setChartCategories] = useState<ChartData | null>(null)
+  const [chartCategories, setChartCategories] = useState({
+    notIncome: {
+      labels: ['sem valor'],
+      datasets: [
+        {
+          data: [0],
+          backgroundColor: ['#000'],
+          hoverBackgroundColor: ['#000'],
+        },
+      ],
+    },
+    income: {
+      labels: ['sem valor'],
+      datasets: [
+        {
+          data: [0],
+          backgroundColor: ['#000'],
+          hoverBackgroundColor: ['#000'],
+        },
+      ],
+    },
+  })
 
   const handleGetChartCategories = async () => {
     try {
@@ -13,31 +34,54 @@ export default function useCategories() {
       const startDate = date.startOf('month')
       const endDate = date.endOf('month')
 
-      const { data } = await api.get<CategoryData[]>(
+      const { data } = await api.get<CategoryData>(
         `/categories/chart?startDate=${startDate}&endDate=${endDate}`,
       )
 
-      const prices: number[] = []
-      const labels: string[] = []
-      const backgroundColor: (string | undefined)[] = []
-      const hoverBackgroundColor: (string | undefined)[] = []
+      const pricesNotIncome: number[] = []
+      const pricesIncome: number[] = []
+      const labelsNotIncome: string[] = []
+      const labelsIncome: string[] = []
+      const backgroundColorNotIncome: (string | undefined)[] = []
+      const backgroundColorIncome: (string | undefined)[] = []
+      const hoverBackgroundColorNotIncome: (string | undefined)[] = []
+      const hoverBackgroundColorIncome: (string | undefined)[] = []
 
-      data.forEach((item) => {
-        prices.push(item.total)
-        labels.push(item.name)
-        backgroundColor.push(colorsMap.get(item.color)?.color)
-        hoverBackgroundColor.push(colorsMap.get(item.color)?.hover)
+      data.notIncome.forEach((item) => {
+        pricesNotIncome.push(item.total)
+        labelsNotIncome.push(item.name)
+        backgroundColorNotIncome.push(colorsMap.get(item.color)?.color)
+        hoverBackgroundColorNotIncome.push(colorsMap.get(item.color)?.hover)
+      })
+
+      data.income.forEach((item) => {
+        pricesIncome.push(item.total)
+        labelsIncome.push(item.name)
+        backgroundColorIncome.push(colorsMap.get(item.color)?.color)
+        hoverBackgroundColorIncome.push(colorsMap.get(item.color)?.hover)
       })
 
       setChartCategories({
-        labels,
-        datasets: [
-          {
-            data: prices,
-            backgroundColor,
-            hoverBackgroundColor,
-          },
-        ],
+        notIncome: {
+          labels: labelsNotIncome,
+          datasets: [
+            {
+              data: pricesNotIncome,
+              backgroundColor: backgroundColorNotIncome,
+              hoverBackgroundColor: hoverBackgroundColorNotIncome,
+            },
+          ],
+        },
+        income: {
+          labels: labelsIncome,
+          datasets: [
+            {
+              data: pricesIncome,
+              backgroundColor: backgroundColorIncome,
+              hoverBackgroundColor: hoverBackgroundColorIncome,
+            },
+          ],
+        },
       })
     } catch (err) {
       console.error(err)

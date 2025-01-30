@@ -3,7 +3,6 @@ import {
   Eye,
   MoveDownLeft,
   MoveUpRight,
-  StickyNote,
   ChevronRight,
   ChevronLeft,
   Calendar,
@@ -32,6 +31,8 @@ export default function Dashboard() {
     handleUpdateTransaction,
     handleGetOverviewTransactions,
     overview,
+    handleGetBalance,
+    balance,
   } = useTransactions(handleGetChartCategories)
   const { getMonth, getGreeting, getNextWeek, getToday, hasToday } =
     useDashboard(
@@ -39,6 +40,7 @@ export default function Dashboard() {
       handleGetPreviewTransactions,
       handleGetChartCategories,
       handleGetOverviewTransactions,
+      handleGetBalance,
     )
 
   return (
@@ -66,7 +68,12 @@ export default function Dashboard() {
                       <span className="text-xs md:text-sm text-gray mr-1">
                         R$
                       </span>
-                      <strong className="text-lg md:text-xl">15.473,90</strong>
+                      <strong className="text-lg md:text-xl">
+                        {balance.toLocaleString('pt-BR', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </strong>
                     </div>
                   </div>
                   <div className="h-12 flex items-end">
@@ -209,54 +216,14 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="w-full h-full bg-white rounded-xl px-3 py-6 sm:p-6">
-                <h1 className="text-lg font-bold text-gray">Contas a pagar</h1>
-                <div className="mt-4">
-                  <div className="flex justify-between items-center border-b-1 border-softGray py-2">
-                    <div className="flex items-center">
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-softGray">
-                        <StickyNote size={12} className="text-white" />
-                      </div>
-                      <span className="ml-2 text-sm text-gray font-semibold">
-                        Fatura do Bradesco
-                      </span>
-                    </div>
-                    <span className="text-sm text-red-600 font-medium">
-                      R$ 2.100,90
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center border-b-1 border-softGray py-2">
-                    <div className="flex items-center">
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-softGray">
-                        <StickyNote size={12} className="text-white" />
-                      </div>
-                      <span className="ml-2 text-sm text-gray font-semibold">
-                        Fatura do Bradesco
-                      </span>
-                    </div>
-                    <span className="text-sm text-red-600 font-medium">
-                      R$ 2.100,90
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-2">
-                    <div className="flex items-center">
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-softGray">
-                        <StickyNote size={12} className="text-white" />
-                      </div>
-                      <span className="ml-2 text-sm text-gray font-semibold">
-                        Fatura do Bradesco
-                      </span>
-                    </div>
-                    <span className="text-sm text-red-600 font-medium">
-                      R$ 2.100,90
-                    </span>
-                  </div>
-                </div>
+              <div className="w-full h-96 bg-white rounded-xl px-3 py-6 sm:p-6">
+                <h1 className="text-lg font-bold text-gray">Entradas</h1>
+                <ChartComponent categories={chartCategories.income} />
               </div>
 
               <div className="w-full h-96 bg-white rounded-xl px-3 py-6 sm:p-6">
-                <h1 className="text-lg font-bold text-gray">Categorias</h1>
-                <ChartComponent categories={chartCategories} />
+                <h1 className="text-lg font-bold text-gray">Saídas</h1>
+                <ChartComponent categories={chartCategories.notIncome} />
               </div>
             </div>
           </div>
