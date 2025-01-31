@@ -51,14 +51,14 @@ const TablePreview = ({
       return (
         <tr key={row.formatted_date} className="relative">
           <td
-            className={`${row.isToday ? 'bg-grayWhite' : 'bg-white'} sticky left-0 z-auto sm:relative border-b-1 p-2 border-lineGray text-sm text-center`}
+            className={`${row.isToday ? 'bg-grayWhite' : 'bg-white'} sticky left-0 z-auto sm:relative border-b-1 p-2 border-lineGray text-sm text-center font-[600] min-w-[153px]`}
           >
             {row.formatted_date}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border min-w-[153px]`}
           >
-            {row.incomes.valueFormatted}
+            {row.incomes?.valueFormatted}
             <MiniInfoModal
               handleCreateTransaction={(value, setValue) =>
                 handleCreateTransaction('incomes', row, value, setValue)
@@ -69,9 +69,9 @@ const TablePreview = ({
             />
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border min-w-[153px]`}
           >
-            {row.outcomes.valueFormatted}
+            {row.outcomes?.valueFormatted}
             <MiniInfoModal
               handleCreateTransaction={(value, setValue) =>
                 handleCreateTransaction('outcomes', row, value, setValue)
@@ -82,7 +82,7 @@ const TablePreview = ({
             />
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border min-w-[153px]`}
           >
             {row.dailies.valueFormatted}
             <MiniInfoModal
@@ -95,7 +95,7 @@ const TablePreview = ({
             />
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray ${color} ${row.isToday ? 'bg-grayWhite' : ''} font-semibold text-sm text-center`}
+            className={`border-b-1 p-2 border-lineGray ${color} ${row.isToday ? 'bg-grayWhite' : ''} font-semibold text-sm text-center min-w-[153px]`}
           >
             {row.total.valueFormatted}
           </td>

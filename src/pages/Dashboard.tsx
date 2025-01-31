@@ -216,12 +216,12 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="w-full h-96 bg-white rounded-xl px-3 py-6 sm:p-6">
+              <div className="w-full h-72 bg-white rounded-xl px-3 py-6 sm:p-6">
                 <h1 className="text-lg font-bold text-gray">Entradas</h1>
                 <ChartComponent categories={chartCategories.income} />
               </div>
 
-              <div className="w-full h-96 bg-white rounded-xl px-3 py-6 sm:p-6">
+              <div className="w-full h-72 bg-white rounded-xl px-3 py-6 sm:p-6">
                 <h1 className="text-lg font-bold text-gray">Saídas</h1>
                 <ChartComponent categories={chartCategories.notIncome} />
               </div>

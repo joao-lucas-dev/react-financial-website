@@ -43,25 +43,27 @@ export default function useTransactions(
     }
   }, [setBalance])
 
-  const handleGetOverviewTransactions = useCallback(async () => {
-    const date = DateTime.now()
-    const startDate = date.startOf('month')
-    const endDate = date.endOf('month')
+  const handleGetOverviewTransactions = useCallback(
+    async (date = DateTime.now()) => {
+      const startDate = date.startOf('month')
+      const endDate = date.endOf('month')
 
-    try {
-      const { data } = await api.get(
-        `/transactions/overview?startDate=${startDate}&endDate=${endDate}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
+      try {
+        const { data } = await api.get(
+          `/transactions/overview?startDate=${startDate}&endDate=${endDate}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
           },
-        },
-      )
-      setOverview(data)
-    } catch (err) {
-      console.log(err)
-    }
-  }, [setOverview])
+        )
+        setOverview(data)
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [setOverview],
+  )
 
   const handleGetPreviewTransactions = useCallback(
     async (date = DateTime.now()) => {

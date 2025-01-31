@@ -1,6 +1,6 @@
 export const monthRemap = new Map<number, string>([
   [1, 'Janeiro'],
-  [2, 'Feveiro'],
+  [2, 'Fevereiro'],
   [3, 'Março'],
   [4, 'Abril'],
   [5, 'Maio'],
@@ -80,6 +80,13 @@ export const colorsMap = new Map<string, IColorMap>([
     {
       color: '#15803d',
       hover: '#3f9f64',
+    },
+  ],
+  [
+    'bg-orange',
+    {
+      color: '#e76714',
+      hover: '#f88944',
     },
   ],
 ])

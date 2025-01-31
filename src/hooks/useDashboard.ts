@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { monthRemap } from '../common/constants'
 import { IRow } from '../types/transactions'
 import { DateTime } from 'luxon'
@@ -6,10 +6,12 @@ import { DateTime } from 'luxon'
 export default function useDashboard(
   rows: IRow[],
   handleGetPreviewTransactions: (date?: DateTime) => Promise<void>,
-  handleGetChartCategories: () => Promise<void>,
-  handleGetOverviewTransactions: () => Promise<void>,
+  handleGetChartCategories: (date?: DateTime) => Promise<void>,
+  handleGetOverviewTransactions: (date?: DateTime) => Promise<void>,
   handleGetBalance: () => Promise<void>,
 ) {
+  const [currentMonth, setCurrentMonth] = useState(DateTime.now().month)
+
   const getMonth = useCallback(() => {
     if (rows.length > 0) {
       return monthRemap.get(Number(rows[3].formatted_date.split('/')[1]))
@@ -28,14 +30,44 @@ export default function useDashboard(
         newDate = DateTime.fromISO(rows[rows.length - 1].date).plus({ days: 4 })
       }
 
-      await handleGetPreviewTransactions(newDate)
+      const promises = [await handleGetPreviewTransactions(newDate)]
+
+      if (newDate.month !== currentMonth) {
+        promises.push(await handleGetChartCategories(newDate))
+        promises.push(await handleGetOverviewTransactions(newDate))
+        setCurrentMonth(newDate.month)
+      }
+
+      await Promise.all(promises)
     },
-    [handleGetPreviewTransactions, rows],
+    [
+      handleGetPreviewTransactions,
+      rows,
+      handleGetChartCategories,
+      handleGetOverviewTransactions,
+      setCurrentMonth,
+      currentMonth,
+    ],
   )
 
   const getToday = useCallback(async () => {
-    await handleGetPreviewTransactions()
-  }, [handleGetPreviewTransactions])
+    const newDate = DateTime.now()
+    const promises = [await handleGetPreviewTransactions(newDate)]
+
+    if (newDate.month !== currentMonth) {
+      promises.push(await handleGetChartCategories(newDate))
+      promises.push(await handleGetOverviewTransactions(newDate))
+      setCurrentMonth(newDate.month)
+    }
+
+    await Promise.all(promises)
+  }, [
+    handleGetPreviewTransactions,
+    handleGetChartCategories,
+    handleGetOverviewTransactions,
+    setCurrentMonth,
+    currentMonth,
+  ])
 
   const getGreeting = useCallback(() => {
     const now = new Date()

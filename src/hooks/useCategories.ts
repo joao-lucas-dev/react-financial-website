@@ -28,9 +28,8 @@ export default function useCategories() {
     },
   })
 
-  const handleGetChartCategories = async () => {
+  const handleGetChartCategories = async (date = DateTime.now()) => {
     try {
-      const date = DateTime.now()
       const startDate = date.startOf('month')
       const endDate = date.endOf('month')
 
