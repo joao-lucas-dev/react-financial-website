@@ -4,7 +4,7 @@ import { DateTime } from 'luxon'
 import api from '../api/axiosInstance.ts'
 
 export default function useTransactions(
-  handleGetChartCategories: () => Promise<void>,
+  handleGetChartCategories: (date?: DateTime) => Promise<void>,
 ) {
   const [rows, setRows] = useState<IRow[]>([])
   const [overview, setOverview] = useState<IOverview>({
@@ -119,15 +119,12 @@ export default function useTransactions(
           transaction_day: transactionDay,
         })
 
-        const promises = []
+        const newDate = DateTime.fromISO(rows[3].date) as DateTime
 
-        promises.push(
-          handleGetPreviewTransactions(
-            DateTime.fromISO(rows[3].date) as DateTime,
-          ),
-        )
-        promises.push(await handleGetChartCategories())
-        promises.push(await handleGetOverviewTransactions())
+        const promises = [await handleGetPreviewTransactions(newDate)]
+
+        promises.push(await handleGetChartCategories(newDate))
+        promises.push(await handleGetOverviewTransactions(newDate))
         promises.push(await handleGetBalance())
 
         await Promise.all(promises)
@@ -154,15 +151,12 @@ export default function useTransactions(
       try {
         await api.delete(`/transactions/delete/${id}`)
 
-        const promises = []
+        const newDate = DateTime.fromISO(rows[3].date) as DateTime
 
-        promises.push(
-          handleGetPreviewTransactions(
-            DateTime.fromISO(rows[3].date) as DateTime,
-          ),
-        )
-        promises.push(await handleGetChartCategories())
-        promises.push(await handleGetOverviewTransactions())
+        const promises = [await handleGetPreviewTransactions(newDate)]
+
+        promises.push(await handleGetChartCategories(newDate))
+        promises.push(await handleGetOverviewTransactions(newDate))
         promises.push(await handleGetBalance())
 
         await Promise.all(promises)
@@ -187,15 +181,12 @@ export default function useTransactions(
           updateTransaction,
         )
 
-        const promises = []
+        const newDate = DateTime.fromISO(rows[3].date) as DateTime
 
-        promises.push(
-          handleGetPreviewTransactions(
-            DateTime.fromISO(rows[3].date) as DateTime,
-          ),
-        )
-        promises.push(await handleGetChartCategories())
-        promises.push(await handleGetOverviewTransactions())
+        const promises = [await handleGetPreviewTransactions(newDate)]
+
+        promises.push(await handleGetChartCategories(newDate))
+        promises.push(await handleGetOverviewTransactions(newDate))
         promises.push(await handleGetBalance())
 
         await Promise.all(promises)

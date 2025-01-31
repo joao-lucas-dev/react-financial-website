@@ -2,21 +2,28 @@ import { useEffect, useState } from 'react'
 
 interface IParams {
   valueNumber: number
+  isPercentage?: boolean
 }
 
-const CountUp = ({ valueNumber }: IParams) => {
+const CountUp = ({ valueNumber, isPercentage = false }: IParams) => {
   const [value, setValue] = useState(0)
-  const duration = 800
+  const duration = 100
   const fps = 60
 
   useEffect(() => {
     const totalFrames = Math.round((duration / 1000) * fps)
-    const increment = valueNumber / totalFrames
+    const difference = valueNumber - value
+    const increment = difference / totalFrames
     let currentFrame = 0
 
     const interval = setInterval(() => {
       currentFrame += 1
-      setValue((prevValue) => Math.min(prevValue + increment, valueNumber))
+      setValue((prevValue) => {
+        const newValue = prevValue + increment
+        return difference > 0
+          ? Math.min(newValue, valueNumber)
+          : Math.max(newValue, valueNumber)
+      })
 
       if (currentFrame >= totalFrames) {
         clearInterval(interval)
@@ -24,14 +31,18 @@ const CountUp = ({ valueNumber }: IParams) => {
     }, 1000 / fps)
 
     return () => clearInterval(interval)
-  }, [valueNumber, duration, fps])
+  }, [valueNumber, duration, fps, value])
 
   return (
     <>
-      {value.toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      })}
+      {isPercentage
+        ? value >= 0
+          ? `+${value.toFixed(2)}`
+          : value.toFixed(2)
+        : value.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+          })}
     </>
   )
 }

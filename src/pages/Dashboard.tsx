@@ -65,14 +65,8 @@ export default function Dashboard() {
                       Saldo geral
                     </span>
                     <div>
-                      <span className="text-xs md:text-sm text-gray mr-1">
-                        R$
-                      </span>
                       <strong className="text-lg md:text-xl">
-                        {balance.toLocaleString('pt-BR', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
+                        <CountUp valueNumber={balance} />
                       </strong>
                     </div>
                   </div>
@@ -102,9 +96,10 @@ export default function Dashboard() {
                   </div>
                   <div className="ml-8 flex items-end">
                     <span className="flex justify-center items-center bg-green-200 text-green-600 rounded-full w-16 h-6 text-xs px-4 py-2">
-                      {overview?.income?.percentage >= 0
-                        ? `+${overview?.income?.percentage}`
-                        : overview?.income?.percentage}
+                      <CountUp
+                        valueNumber={overview?.income?.percentage}
+                        isPercentage={true}
+                      />
                       %
                     </span>
                   </div>
@@ -123,9 +118,10 @@ export default function Dashboard() {
                   </div>
                   <div className="ml-8 flex items-end">
                     <span className="flex justify-center items-center bg-red-200 text-red-600 rounded-full w-16 h-6 text-xs px-4 py-2">
-                      {overview?.outcome?.percentage >= 0
-                        ? `+${overview?.outcome?.percentage}`
-                        : overview?.outcome?.percentage}
+                      <CountUp
+                        valueNumber={overview?.outcome?.percentage}
+                        isPercentage={true}
+                      />
                       %
                     </span>
                   </div>
@@ -144,9 +140,10 @@ export default function Dashboard() {
                   </div>
                   <div className="ml-8 flex items-end ">
                     <span className="flex justify-center items-center bg-purple-200 text-purple-600 rounded-full w-16 h-6 text-xs px-4 py-2">
-                      {overview?.daily?.percentage >= 0
-                        ? `+${overview?.daily?.percentage}`
-                        : overview?.daily?.percentage}
+                      <CountUp
+                        valueNumber={overview?.daily?.percentage}
+                        isPercentage={true}
+                      />
                       %
                     </span>
                   </div>
