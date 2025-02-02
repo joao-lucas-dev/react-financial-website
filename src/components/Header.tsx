@@ -1,6 +1,10 @@
 import { AlignJustify, BellDot } from 'lucide-react'
 
-const Header = () => {
+interface IParams {
+  title: string
+}
+
+const Header = ({ title }: IParams) => {
   return (
     <header className="fixed z-40 w-full h-24 top-0">
       <div className="w-full h-24 flex bg-white py-4">
@@ -14,7 +18,7 @@ const Header = () => {
           </div>
 
           <h1 className="text-xl md:text-2xl text-gray font-semibold">
-            Dashboard
+            {title}
           </h1>
           <div className="flex justify-center items-center">
             <div className="hidden md:flex w-12 h-12 bg-lightGray rounded-full p-1 justify-center items-center">

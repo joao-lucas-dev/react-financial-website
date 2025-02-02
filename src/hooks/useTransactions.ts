@@ -62,7 +62,30 @@ export default function useTransactions(
         console.log(err)
       }
     },
-    [setOverview],
+    [],
+  )
+
+  const handleGetTransactionsMonth = useCallback(
+    async (date = DateTime.now()) => {
+      const month = date.month
+      const year = date.year
+
+      try {
+        const { data } = await api.get(
+          `/transactions?month=${month}&year=${year}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            },
+          },
+        )
+        setRows(data)
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [],
   )
 
   const handleGetPreviewTransactions = useCallback(
@@ -214,5 +237,6 @@ export default function useTransactions(
     overview,
     handleGetBalance,
     balance,
+    handleGetTransactionsMonth,
   }
 }

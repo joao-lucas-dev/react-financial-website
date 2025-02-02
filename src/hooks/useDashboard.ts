@@ -9,12 +9,14 @@ export default function useDashboard(
   handleGetChartCategories: (date?: DateTime) => Promise<void>,
   handleGetOverviewTransactions: (date?: DateTime) => Promise<void>,
   handleGetBalance: () => Promise<void>,
+  previewView: boolean,
+  handleGetTransactionsMonth: (date?: DateTime) => Promise<void>,
 ) {
   const [currentMonth, setCurrentMonth] = useState(DateTime.now().month)
 
   const getMonth = useCallback(() => {
     if (rows.length > 0) {
-      return monthRemap.get(Number(rows[3].formatted_date.split('/')[1]))
+      return `${monthRemap.get(Number(rows[3].formatted_date.split('/')[1]))}/${rows[3]?.date.substring(2, 4)}`
     }
 
     return ''
@@ -30,7 +32,11 @@ export default function useDashboard(
         newDate = DateTime.fromISO(rows[rows.length - 1].date).plus({ days: 4 })
       }
 
-      const promises = [await handleGetPreviewTransactions(newDate)]
+      const promises = [
+        previewView
+          ? await handleGetPreviewTransactions(newDate)
+          : await handleGetTransactionsMonth(newDate),
+      ]
 
       if (newDate.month !== currentMonth) {
         promises.push(await handleGetChartCategories(newDate))
@@ -47,12 +53,18 @@ export default function useDashboard(
       handleGetOverviewTransactions,
       setCurrentMonth,
       currentMonth,
+      previewView,
+      handleGetTransactionsMonth,
     ],
   )
 
   const getToday = useCallback(async () => {
     const newDate = DateTime.now()
-    const promises = [await handleGetPreviewTransactions(newDate)]
+    const promises = [
+      previewView
+        ? await handleGetPreviewTransactions(newDate)
+        : await handleGetTransactionsMonth(newDate),
+    ]
 
     if (newDate.month !== currentMonth) {
       promises.push(await handleGetChartCategories(newDate))
@@ -65,8 +77,9 @@ export default function useDashboard(
     handleGetPreviewTransactions,
     handleGetChartCategories,
     handleGetOverviewTransactions,
-    setCurrentMonth,
     currentMonth,
+    previewView,
+    handleGetTransactionsMonth,
   ])
 
   const getGreeting = useCallback(() => {
@@ -105,5 +118,6 @@ export default function useDashboard(
     getToday,
     getGreeting,
     hasToday,
+    currentMonth,
   }
 }

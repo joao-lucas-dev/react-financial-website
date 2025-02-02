@@ -2,7 +2,6 @@ import {
   BadgeHelp,
   House,
   MessageCircleQuestion,
-  NotebookText,
   Settings,
   Tags,
 } from 'lucide-react'
@@ -15,14 +14,6 @@ const MenuAside = () => {
           <a href="/" className="flex items-center">
             <House size={20} className="text-primary mr-5" />
             <span className="text-sm md:text-base text-primary">Dashboard</span>
-          </a>
-        </li>
-        <li className="h-12 flex items-center p-4 mt-5">
-          <a href="/" className="flex items-center">
-            <NotebookText size={20} className="text-zinc-500 mr-5" />
-            <span className="text-sm md:text-base text-zinc-500">
-              Lançamentos
-            </span>
           </a>
         </li>
         <li className="h-12 flex items-center p-4 mt-5">

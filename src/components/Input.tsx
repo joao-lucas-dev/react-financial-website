@@ -21,7 +21,6 @@ const Input: FC<CustomInputProps> = forwardRef<
   )
 })
 
-// Necessário para adicionar displayName ao componente com forwardRef
 Input.displayName = 'Input'
 
 export default Input

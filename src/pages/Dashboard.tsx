@@ -6,6 +6,8 @@ import {
   ChevronRight,
   ChevronLeft,
   Calendar,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react'
 
 import TablePreview from '../components/TablePreview'
@@ -20,8 +22,11 @@ import useDashboard from '../hooks/useDashboard.ts'
 import useTransactions from '../hooks/useTransactions.ts'
 import CountUp from '../components/CountUp.tsx'
 import useCategories from '../hooks/useCategories.ts'
+import { DateTime } from 'luxon'
+import { useState } from 'react'
 
 export default function Dashboard() {
+  const [previewView, setPreviewView] = useState(true)
   const { chartCategories, handleGetChartCategories } = useCategories()
   const {
     rows,
@@ -33,19 +38,28 @@ export default function Dashboard() {
     overview,
     handleGetBalance,
     balance,
+    handleGetTransactionsMonth,
   } = useTransactions(handleGetChartCategories)
-  const { getMonth, getGreeting, getNextWeek, getToday, hasToday } =
-    useDashboard(
-      rows,
-      handleGetPreviewTransactions,
-      handleGetChartCategories,
-      handleGetOverviewTransactions,
-      handleGetBalance,
-    )
+  const {
+    getMonth,
+    getGreeting,
+    getNextWeek,
+    getToday,
+    hasToday,
+    currentMonth,
+  } = useDashboard(
+    rows,
+    handleGetPreviewTransactions,
+    handleGetChartCategories,
+    handleGetOverviewTransactions,
+    handleGetBalance,
+    previewView,
+    handleGetTransactionsMonth,
+  )
 
   return (
     <div className="w-full h-full">
-      <Header />
+      <Header title="Dashboard" />
 
       <div className="flex h-screen">
         <MenuAside />
@@ -203,24 +217,46 @@ export default function Dashboard() {
                   />
                 </div>
 
-                <div className="flex flex-none justify-end items-end text-right mt-4">
-                  <a
-                    href="/lancamentos"
-                    className="text-sm text-gray font-semibold"
-                  >
-                    Todos lançamentos &gt;
-                  </a>
+                <div className="flex flex-none justify-center items-center text-right mt-4">
+                  {previewView && (
+                    <button
+                      className="text-sm text-gray font-semibold flex"
+                      onClick={() => {
+                        setPreviewView(false)
+                        handleGetTransactionsMonth(
+                          DateTime.fromISO(rows[3].date),
+                        )
+                      }}
+                    >
+                      Visualizar por mês <ChevronDown />
+                    </button>
+                  )}
+                  {!previewView && (
+                    <button
+                      className="text-sm text-gray font-semibold flex"
+                      onClick={() => {
+                        setPreviewView(true)
+                        handleGetPreviewTransactions(
+                          DateTime.now().set({ month: currentMonth }),
+                        )
+                      }}
+                    >
+                      Visualizar por semana <ChevronUp />
+                    </button>
+                  )}
                 </div>
               </div>
 
-              <div className="w-full h-72 bg-white rounded-xl px-3 py-6 sm:p-6">
-                <h1 className="text-lg font-bold text-gray">Entradas</h1>
-                <ChartComponent categories={chartCategories.income} />
-              </div>
+              <div>
+                <div className="w-full h-72 bg-white rounded-xl px-3 py-6 sm:p-6">
+                  <h1 className="text-lg font-bold text-gray">Entradas</h1>
+                  <ChartComponent categories={chartCategories.income} />
+                </div>
 
-              <div className="w-full h-72 bg-white rounded-xl px-3 py-6 sm:p-6">
-                <h1 className="text-lg font-bold text-gray">Saídas</h1>
-                <ChartComponent categories={chartCategories.notIncome} />
+                <div className="w-full h-72 bg-white rounded-xl px-3 py-6 sm:p-6 mt-8">
+                  <h1 className="text-lg font-bold text-gray">Saídas</h1>
+                  <ChartComponent categories={chartCategories.notIncome} />
+                </div>
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useEffect } from 'react'
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { ITransaction } from '../types/transactions.ts'
 import Input from './Input.tsx'
 import Button from './Button.tsx'
@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import SelectInput from './SelectInput.tsx'
+import api from '../api/axiosInstance.ts'
 
 interface IParams {
   openModal: {
@@ -40,16 +41,26 @@ const ModalEdit = ({
   setOpenModal,
   handleUpdateTransaction,
 }: IParams) => {
+  const [categories, setCategories] = useState([])
+
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
     setValue,
   } = useForm<ModalEditData>({
     resolver: zodResolver(modalEditSchema),
   })
 
+  const getCategories = useCallback(async () => {
+    const { data } = await api.get('/categories')
+    setCategories(data)
+  }, [setCategories])
+
   useEffect(() => {
+    getCategories()
+
     setValue('description', openModal.transaction.description)
     setValue('price', String(openModal.transaction.price))
     setValue(
@@ -59,7 +70,7 @@ const ModalEdit = ({
         .split('T')[0],
     )
     setValue('category', String(openModal.transaction.category.id))
-  }, [openModal.transaction, setValue])
+  }, [openModal.transaction, setValue, getCategories])
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -153,7 +164,14 @@ const ModalEdit = ({
               </div>
             </div>
 
-            <SelectInput label="Categoria" {...register('category')} />
+            {categories.length > 0 && (
+              <SelectInput
+                control={control}
+                label="Categorias"
+                categories={categories}
+              />
+            )}
+
             <span className="text-red-500 my-4 text-sm">
               {errors.category?.message}
             </span>
