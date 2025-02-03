@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useRef, Dispatch, SetStateAction } from 'react'
 import { ITransaction } from '../../types/transactions'
-
 import Index from '../CategoryIcon'
 import './styles.css'
 import { EllipsisVertical } from 'lucide-react'
@@ -23,6 +21,7 @@ interface IParams {
       type: string
     }>
   >
+  tdRect: DOMRect | null
 }
 
 const MiniInfoModal = ({
@@ -30,6 +29,7 @@ const MiniInfoModal = ({
   type,
   setOpenModal,
   handleCreateTransaction,
+  tdRect,
 }: IParams) => {
   const {
     handleMouseEnter,
@@ -66,7 +66,11 @@ const MiniInfoModal = ({
   return (
     <div
       ref={modalRef}
-      className={`z-30 absolute left-full ${isClipped ? 'bottom-0' : '-top-2'} w-80 bg-white shadow-lg rounded-lg hidden group-hover:lg:block`}
+      className="z-50 fixed bg-white shadow-lg rounded-lg w-80" // Use fixed positioning
+      style={{
+        left: tdRect ? tdRect.right + 2 : 0, // Position modal to the left of the <td>
+        top: tdRect ? (isClipped ? tdRect.top - 50 : tdRect.top) : 0, // Align with the top of the <td>
+      }}
     >
       <div ref={scrollRef} className="max-h-52 card-miniinfo">
         <div className="w-full px-4 pt-2 flex flex-col">
@@ -160,7 +164,7 @@ const MiniInfoModal = ({
 
                         <div className="absolute bottom-5 right-0 mt-2 w-28 bg-white shadow-md rounded-lg">
                           <button
-                            onClick={() =>
+                            onClick={() => {
                               setOpenModal({
                                 isOpen: true,
                                 transaction: {
@@ -169,19 +173,19 @@ const MiniInfoModal = ({
                                 },
                                 type: 'edit',
                               })
-                            }
+                            }}
                             className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50"
                           >
                             Editar
                           </button>
                           <button
-                            onClick={() =>
+                            onClick={() => {
                               setOpenModal({
                                 isOpen: true,
                                 transaction,
                                 type: 'delete',
                               })
-                            }
+                            }}
                             className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50"
                           >
                             Excluir

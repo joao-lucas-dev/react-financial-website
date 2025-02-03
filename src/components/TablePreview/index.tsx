@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react'
 import MiniInfoModal from '../MiniInfoModal'
-
 import 'react-loading-skeleton/dist/skeleton.css'
 import './styles.css'
 import TableSkeleton from '../TableSkeleton'
@@ -35,9 +34,27 @@ const TablePreview = ({
     transaction: {} as ITransaction,
     type: '',
   })
+  const [hoveredCell, setHoveredCell] = useState<{
+    rowIndex: number
+    colIndex: number
+    tdRect: DOMRect | null
+  } | null>(null)
+
+  const handleMouseEnter = (
+    event: React.MouseEvent<HTMLTableCellElement>,
+    rowIndex: number,
+    colIndex: number,
+  ) => {
+    const tdRect = event.currentTarget.getBoundingClientRect() // Get the <td> bounding rectangle
+    setHoveredCell({ rowIndex, colIndex, tdRect })
+  }
+
+  const handleMouseLeave = () => {
+    setHoveredCell(null)
+  }
 
   const memoizedTransactions = useMemo(() => {
-    return rows.map((row: IRow) => {
+    return rows.map((row: IRow, rowIndex: number) => {
       const color = findTotalColor(row)
 
       const today = new Date()
@@ -51,58 +68,76 @@ const TablePreview = ({
       return (
         <tr key={row.formatted_date} className="relative">
           <td
-            className={`${row.isToday ? 'bg-grayWhite' : 'bg-white'} sticky left-0 z-auto sm:relative border-b-1 p-2 border-lineGray text-sm text-center font-[600] min-w-[153px]`}
+            className={`${row.isToday ? 'bg-grayWhite' : 'bg-white'} sm:relative border-b-1 p-2 border-lineGray text-sm text-center font-[600] min-w-[153px] h-[56px]`}
           >
             {row.formatted_date}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border min-w-[153px]`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border min-w-[153px] h-[56px]`}
+            onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 1)}
+            onMouseLeave={handleMouseLeave}
           >
             {row.incomes?.valueFormatted}
-            <MiniInfoModal
-              handleCreateTransaction={(value, setValue) =>
-                handleCreateTransaction('incomes', row, value, setValue)
-              }
-              transactions={row.incomes.transactions}
-              type="income"
-              setOpenModal={setOpenModal}
-            />
+            {hoveredCell?.rowIndex === rowIndex &&
+              hoveredCell?.colIndex === 1 && (
+                <MiniInfoModal
+                  handleCreateTransaction={(value, setValue) =>
+                    handleCreateTransaction('incomes', row, value, setValue)
+                  }
+                  transactions={row.incomes.transactions}
+                  type="income"
+                  setOpenModal={setOpenModal}
+                  tdRect={hoveredCell?.tdRect}
+                />
+              )}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border min-w-[153px]`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border min-w-[153px] h-[56px]`}
+            onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 2)}
+            onMouseLeave={handleMouseLeave}
           >
             {row.outcomes?.valueFormatted}
-            <MiniInfoModal
-              handleCreateTransaction={(value, setValue) =>
-                handleCreateTransaction('outcomes', row, value, setValue)
-              }
-              transactions={row.outcomes.transactions}
-              type="outcome"
-              setOpenModal={setOpenModal}
-            />
+            {hoveredCell?.rowIndex === rowIndex &&
+              hoveredCell?.colIndex === 2 && (
+                <MiniInfoModal
+                  handleCreateTransaction={(value, setValue) =>
+                    handleCreateTransaction('outcomes', row, value, setValue)
+                  }
+                  transactions={row.outcomes.transactions}
+                  type="outcome"
+                  setOpenModal={setOpenModal}
+                  tdRect={hoveredCell?.tdRect}
+                />
+              )}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border min-w-[153px]`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border min-w-[153px] h-[56px]`}
+            onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 3)}
+            onMouseLeave={handleMouseLeave}
           >
             {row.dailies.valueFormatted}
-            <MiniInfoModal
-              handleCreateTransaction={(value, setValue) =>
-                handleCreateTransaction('dailies', row, value, setValue)
-              }
-              transactions={row.dailies.transactions}
-              type="daily"
-              setOpenModal={setOpenModal}
-            />
+            {hoveredCell?.rowIndex === rowIndex &&
+              hoveredCell?.colIndex === 3 && (
+                <MiniInfoModal
+                  handleCreateTransaction={(value, setValue) =>
+                    handleCreateTransaction('dailies', row, value, setValue)
+                  }
+                  transactions={row.dailies.transactions}
+                  type="daily"
+                  setOpenModal={setOpenModal}
+                  tdRect={hoveredCell?.tdRect}
+                />
+              )}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray ${color} ${row.isToday ? 'bg-grayWhite' : ''} font-semibold text-sm text-center min-w-[153px]`}
+            className={`border-b-1 p-2 border-lineGray ${color} ${row.isToday ? 'bg-grayWhite' : ''} font-semibold text-sm text-center min-w-[153px] h-[56px]`}
           >
             {row.total.valueFormatted}
           </td>
         </tr>
       )
     })
-  }, [rows, findTotalColor, setOpenModal, handleCreateTransaction])
+  }, [rows, findTotalColor, setOpenModal, handleCreateTransaction, hoveredCell])
 
   return (
     <>
@@ -110,19 +145,19 @@ const TablePreview = ({
         <table className="min-w-640 sm:w-full h-full text-left rounded-lg">
           <thead>
             <tr>
-              <th className="sticky left-0 z-10 bg-background rounded-tl-lg text-center p-4 text-gray border-b-1 border-lineGray  text-sm">
+              <th className="sticky top-0 z-10 bg-background rounded-tl-lg text-center p-4 text-gray border-b-1 border-lineGray  text-sm">
                 Data
               </th>
-              <th className="text-center text-gray border-b-1 border-lineGray bg-background text-sm">
+              <th className="sticky top-0 z-10 text-center text-gray border-b-1 border-lineGray bg-background text-sm">
                 Entradas
               </th>
-              <th className="text-center text-gray border-b-1 border-lineGray bg-background text-sm">
+              <th className="sticky top-0 z-10 text-center text-gray border-b-1 border-lineGray bg-background text-sm">
                 Saídas
               </th>
-              <th className="text-center text-gray border-b-1 border-lineGray bg-background text-sm">
+              <th className="sticky top-0 z-10 text-center text-gray border-b-1 border-lineGray bg-background text-sm">
                 Diário
               </th>
-              <th className="rounded-tr-lg text-center text-gray border-b-1 border-lineGray bg-background text-sm">
+              <th className="sticky top-0 z-10 rounded-tr-lg text-center text-gray border-b-1 border-lineGray bg-background text-sm">
                 Saldo
               </th>
             </tr>
