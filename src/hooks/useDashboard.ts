@@ -106,7 +106,7 @@ export default function useDashboard(
   }, [rows])
 
   useEffect(() => {
-    handleGetPreviewTransactions()
+    handleGetTransactionsMonth()
     handleGetChartCategories()
     handleGetOverviewTransactions()
     handleGetBalance()
@@ -119,5 +119,6 @@ export default function useDashboard(
     getGreeting,
     hasToday,
     currentMonth,
+    setCurrentMonth,
   }
 }

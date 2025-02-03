@@ -22,7 +22,15 @@ interface IParams {
       type: string
     }>
   >
-  handleUpdateTransaction: (updateTransaction: ITransaction) => Promise<void>
+  handleUpdateTransaction: (
+    updateTransaction: ITransaction,
+    previewView: boolean,
+    currentMonth: number,
+    setCurrentMonth: React.Dispatch<number>,
+  ) => Promise<void>
+  previewView: boolean
+  currentMonth: number
+  setCurrentMonth: React.Dispatch<number>
 }
 
 const modalEditSchema = z.object({
@@ -40,6 +48,9 @@ const ModalEdit = ({
   openModal,
   setOpenModal,
   handleUpdateTransaction,
+  previewView,
+  currentMonth,
+  setCurrentMonth,
 }: IParams) => {
   const [categories, setCategories] = useState([])
 
@@ -102,7 +113,12 @@ const ModalEdit = ({
           shared_id: null,
         } as ITransaction
 
-        await handleUpdateTransaction(updatedTransaction)
+        await handleUpdateTransaction(
+          updatedTransaction,
+          previewView,
+          currentMonth,
+          setCurrentMonth,
+        )
 
         setOpenModal({
           isOpen: false,

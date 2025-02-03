@@ -24,7 +24,7 @@ import { DateTime } from 'luxon'
 import { useState } from 'react'
 
 export default function Dashboard() {
-  const [previewView, setPreviewView] = useState(true)
+  const [previewView, setPreviewView] = useState(false)
   const { chartCategories, handleGetChartCategories } = useCategories()
   const {
     rows,
@@ -45,6 +45,7 @@ export default function Dashboard() {
     getToday,
     hasToday,
     currentMonth,
+    setCurrentMonth,
   } = useDashboard(
     rows,
     handleGetPreviewTransactions,
@@ -165,7 +166,7 @@ export default function Dashboard() {
 
             <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6 pb-24">
               <div
-                className={`h-[600px] flex flex-col bg-white rounded-xl px-6 py-6 sm:p-6  lg:col-span-2 lg:row-span-2`}
+                className={`${!previewView ? 'h-[800px]' : 'h-[600px]'} flex flex-col bg-white rounded-xl px-6 py-6 sm:p-6  lg:col-span-2 lg:row-span-2`}
               >
                 <div className="flex flex-none justify-between items-center mb-4">
                   <h2 className="text-base md:text-lg lg:text-xl font-semibold text-gray w-24">
@@ -214,6 +215,9 @@ export default function Dashboard() {
                     handleCreateTransaction={handleCreateTransaction}
                     handleDeleteTransaction={handleDeleteTransaction}
                     handleUpdateTransaction={handleUpdateTransaction}
+                    previewView={previewView}
+                    currentMonth={currentMonth}
+                    setCurrentMonth={setCurrentMonth}
                   />
                 </div>
 
@@ -253,13 +257,17 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div>
-                <div className="w-full h-72 bg-white rounded-xl px-3 py-6 sm:p-6">
+              <div className={`${!previewView ? 'h-[800px]' : 'h-[600px]'}`}>
+                <div
+                  className={`${previewView ? 'h-72' : 'h-96'} w-full bg-white rounded-xl px-3 py-6 sm:p-6`}
+                >
                   <h1 className="text-lg font-bold text-gray">Entradas</h1>
                   <ChartComponent categories={chartCategories.income} />
                 </div>
 
-                <div className="w-full h-72 bg-white rounded-xl px-3 py-6 sm:p-6 mt-6">
+                <div
+                  className={`${previewView ? 'h-72' : 'h-96'} w-full bg-white rounded-xl px-3 py-6 sm:p-6 mt-6`}
+                >
                   <h1 className="text-lg font-bold text-gray">Saídas</h1>
                   <ChartComponent categories={chartCategories.notIncome} />
                 </div>

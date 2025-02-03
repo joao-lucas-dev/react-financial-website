@@ -17,9 +17,25 @@ interface IParams {
     setValue: React.Dispatch<
       React.SetStateAction<{ formattedValue: string; originalValue: number }>
     >,
+    previewView: boolean,
+    currentMonth: number,
+    setCurrentMonth: React.Dispatch<number>,
   ) => Promise<void>
-  handleUpdateTransaction: (updateTransaction: ITransaction) => Promise<void>
-  handleDeleteTransaction: (id: string) => Promise<void>
+  handleUpdateTransaction: (
+    updateTransaction: ITransaction,
+    previewView: boolean,
+    currentMonth: number,
+    setCurrentMonth: React.Dispatch<number>,
+  ) => Promise<void>
+  handleDeleteTransaction: (
+    id: string,
+    previewView: boolean,
+    currentMonth: number,
+    setCurrentMonth: React.Dispatch<number>,
+  ) => Promise<void>
+  previewView: boolean
+  currentMonth: number
+  setCurrentMonth: React.Dispatch<number>
 }
 
 const TablePreview = ({
@@ -27,6 +43,9 @@ const TablePreview = ({
   handleCreateTransaction,
   handleDeleteTransaction,
   handleUpdateTransaction,
+  previewView,
+  currentMonth,
+  setCurrentMonth,
 }: IParams) => {
   const { findTotalColor } = useTablePreviewAux()
   const [openModal, setOpenModal] = useState({
@@ -82,7 +101,15 @@ const TablePreview = ({
               hoveredCell?.colIndex === 1 && (
                 <MiniInfoModal
                   handleCreateTransaction={(value, setValue) =>
-                    handleCreateTransaction('incomes', row, value, setValue)
+                    handleCreateTransaction(
+                      'incomes',
+                      row,
+                      value,
+                      setValue,
+                      previewView,
+                      currentMonth,
+                      setCurrentMonth,
+                    )
                   }
                   transactions={row.incomes.transactions}
                   type="income"
@@ -101,7 +128,15 @@ const TablePreview = ({
               hoveredCell?.colIndex === 2 && (
                 <MiniInfoModal
                   handleCreateTransaction={(value, setValue) =>
-                    handleCreateTransaction('outcomes', row, value, setValue)
+                    handleCreateTransaction(
+                      'outcomes',
+                      row,
+                      value,
+                      setValue,
+                      previewView,
+                      currentMonth,
+                      setCurrentMonth,
+                    )
                   }
                   transactions={row.outcomes.transactions}
                   type="outcome"
@@ -120,7 +155,15 @@ const TablePreview = ({
               hoveredCell?.colIndex === 3 && (
                 <MiniInfoModal
                   handleCreateTransaction={(value, setValue) =>
-                    handleCreateTransaction('dailies', row, value, setValue)
+                    handleCreateTransaction(
+                      'dailies',
+                      row,
+                      value,
+                      setValue,
+                      previewView,
+                      currentMonth,
+                      setCurrentMonth,
+                    )
                   }
                   transactions={row.dailies.transactions}
                   type="daily"
@@ -137,7 +180,16 @@ const TablePreview = ({
         </tr>
       )
     })
-  }, [rows, findTotalColor, setOpenModal, handleCreateTransaction, hoveredCell])
+  }, [
+    rows,
+    findTotalColor,
+    setOpenModal,
+    handleCreateTransaction,
+    hoveredCell,
+    currentMonth,
+    previewView,
+    setCurrentMonth,
+  ])
 
   return (
     <>
@@ -176,12 +228,18 @@ const TablePreview = ({
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 handleUpdateTransaction={handleUpdateTransaction}
+                previewView={previewView}
+                currentMonth={currentMonth}
+                setCurrentMonth={setCurrentMonth}
               />
             ) : (
               <ModalDelete
                 setOpenModal={setOpenModal}
                 openModal={openModal}
                 handleDeleteTransaction={handleDeleteTransaction}
+                previewView={previewView}
+                currentMonth={currentMonth}
+                setCurrentMonth={setCurrentMonth}
               />
             )}
           </div>

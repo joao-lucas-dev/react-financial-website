@@ -14,13 +14,24 @@ interface IParams {
       type: string
     }>
   >
-  handleDeleteTransaction: (id: string) => Promise<void>
+  handleDeleteTransaction: (
+    id: string,
+    previewView: boolean,
+    currentMonth: number,
+    setCurrentMonth: React.Dispatch<number>,
+  ) => Promise<void>
+  previewView: boolean
+  currentMonth: number
+  setCurrentMonth: React.Dispatch<number>
 }
 
 const ModalDelete = ({
   openModal,
   setOpenModal,
   handleDeleteTransaction,
+  previewView,
+  currentMonth,
+  setCurrentMonth,
 }: IParams) => {
   return (
     <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -44,7 +55,12 @@ const ModalDelete = ({
           </button>
           <button
             onClick={async () => {
-              await handleDeleteTransaction(openModal.transaction.id)
+              await handleDeleteTransaction(
+                openModal.transaction.id,
+                previewView,
+                currentMonth,
+                setCurrentMonth,
+              )
               setOpenModal({
                 isOpen: false,
                 transaction: {} as ITransaction,
