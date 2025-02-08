@@ -35,8 +35,8 @@ const ModalDelete = ({
 }: IParams) => {
   return (
     <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white w-96 rounded-lg shadow-lg p-6 relative">
-        <h2 className="text-lg font-semibold mb-6 text-center">
+      <div className="bg-white dark:bg-black-bg w-96 rounded-lg shadow-lg p-6 relative">
+        <h2 className="text-lg font-semibold mb-6 text-center dark:text-softGray">
           Deseja realmente excluir o item?
         </h2>
 
@@ -49,7 +49,7 @@ const ModalDelete = ({
                 type: '',
               })
             }
-            className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300"
+            className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 dark:text-softGray"
           >
             Cancelar
           </button>

@@ -3,7 +3,7 @@ import { ITransaction } from '../types/transactions.ts'
 import Input from './Input.tsx'
 import Button from './Button.tsx'
 import { X } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import SelectInput from './SelectInput.tsx'
@@ -134,8 +134,8 @@ const ModalEdit = ({
 
   return (
     <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white w-[490px] rounded-lg shadow-lg p-6 relative">
-        <div className="flex justify-between items-center">
+      <div className="bg-white dark:bg-black-bg w-[490px] rounded-lg shadow-lg p-6 relative">
+        <div className="flex justify-between  dark:text-softGray">
           <h2 className="text-lg font-semibold">Editar item</h2>
           <button
             onClick={() => {
@@ -181,10 +181,12 @@ const ModalEdit = ({
             </div>
 
             {categories.length > 0 && (
-              <SelectInput
+              <Controller
+                render={(field) => (
+                  <SelectInput {...field} categories={categories} />
+                )}
+                name="category"
                 control={control}
-                label="Categorias"
-                categories={categories}
               />
             )}
 

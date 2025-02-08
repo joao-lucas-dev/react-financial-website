@@ -6,6 +6,9 @@ const config: Config = {
     extend: {
       colors: {
         background: '#FBF5EC',
+        'black-bg': '#181a1b',
+        'softBlack-bg': '#131516',
+        orangeDark: '#36250b',
         primary: '#FF7E1D',
         softOrange: '#FFA441',
         gray: '#393938',
@@ -26,5 +29,6 @@ const config: Config = {
     },
   },
   plugins: [require('tailwind-scrollbar-hide')],
+  darkMode: 'class',
 }
 export default config

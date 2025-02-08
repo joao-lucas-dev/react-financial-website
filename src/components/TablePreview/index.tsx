@@ -87,12 +87,12 @@ const TablePreview = ({
       return (
         <tr key={row.formatted_date} className="relative">
           <td
-            className={`${row.isToday ? 'bg-grayWhite' : 'bg-white'} sm:relative border-b-1 p-2 border-lineGray text-sm text-center font-[600] min-w-[153px] h-[56px]`}
+            className={`${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : 'bg-white'} bg-white dark:bg-softBlack-bg dark:text-softGray sm:relative border-b-1 p-2 border-lineGray text-sm text-center font-[600] min-w-[153px] h-[56px]`}
           >
             {row.formatted_date}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border min-w-[153px] h-[56px]`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} bg-white dark:bg-softBlack-bg dark:text-softGray sm:relative hover:cursor-pointer group hover:border min-w-[153px] h-[56px]`}
             onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 1)}
             onMouseLeave={handleMouseLeave}
           >
@@ -119,7 +119,7 @@ const TablePreview = ({
               )}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border min-w-[153px] h-[56px]`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} bg-white dark:bg-softBlack-bg dark:text-softGray sm:relative hover:cursor-pointer group hover:border min-w-[153px] h-[56px]`}
             onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 2)}
             onMouseLeave={handleMouseLeave}
           >
@@ -146,7 +146,7 @@ const TablePreview = ({
               )}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite' : ''} sm:relative hover:cursor-pointer group hover:border min-w-[153px] h-[56px]`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} bg-white dark:bg-softBlack-bg dark:text-softGray sm:relative hover:cursor-pointer group hover:border min-w-[153px] h-[56px]`}
             onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 3)}
             onMouseLeave={handleMouseLeave}
           >
@@ -173,7 +173,7 @@ const TablePreview = ({
               )}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray ${color} ${row.isToday ? 'bg-grayWhite' : ''} font-semibold text-sm text-center min-w-[153px] h-[56px]`}
+            className={`border-b-1 p-2 border-lineGray ${color} ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} bg-white dark:bg-softBlack-bg font-semibold text-sm text-center min-w-[153px] h-[56px]`}
           >
             {row.total.valueFormatted}
           </td>
@@ -197,19 +197,19 @@ const TablePreview = ({
         <table className="min-w-640 sm:w-full h-full text-left rounded-lg">
           <thead>
             <tr>
-              <th className="sticky top-0 z-10 bg-background rounded-tl-lg text-center p-4 text-gray border-b-1 border-lineGray  text-sm">
+              <th className="sticky top-0 z-10 bg-background dark:bg-orangeDark rounded-tl-lg text-center p-4 text-gray dark:text-softGray border-b-1 border-lineGray  text-sm">
                 Data
               </th>
-              <th className="sticky top-0 z-10 text-center text-gray border-b-1 border-lineGray bg-background text-sm">
+              <th className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
                 Entradas
               </th>
-              <th className="sticky top-0 z-10 text-center text-gray border-b-1 border-lineGray bg-background text-sm">
+              <th className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
                 Saídas
               </th>
-              <th className="sticky top-0 z-10 text-center text-gray border-b-1 border-lineGray bg-background text-sm">
+              <th className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
                 Diário
               </th>
-              <th className="sticky top-0 z-10 rounded-tr-lg text-center text-gray border-b-1 border-lineGray bg-background text-sm">
+              <th className="sticky top-0 z-10 rounded-tr-lg text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
                 Saldo
               </th>
             </tr>

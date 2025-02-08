@@ -10,9 +10,11 @@ const Input: FC<CustomInputProps> = forwardRef<
 >(({ label, type, ...props }, ref) => {
   return (
     <div className="flex flex-col mt-4">
-      <label className="text-md font-semibold text-gray">{label}</label>
+      <label className="text-md font-semibold text-gray dark:text-softGray">
+        {label}
+      </label>
       <input
-        className="focus:outline-primary border border-softGray h-12 rounded-lg mt-2 px-5"
+        className="focus:outline-primary border border-softGray dark:bg-zinc-800 dark:border-zinc-700 dark:text-softGray h-12 rounded-lg mt-2 px-5"
         type={type}
         ref={ref}
         {...props}

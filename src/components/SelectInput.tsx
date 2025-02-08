@@ -1,44 +1,81 @@
-import { FC, forwardRef } from 'react'
+import { forwardRef, useEffect, useState, useRef } from 'react'
 import CategoryIcon from './CategoryIcon'
-import { ICategory } from '../types/transactions.ts'
-import { Select } from 'antd'
-import { Controller, Control } from 'react-hook-form'
+import { ChevronDown } from 'lucide-react'
 
-interface CustomSelectProps {
-  label: string
-  categories: ICategory[]
-  control: Control
-}
+const SelectInput = forwardRef(({ field, categories }, ref) => {
+  const { onChange } = field
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState({})
+  const [dropdownDirection, setDropdownDirection] = useState('down')
+  const dropdownRef = useRef(null)
 
-const SelectInput: FC<CustomSelectProps> = forwardRef<
-  HTMLSelectElement,
-  CustomSelectProps
->(({ label, categories, control }) => {
+  useEffect(() => {
+    setSelectedCategory(
+      categories.find((cat) => String(cat.id) === field.value) || categories[0],
+    )
+  }, [field.value, categories])
+
+  const checkDropdownPosition = () => {
+    if (dropdownRef.current) {
+      const dropdownRect = dropdownRef.current.getBoundingClientRect()
+      const windowHeight = window.innerHeight
+
+      if (dropdownRect.bottom > windowHeight) {
+        setDropdownDirection('up')
+      } else {
+        setDropdownDirection('down')
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (isOpen) {
+      checkDropdownPosition()
+    }
+  }, [isOpen])
+
+  const handleSelect = (category) => {
+    onChange(String(category.id))
+    setSelectedCategory(category)
+    setIsOpen(false)
+  }
+
   return (
-    <div className="w-full flex flex-col mt-4">
-      <label className="text-md font-semibold text-gray">{label}</label>
-      <Controller
-        name="category"
-        control={control}
-        rules={{ required: 'Seleção obrigatória' }}
-        render={({ field }) => {
-          return (
-            <Select
-              {...field}
-              className="w-full mt-2 h-12 focus:border-0"
-              options={categories.map((category) => ({
-                value: String(category.id),
-                label: (
-                  <span key={category.id} className="flex items-center">
-                    <CategoryIcon category={category} />
-                    <span className="ml-2">{category.name}</span>
-                  </span>
-                ),
-              }))}
-            />
-          )
-        }}
-      />
+    <div className="relative w-full mt-4" ref={ref}>
+      <span className="text-md font-semibold text-gray dark:text-softGray">
+        Categorias
+      </span>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex h-12 mt-2 rounded-lg p-4 border border-softGray items-center justify-between bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
+      >
+        <div className="flex items-center">
+          <CategoryIcon category={selectedCategory} />
+          <span className="ml-2">{selectedCategory.name}</span>
+        </div>
+        <ChevronDown className="w-4 h-4" />
+      </button>
+
+      {isOpen && (
+        <div
+          ref={dropdownRef}
+          className={`absolute ${
+            dropdownDirection === 'down' ? 'mt-1' : 'bottom-full mb-1'
+          } w-full h-48 overflow-y-scroll bg-white border border-zinc-300 dark:border-zinc-700 rounded-md shadow-lg z-10`}
+        >
+          {categories.map((category) => (
+            <div
+              key={category.id}
+              onClick={() => handleSelect(category)}
+              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer hover:bg-zinc-100 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
+            >
+              <CategoryIcon category={category} />
+              <span className="ml-2">{category.name}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 })

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, Dispatch, SetStateAction } from 'react'
 import { ITransaction } from '../../types/transactions'
-import Index from '../CategoryIcon'
+import CategoryIcon from '../CategoryIcon'
 import './styles.css'
 import { EllipsisVertical } from 'lucide-react'
 import useMiniInfoAux from '../../hooks/useMiniInfoAux'
@@ -66,21 +66,21 @@ const MiniInfoModal = ({
   return (
     <div
       ref={modalRef}
-      className="z-50 fixed bg-white shadow-lg rounded-lg w-80" // Use fixed positioning
+      className="z-50 fixed bg-white dark:bg-black-bg shadow-lg rounded-lg w-80" // Use fixed positioning
       style={{
         left: tdRect ? tdRect.right + 2 : 0, // Position modal to the left of the <td>
         top: tdRect ? (isClipped ? tdRect.top - 50 : tdRect.top) : 0, // Align with the top of the <td>
       }}
     >
       <div ref={scrollRef} className="max-h-52 card-miniinfo">
-        <div className="w-full px-4 pt-2 flex flex-col">
+        <div className="w-full px-4 pt-2 flex flex-col mb-2">
           <label htmlFor="currency" className="text-left mb-2">
             Insira um valor
           </label>
           <input
             id="currency"
             type="text"
-            className="border border-zinc-200 w-full h-8 px-4 rounded-lg text-xs"
+            className="border border-zinc-200 dark:border-zinc-700 w-full h-8 px-4 rounded-lg text-xs dark:bg-zinc-800"
             placeholder="R$ 0,00"
             value={value.formattedValue}
             onChange={handleChange}
@@ -128,12 +128,12 @@ const MiniInfoModal = ({
                   )}
 
                   <div
-                    className="flex px-4 py-3 hover:bg-zinc-50 transaction-area"
+                    className="flex px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 transaction-area"
                     onMouseEnter={() => handleMouseEnter(index)}
                     onMouseLeave={() => handleMouseLeave(index)}
                   >
                     <div className="flex h-full">
-                      <Index category={transaction.category} />
+                      <CategoryIcon category={transaction.category} />
                     </div>
 
                     <div className="flex flex-1">
@@ -158,11 +158,11 @@ const MiniInfoModal = ({
                         <button>
                           <EllipsisVertical
                             size={16}
-                            className="text-zinc-600"
+                            className="text-zinc-600 dark:text-softGray"
                           />
                         </button>
 
-                        <div className="absolute bottom-5 right-0 mt-2 w-28 bg-white shadow-md rounded-lg">
+                        <div className="absolute bottom-5 right-0 mt-2 w-28 bg-white dark:bg-black-bg shadow-md rounded-lg">
                           <button
                             onClick={() => {
                               setOpenModal({
@@ -174,7 +174,7 @@ const MiniInfoModal = ({
                                 type: 'edit',
                               })
                             }}
-                            className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50"
+                            className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
                           >
                             Editar
                           </button>
@@ -186,7 +186,7 @@ const MiniInfoModal = ({
                                 type: 'delete',
                               })
                             }}
-                            className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50"
+                            className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
                           >
                             Excluir
                           </button>
@@ -205,8 +205,8 @@ const MiniInfoModal = ({
         )}
       </div>
 
-      <div className="w-full h-full px-4">
-        <div className="w-full h-px bg-zinc-200 mb-2" />
+      <div className="w-full h-full px-4 mt-2">
+        <div className="w-full h-px bg-zinc-200 dark:bg-zinc-700 mb-2" />
       </div>
 
       <div className="py-2 px-4">
