@@ -1,6 +1,5 @@
 import {
   ChartColumnDecreasing,
-  Eye,
   MoveDownLeft,
   MoveUpRight,
   ChevronRight,
@@ -10,6 +9,7 @@ import {
 
 import TablePreview from '../components/TablePreview'
 import ChartComponent from '../components/ChartComponent'
+import FloatingButton from '../components/FloatingButton'
 
 import './styles.css'
 import Header from '../components/Header'
@@ -20,16 +20,22 @@ import useDashboard from '../hooks/useDashboard.ts'
 import useTransactions from '../hooks/useTransactions.ts'
 import CountUp from '../components/CountUp.tsx'
 import useCategories from '../hooks/useCategories.ts'
-import { DateTime } from 'luxon'
 import { useState } from 'react'
+import { ITransaction } from '../types/transactions.ts'
 
 export default function Dashboard() {
-  const [previewView, setPreviewView] = useState(false)
+  const [openModal, setOpenModal] = useState({
+    isOpen: false,
+    transaction: {} as ITransaction,
+    type: '',
+  })
+
   const { chartCategories, handleGetChartCategories } = useCategories()
   const {
     rows,
     handleGetPreviewTransactions,
     handleCreateTransaction,
+    handleCreateCompleteTransaction,
     handleDeleteTransaction,
     handleUpdateTransaction,
     handleGetOverviewTransactions,
@@ -52,12 +58,11 @@ export default function Dashboard() {
     handleGetChartCategories,
     handleGetOverviewTransactions,
     handleGetBalance,
-    previewView,
     handleGetTransactionsMonth,
   )
 
   return (
-    <div className="dark">
+    <div className="">
       <div className="w-full h-full bg-background dark:bg-orangeDark">
         <Header title="Dashboard" />
 
@@ -163,10 +168,8 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6 pb-24">
-                <div
-                  className={`${!previewView ? 'h-[800px]' : 'h-[600px]'} flex flex-col bg-white dark:bg-black-bg rounded-xl px-6 py-6 sm:p-6  lg:col-span-2 lg:row-span-2`}
-                >
+              <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6 pb-2">
+                <div className="h-[600px] flex flex-col bg-white dark:bg-black-bg rounded-xl px-6 py-6 sm:p-6  lg:col-span-2 lg:row-span-2">
                   <div className="flex flex-none justify-between items-center mb-4">
                     <h2 className="text-base md:text-lg lg:text-xl font-semibold text-gray dark:text-softGray w-24">
                       {getMonth ? (
@@ -199,7 +202,7 @@ export default function Dashboard() {
                     <div>
                       <button
                         disabled={hasToday()}
-                        className="bg-primary px-4 py-1 text-white rounded-lg disabled:bg-orange-300 dark:disabled:bg-auto flex justify-center items-center"
+                        className="bg-primary px-4 py-1 text-white rounded-lg disabled:bg-orange-200 dark:disabled:bg-auto flex justify-center items-center"
                         onClick={() => getToday()}
                       >
                         <Calendar size={16} className="mr-2" />
@@ -208,67 +211,30 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <div className="table-preview-area flex flex-auto relative overflow-y-scroll scrollbar-hide">
-                    <TablePreview
-                      rows={rows}
-                      handleCreateTransaction={handleCreateTransaction}
-                      handleDeleteTransaction={handleDeleteTransaction}
-                      handleUpdateTransaction={handleUpdateTransaction}
-                      previewView={previewView}
-                      currentMonth={currentMonth}
-                      setCurrentMonth={setCurrentMonth}
-                    />
-                  </div>
-
-                  <div className="flex flex-none justify-center items-center text-right mt-4">
-                    {previewView && (
-                      <button
-                        className="text-sm text-gray dark:text-softGray font-semibold flex"
-                        onClick={async () => {
-                          await handleGetTransactionsMonth(
-                            DateTime.fromISO(rows[3].date),
-                          )
-                          setPreviewView(false)
-                        }}
-                      >
-                        Visualizar por:
-                        <strong className="text-primary ml-2 hover:text-orange-300">
-                          mês
-                        </strong>
-                      </button>
-                    )}
-                    {!previewView && (
-                      <button
-                        className="text-sm text-gray dark:text-softGray font-semibold flex"
-                        onClick={async () => {
-                          await handleGetPreviewTransactions(
-                            DateTime.now().set({ month: currentMonth }),
-                          )
-                          setPreviewView(true)
-                        }}
-                      >
-                        Visualizar por:
-                        <strong className="text-primary ml-2 hover:text-orange-300">
-                          semana
-                        </strong>
-                      </button>
-                    )}
-                  </div>
+                  <TablePreview
+                    rows={rows}
+                    handleCreateTransaction={handleCreateTransaction}
+                    handleCreateCompleteTransaction={
+                      handleCreateCompleteTransaction
+                    }
+                    handleDeleteTransaction={handleDeleteTransaction}
+                    handleUpdateTransaction={handleUpdateTransaction}
+                    currentMonth={currentMonth}
+                    setCurrentMonth={setCurrentMonth}
+                    openModal={openModal}
+                    setOpenModal={setOpenModal}
+                  />
                 </div>
 
-                <div className={`${!previewView ? 'h-[800px]' : 'h-[600px]'}`}>
-                  <div
-                    className={`${previewView ? 'h-72' : 'h-96'} w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6`}
-                  >
+                <div>
+                  <div className="h-72 w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6">
                     <h1 className="text-lg font-bold text-gray dark:text-softGray">
                       Entradas
                     </h1>
                     <ChartComponent categories={chartCategories.income} />
                   </div>
 
-                  <div
-                    className={`${previewView ? 'h-72' : 'h-96'} w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6 mt-6`}
-                  >
+                  <div className="h-72 w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6 mt-6">
                     <h1 className="text-lg font-bold text-gray dark:text-softGray">
                       Saídas
                     </h1>
@@ -280,6 +246,8 @@ export default function Dashboard() {
           </main>
         </div>
       </div>
+
+      <FloatingButton setOpenModal={setOpenModal} />
     </div>
   )
 }

@@ -122,7 +122,6 @@ export default function useTransactions(
       setValue: Dispatch<
         SetStateAction<{ formattedValue: string; originalValue: number }>
       >,
-      previewView: boolean,
       currentMonth: number,
       setCurrentMonth: Dispatch<SetStateAction<number>>,
     ) => {
@@ -147,11 +146,7 @@ export default function useTransactions(
 
         const newDate = DateTime.fromISO(rows[3].date) as DateTime
 
-        const promises = [
-          previewView
-            ? await handleGetPreviewTransactions(newDate)
-            : await handleGetTransactionsMonth(newDate),
-        ]
+        const promises = [await handleGetTransactionsMonth(newDate)]
 
         if (newDate.month !== currentMonth) {
           promises.push(await handleGetChartCategories(newDate))
@@ -159,8 +154,6 @@ export default function useTransactions(
           promises.push(await handleGetOverviewTransactions(newDate))
           setCurrentMonth(newDate.month)
         }
-
-        await Promise.all(promises)
 
         await Promise.all(promises)
 
@@ -174,7 +167,6 @@ export default function useTransactions(
     },
     [
       rows,
-      handleGetPreviewTransactions,
       handleGetChartCategories,
       handleGetOverviewTransactions,
       handleGetBalance,
@@ -182,10 +174,47 @@ export default function useTransactions(
     ],
   )
 
+  const handleCreateCompleteTransaction = useCallback(
+    async (createTransaction: any, currentMonth: number) => {
+      try {
+        await api.post('/transactions/create', {
+          description: createTransaction.description,
+          price: createTransaction.price,
+          category_id: createTransaction.category_id,
+          type: createTransaction.type,
+          shared_id: null,
+          transaction_day: createTransaction.transaction_day,
+        })
+
+        const newDate = DateTime.fromJSDate(
+          createTransaction.transaction_day,
+        ) as DateTime
+
+        const promises = []
+
+        if (newDate.month === currentMonth) {
+          promises.push(await handleGetTransactionsMonth(newDate))
+          promises.push(await handleGetChartCategories(newDate))
+          promises.push(await handleGetBalance())
+          promises.push(await handleGetOverviewTransactions(newDate))
+
+          await Promise.all(promises)
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [
+      handleGetTransactionsMonth,
+      handleGetChartCategories,
+      handleGetBalance,
+      handleGetOverviewTransactions,
+    ],
+  )
+
   const handleDeleteTransaction = useCallback(
     async (
       id: string,
-      previewView: boolean,
       currentMonth: number,
       setCurrentMonth: Dispatch<SetStateAction<number>>,
     ) => {
@@ -194,11 +223,7 @@ export default function useTransactions(
 
         const newDate = DateTime.fromISO(rows[3].date) as DateTime
 
-        const promises = [
-          previewView
-            ? await handleGetPreviewTransactions(newDate)
-            : await handleGetTransactionsMonth(newDate),
-        ]
+        const promises = [await handleGetTransactionsMonth(newDate)]
 
         if (newDate.month !== currentMonth) {
           promises.push(await handleGetChartCategories(newDate))
@@ -225,7 +250,6 @@ export default function useTransactions(
   const handleUpdateTransaction = useCallback(
     async (
       updateTransaction: ITransaction,
-      previewView: boolean,
       currentMonth: number,
       setCurrentMonth: Dispatch<SetStateAction<number>>,
     ) => {
@@ -237,11 +261,7 @@ export default function useTransactions(
 
         const newDate = DateTime.fromISO(rows[3].date) as DateTime
 
-        const promises = [
-          previewView
-            ? await handleGetPreviewTransactions(newDate)
-            : await handleGetTransactionsMonth(newDate),
-        ]
+        const promises = [await handleGetTransactionsMonth(newDate)]
 
         if (newDate.month !== currentMonth) {
           promises.push(await handleGetChartCategories(newDate))
@@ -277,5 +297,6 @@ export default function useTransactions(
     handleGetBalance,
     balance,
     handleGetTransactionsMonth,
+    handleCreateCompleteTransaction,
   }
 }

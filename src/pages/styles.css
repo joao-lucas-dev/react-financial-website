@@ -13,12 +13,6 @@
         width: 340px;
         flex-shrink: 0;
     }
-
-    .table-preview-area {
-        overflow-x: auto;
-        -ms-overflow-style: none; 
-        scrollbar-width: none;
-    }
 }
 
 @media(max-width: 480px) {

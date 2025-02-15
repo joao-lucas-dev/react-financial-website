@@ -23,7 +23,7 @@ export type ICategory = {
 }
 
 export type ITransaction = {
-  id: string
+  id?: string
   description: string
   price: string | number
   category: ICategory

@@ -1,5 +1,12 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
-import { ITransaction } from '../types/transactions.ts'
+import React, {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react'
+import { IRow, ITransaction } from '../types/transactions.ts'
 import Input from './Input.tsx'
 import Button from './Button.tsx'
 import { X } from 'lucide-react'
@@ -14,18 +21,20 @@ interface IParams {
     isOpen: boolean
     transaction: ITransaction
     type: string
+    button?: string
   }
   setOpenModal: React.Dispatch<
     React.SetStateAction<{
       isOpen: boolean
       transaction: ITransaction
       type: string
+      button?: string
     }>
   >
-  handleUpdateTransaction: (
-    updateTransaction: ITransaction,
+  handleCreateCompleteTransaction: (
+    createTransaction: any,
     currentMonth: number,
-    setCurrentMonth: React.Dispatch<number>,
+    setCurrentMonth: Dispatch<SetStateAction<number>>,
   ) => Promise<void>
   currentMonth: number
   setCurrentMonth: React.Dispatch<number>
@@ -40,16 +49,24 @@ const modalEditSchema = z.object({
   category: z.string(),
 })
 
-type ModalEditData = z.infer<typeof modalEditSchema>
+type ModalCreateData = z.infer<typeof modalEditSchema>
 
-const ModalEdit = ({
+const ModalCreate = ({
   openModal,
   setOpenModal,
-  handleUpdateTransaction,
+  handleCreateCompleteTransaction,
   currentMonth,
   setCurrentMonth,
 }: IParams) => {
   const [categories, setCategories] = useState([])
+
+  const getType = useCallback(() => {
+    if (openModal.button === 'income') return 'entrada'
+
+    if (openModal.button === 'outcome') return 'saída'
+
+    return 'diário'
+  }, [openModal.button])
 
   const {
     register,
@@ -57,7 +74,7 @@ const ModalEdit = ({
     control,
     formState: { errors },
     setValue,
-  } = useForm<ModalEditData>({
+  } = useForm<ModalCreateData>({
     resolver: zodResolver(modalEditSchema),
   })
 
@@ -68,17 +85,8 @@ const ModalEdit = ({
 
   useEffect(() => {
     getCategories()
-
-    setValue('description', openModal.transaction.description)
-    setValue('price', String(openModal.transaction.price))
-    setValue(
-      'transaction_day',
-      new Date(openModal.transaction.transaction_day)
-        .toISOString()
-        .split('T')[0],
-    )
-    setValue('category', String(openModal.transaction.category.id))
-  }, [openModal.transaction, setValue, getCategories])
+    setValue('transaction_day', new Date().toISOString().split('T')[0])
+  }, [setValue, getCategories])
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -98,20 +106,20 @@ const ModalEdit = ({
     [setValue],
   )
 
-  const handleUpdate = useCallback(
-    async (data: ModalEditData) => {
+  const handleCreate = useCallback(
+    async (data: ModalCreateData) => {
       try {
-        const updatedTransaction = {
-          ...openModal.transaction,
+        const createTransaction = {
+          type: openModal.button,
           description: data.description,
           price: Number(data.price.replace(/\D/g, '')) / 100,
           category_id: Number(data.category),
           transaction_day: new Date(`${data.transaction_day}T00:00:00`),
           shared_id: null,
-        } as ITransaction
+        }
 
-        await handleUpdateTransaction(
-          updatedTransaction,
+        await handleCreateCompleteTransaction(
+          createTransaction,
           currentMonth,
           setCurrentMonth,
         )
@@ -125,14 +133,20 @@ const ModalEdit = ({
         console.error(err)
       }
     },
-    [handleUpdateTransaction, openModal.transaction, setOpenModal],
+    [
+      handleCreateCompleteTransaction,
+      openModal.transaction,
+      setOpenModal,
+      currentMonth,
+      setCurrentMonth,
+    ],
   )
 
   return (
     <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white dark:bg-black-bg w-[490px] rounded-lg shadow-lg p-6 relative">
         <div className="flex justify-between  dark:text-softGray">
-          <h2 className="text-lg font-semibold">Editar item</h2>
+          <h2 className="text-lg font-semibold">Criar {getType()}</h2>
           <button
             onClick={() => {
               setOpenModal({
@@ -146,8 +160,12 @@ const ModalEdit = ({
           </button>
         </div>
         <div>
-          <form onSubmit={handleSubmit(handleUpdate)}>
-            <Input label="Descrição" {...register('description')} />
+          <form onSubmit={handleSubmit(handleCreate)}>
+            <Input
+              label="Descrição"
+              placeholder="Insira um descrição"
+              {...register('description')}
+            />
             <span className="text-red-500 my-4 text-sm">
               {errors.description?.message}
             </span>
@@ -156,6 +174,7 @@ const ModalEdit = ({
               <div className="w-[200px]">
                 <Input
                   label="Valor"
+                  placeholder="R$ 0,00"
                   {...register('price')}
                   onChange={handleChange}
                 />
@@ -190,7 +209,7 @@ const ModalEdit = ({
               {errors.category?.message}
             </span>
 
-            <Button title="Atualizar" type="submit" />
+            <Button title="Criar" type="submit" />
           </form>
         </div>
       </div>
@@ -198,4 +217,4 @@ const ModalEdit = ({
   )
 }
 
-export default ModalEdit
+export default ModalCreate

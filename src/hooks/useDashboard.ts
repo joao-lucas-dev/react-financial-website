@@ -9,7 +9,6 @@ export default function useDashboard(
   handleGetChartCategories: (date?: DateTime) => Promise<void>,
   handleGetOverviewTransactions: (date?: DateTime) => Promise<void>,
   handleGetBalance: () => Promise<void>,
-  previewView: boolean,
   handleGetTransactionsMonth: (date?: DateTime) => Promise<void>,
 ) {
   const [currentMonth, setCurrentMonth] = useState(DateTime.now().month)
@@ -32,11 +31,7 @@ export default function useDashboard(
         newDate = DateTime.fromISO(rows[rows.length - 1].date).plus({ days: 4 })
       }
 
-      const promises = [
-        previewView
-          ? await handleGetPreviewTransactions(newDate)
-          : await handleGetTransactionsMonth(newDate),
-      ]
+      const promises = [await handleGetTransactionsMonth(newDate)]
 
       if (newDate.month !== currentMonth) {
         promises.push(await handleGetChartCategories(newDate))
@@ -53,18 +48,13 @@ export default function useDashboard(
       handleGetOverviewTransactions,
       setCurrentMonth,
       currentMonth,
-      previewView,
       handleGetTransactionsMonth,
     ],
   )
 
   const getToday = useCallback(async () => {
     const newDate = DateTime.now()
-    const promises = [
-      previewView
-        ? await handleGetPreviewTransactions(newDate)
-        : await handleGetTransactionsMonth(newDate),
-    ]
+    const promises = [await handleGetTransactionsMonth(newDate)]
 
     if (newDate.month !== currentMonth) {
       promises.push(await handleGetChartCategories(newDate))
@@ -78,7 +68,6 @@ export default function useDashboard(
     handleGetChartCategories,
     handleGetOverviewTransactions,
     currentMonth,
-    previewView,
     handleGetTransactionsMonth,
   ])
 
