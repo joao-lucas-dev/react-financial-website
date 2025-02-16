@@ -7,21 +7,23 @@ import {
   Calendar,
 } from 'lucide-react'
 
-import TablePreview from '../components/TablePreview'
-import ChartComponent from '../components/ChartComponent'
-import FloatingButton from '../components/FloatingButton'
+import TablePreview from '../../components/TablePreview'
+import ChartComponent from '../../components/ChartComponent.tsx'
+import FloatingButton from '../../components/FloatingButton.tsx'
 
 import './styles.css'
-import Header from '../components/Header'
-import MenuAside from '../components/MenuAside'
+import Header from '../../components/Header.tsx'
+import MenuAside from '../../components/MenuAside.tsx'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
-import useDashboard from '../hooks/useDashboard.ts'
-import useTransactions from '../hooks/useTransactions.ts'
-import CountUp from '../components/CountUp.tsx'
-import useCategories from '../hooks/useCategories.ts'
+import useDashboard from '../../hooks/useDashboard.ts'
+import useTransactions from '../../hooks/useTransactions.ts'
+import CountUp from '../../components/CountUp.tsx'
+import useCategories from '../../hooks/useCategories.ts'
+// import useAuthentication from '../../hooks/useAutentication.ts'
 import { useState } from 'react'
-import { ITransaction } from '../types/transactions.ts'
+import { ITransaction } from '../../types/transactions.ts'
+import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard() {
   const [openModal, setOpenModal] = useState({
@@ -29,6 +31,12 @@ export default function Dashboard() {
     transaction: {} as ITransaction,
     type: '',
   })
+
+  const navigate = useNavigate()
+  // const { getUserSession } = useAuthentication()
+  // const user = getUserSession()
+  //
+  // if (!user) navigate('/login')
 
   const { chartCategories, handleGetChartCategories } = useCategories()
   const {

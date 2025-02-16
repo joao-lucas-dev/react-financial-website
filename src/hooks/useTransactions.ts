@@ -77,12 +77,16 @@ export default function useTransactions(
             headers: {
               'Content-Type': 'application/json',
               timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              Authorization:
+                'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzMzNzkyMDAyLCJleHAiOjE3MzM3OTU2MDJ9.9shPDhBRYX38WVeIXXEh3NvshRR00UbwQV8v1H7JZfM',
             },
           },
         )
         setRows(data)
       } catch (err) {
-        console.log(err)
+        if (err.status === 401) {
+          const { data } = await api.get('/token')
+        }
       }
     },
     [],
