@@ -5,49 +5,29 @@ import './styles.css'
 import TableSkeleton from '../TableSkeleton'
 import ModalDelete from '../ModalDelete'
 import useTablePreviewAux from '../../hooks/useTablePreviewAux'
-import { IRow, ITransaction } from '../../types/transactions'
+import {
+  IHandleCreateCompleteTransaction,
+  IHandleCreateTransaction,
+  IHandleDeleteTransaction,
+  IHandleUpdateTransaction,
+  IOpenModal,
+  IRow,
+  ISetCurrentMonth,
+  ISetOpenModal,
+} from '../../types/transactions'
 import ModalEdit from '../ModalEdit'
 import ModalCreate from '../ModalCreate.tsx'
 
 interface IParams {
   rows: IRow[]
-  handleCreateTransaction: (
-    type: 'incomes' | 'outcomes' | 'dailies',
-    row: IRow,
-    value: { formattedValue: string; originalValue: number },
-    setValue: React.Dispatch<
-      React.SetStateAction<{ formattedValue: string; originalValue: number }>
-    >,
-    currentMonth: number,
-    setCurrentMonth: React.Dispatch<number>,
-  ) => Promise<void>
-  handleCreateCompleteTransaction: (
-    createTransaction: ITransaction,
-    currentMonth: number,
-    setCurrentMonth: React.Dispatch<number>,
-  ) => Promise<void>
-  handleUpdateTransaction: (
-    updateTransaction: ITransaction,
-    currentMonth: number,
-    setCurrentMonth: React.Dispatch<number>,
-  ) => Promise<void>
-  handleDeleteTransaction: (
-    id: string,
-    currentMonth: number,
-    setCurrentMonth: React.Dispatch<number>,
-  ) => Promise<void>
+  handleCreateTransaction: IHandleCreateTransaction
+  handleCreateCompleteTransaction: IHandleCreateCompleteTransaction
+  handleUpdateTransaction: IHandleUpdateTransaction
+  handleDeleteTransaction: IHandleDeleteTransaction
   currentMonth: number
-  setCurrentMonth: React.Dispatch<number>
-  openModal: {
-    isOpen: boolean
-    transaction: ITransaction
-    type: string
-  }
-  setOpenModal: React.Dispatch<{
-    isOpen: boolean
-    transaction: ITransaction
-    type: string
-  }>
+  setCurrentMonth: ISetCurrentMonth
+  openModal: IOpenModal
+  setOpenModal: ISetOpenModal
 }
 
 const TablePreview = ({

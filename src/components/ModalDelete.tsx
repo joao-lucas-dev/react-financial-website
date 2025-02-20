@@ -1,26 +1,17 @@
-import React from 'react'
-import { ITransaction } from '../types/transactions.ts'
+import {
+  IHandleDeleteTransaction,
+  IOpenModal,
+  ISetCurrentMonth,
+  ISetOpenModal,
+  ITransaction,
+} from '../types/transactions.ts'
 
 interface IParams {
-  openModal: {
-    isOpen: boolean
-    transaction: ITransaction
-    type: string
-  }
-  setOpenModal: React.Dispatch<
-    React.SetStateAction<{
-      isOpen: boolean
-      transaction: ITransaction
-      type: string
-    }>
-  >
-  handleDeleteTransaction: (
-    id: string,
-    currentMonth: number,
-    setCurrentMonth: React.Dispatch<number>,
-  ) => Promise<void>
+  openModal: IOpenModal
+  setOpenModal: ISetOpenModal
+  handleDeleteTransaction: IHandleDeleteTransaction
   currentMonth: number
-  setCurrentMonth: React.Dispatch<number>
+  setCurrentMonth: ISetCurrentMonth
 }
 
 const ModalDelete = ({

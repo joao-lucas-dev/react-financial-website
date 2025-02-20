@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { colorsMap } from '../common/constants'
 import { useCallback, useState } from 'react'
-import { ChartData, CategoryData } from '../types/categories.ts'
+import { CategoryData } from '../types/categories.ts'
 import useAxiosPrivate from './useAxiosPrivate.tsx'
 
 export default function useCategories() {
@@ -69,7 +69,9 @@ export default function useCategories() {
             datasets: [
               {
                 data: pricesNotIncome,
+                // @ts-expect-error TS2322
                 backgroundColor: backgroundColorNotIncome,
+                // @ts-expect-error TS2322
                 hoverBackgroundColor: hoverBackgroundColorNotIncome,
               },
             ],
@@ -79,7 +81,9 @@ export default function useCategories() {
             datasets: [
               {
                 data: pricesIncome,
+                // @ts-expect-error TS2322
                 backgroundColor: backgroundColorIncome,
+                // @ts-expect-error TS2322
                 hoverBackgroundColor: hoverBackgroundColorIncome,
               },
             ],

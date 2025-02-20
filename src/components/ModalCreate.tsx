@@ -1,12 +1,11 @@
-import React, {
-  ChangeEvent,
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react'
-import { ITransaction } from '../types/transactions.ts'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import {
+  IHandleCreateCompleteTransaction,
+  IOpenModal,
+  ISetCurrentMonth,
+  ISetOpenModal,
+  ITransaction,
+} from '../types/transactions.ts'
 import Input from './Input.tsx'
 import Button from './Button.tsx'
 import { X } from 'lucide-react'
@@ -15,29 +14,14 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import SelectInput from './SelectInput.tsx'
 import useAxiosPrivate from '../hooks/useAxiosPrivate.tsx'
+import { IValue } from '../types/categories.ts'
 
 interface IParams {
-  openModal: {
-    isOpen: boolean
-    transaction: ITransaction
-    type: string
-    button?: string
-  }
-  setOpenModal: React.Dispatch<
-    React.SetStateAction<{
-      isOpen: boolean
-      transaction: ITransaction
-      type: string
-      button?: string
-    }>
-  >
-  handleCreateCompleteTransaction: (
-    createTransaction: any,
-    currentMonth: number,
-    setCurrentMonth: Dispatch<SetStateAction<number>>,
-  ) => Promise<void>
+  openModal: IOpenModal
+  setOpenModal: ISetOpenModal
+  handleCreateCompleteTransaction: IHandleCreateCompleteTransaction
   currentMonth: number
-  setCurrentMonth: React.Dispatch<number>
+  setCurrentMonth: ISetCurrentMonth
 }
 
 const modalEditSchema = z.object({
@@ -58,7 +42,7 @@ const ModalCreate = ({
   currentMonth,
   setCurrentMonth,
 }: IParams) => {
-  const [categories, setCategories] = useState([])
+  const [categories, setCategories] = useState<IValue[]>([])
   const axiosPrivate = useAxiosPrivate()
 
   const getType = useCallback(() => {
@@ -117,7 +101,7 @@ const ModalCreate = ({
           category_id: Number(data.category),
           transaction_day: new Date(`${data.transaction_day}T00:00:00`),
           shared_id: null,
-        }
+        } as unknown as ITransaction
 
         await handleCreateCompleteTransaction(
           createTransaction,
@@ -204,6 +188,7 @@ const ModalCreate = ({
             {categories.length > 0 && (
               <Controller
                 render={(field) => (
+                  // @ts-expect-error TS2322
                   <SelectInput {...field} categories={categories} />
                 )}
                 name="category"

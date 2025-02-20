@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useState } from 'react'
+import React, { Dispatch, SetStateAction, useCallback, useState } from 'react'
 import { IOverview, IRow, ITransaction } from '../types/transactions.ts'
 import { DateTime } from 'luxon'
 import useAxiosPrivate from './useAxiosPrivate.tsx'
@@ -93,29 +93,6 @@ export default function useTransactions(
     [axiosPrivate],
   )
 
-  const handleGetPreviewTransactions = useCallback(
-    async (date = DateTime.now()) => {
-      const startDate = date.minus({ days: 3 }).startOf('day')
-      const endDate = date.plus({ days: 3 }).endOf('day')
-
-      try {
-        const { data } = await axiosPrivate.get(
-          `/transactions/preview?startDate=${startDate}&endDate=${endDate}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            },
-          },
-        )
-        setRows(data)
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    [setRows, axiosPrivate],
-  )
-
   const handleCreateTransaction = useCallback(
     async (
       type: 'incomes' | 'outcomes' | 'dailies',
@@ -128,7 +105,9 @@ export default function useTransactions(
         SetStateAction<{ formattedValue: string; originalValue: number }>
       >,
       currentMonth: number,
-      setCurrentMonth: Dispatch<SetStateAction<number>>,
+      setCurrentMonth: Dispatch<
+        React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
+      >,
     ) => {
       try {
         const now = DateTime.now()
@@ -157,6 +136,7 @@ export default function useTransactions(
           promises.push(await handleGetChartCategories(newDate))
           promises.push(await handleGetBalance())
           promises.push(await handleGetOverviewTransactions(newDate))
+          // @ts-expect-error TS2345
           setCurrentMonth(newDate.month)
         }
 
@@ -181,7 +161,7 @@ export default function useTransactions(
   )
 
   const handleCreateCompleteTransaction = useCallback(
-    async (createTransaction: any, currentMonth: number) => {
+    async (createTransaction: ITransaction, currentMonth: number) => {
       try {
         await axiosPrivate.post('/transactions/create', {
           description: createTransaction.description,
@@ -193,7 +173,7 @@ export default function useTransactions(
         })
 
         const newDate = DateTime.fromJSDate(
-          createTransaction.transaction_day,
+          <Date>createTransaction.transaction_day,
         ) as DateTime
 
         const promises = []
@@ -221,9 +201,12 @@ export default function useTransactions(
 
   const handleDeleteTransaction = useCallback(
     async (
-      id: string,
+      id?: string,
+      // @ts-expect-error TS1016
       currentMonth: number,
-      setCurrentMonth: Dispatch<SetStateAction<number>>,
+      setCurrentMonth: Dispatch<
+        React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
+      >,
     ) => {
       try {
         await axiosPrivate.delete(`/transactions/delete/${id}`)
@@ -236,6 +219,7 @@ export default function useTransactions(
           promises.push(await handleGetChartCategories(newDate))
           promises.push(await handleGetOverviewTransactions(newDate))
           promises.push(await handleGetBalance())
+          // @ts-expect-error TS2345
           setCurrentMonth(newDate.month)
         }
 
@@ -246,7 +230,6 @@ export default function useTransactions(
     },
     [
       rows,
-      handleGetPreviewTransactions,
       handleGetChartCategories,
       handleGetOverviewTransactions,
       handleGetBalance,
@@ -259,7 +242,9 @@ export default function useTransactions(
     async (
       updateTransaction: ITransaction,
       currentMonth: number,
-      setCurrentMonth: Dispatch<SetStateAction<number>>,
+      setCurrentMonth: Dispatch<
+        React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
+      >,
     ) => {
       try {
         await axiosPrivate.put(
@@ -275,6 +260,7 @@ export default function useTransactions(
           promises.push(await handleGetChartCategories(newDate))
           promises.push(await handleGetBalance())
           promises.push(await handleGetOverviewTransactions(newDate))
+          // @ts-expect-error TS2345
           setCurrentMonth(newDate.month)
         }
 
@@ -285,7 +271,6 @@ export default function useTransactions(
     },
     [
       rows,
-      handleGetPreviewTransactions,
       handleGetChartCategories,
       handleGetOverviewTransactions,
       handleGetBalance,
@@ -297,7 +282,6 @@ export default function useTransactions(
   return {
     rows,
     setRows,
-    handleGetPreviewTransactions,
     handleDeleteTransaction,
     handleCreateTransaction,
     handleUpdateTransaction,

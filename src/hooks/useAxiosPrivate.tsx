@@ -49,7 +49,7 @@ const useAxiosPrivate = () => {
               failedRequestsQueue.forEach(({ onSuccess }) => {
                 onSuccess(data.accessToken)
               })
-            } catch (err) {
+            } catch (err: any) {
               failedRequestsQueue.forEach(({ onFailure }) => {
                 onFailure(err)
               })

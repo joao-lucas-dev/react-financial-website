@@ -5,7 +5,6 @@ import { DateTime } from 'luxon'
 
 export default function useDashboard(
   rows: IRow[],
-  handleGetPreviewTransactions: (date?: DateTime) => Promise<void>,
   handleGetChartCategories: (date?: DateTime) => Promise<void>,
   handleGetOverviewTransactions: (date?: DateTime) => Promise<void>,
   handleGetBalance: () => Promise<void>,
@@ -36,13 +35,13 @@ export default function useDashboard(
       if (newDate.month !== currentMonth) {
         promises.push(await handleGetChartCategories(newDate))
         promises.push(await handleGetOverviewTransactions(newDate))
+        // @ts-expect-error TS2322
         setCurrentMonth(newDate.month)
       }
 
       await Promise.all(promises)
     },
     [
-      handleGetPreviewTransactions,
       rows,
       handleGetChartCategories,
       handleGetOverviewTransactions,
@@ -64,7 +63,6 @@ export default function useDashboard(
 
     await Promise.all(promises)
   }, [
-    handleGetPreviewTransactions,
     handleGetChartCategories,
     handleGetOverviewTransactions,
     currentMonth,

@@ -33,7 +33,6 @@ export default function Dashboard() {
   const { chartCategories, handleGetChartCategories } = useCategories()
   const {
     rows,
-    handleGetPreviewTransactions,
     handleCreateTransaction,
     handleCreateCompleteTransaction,
     handleDeleteTransaction,
@@ -54,7 +53,6 @@ export default function Dashboard() {
     setCurrentMonth,
   } = useDashboard(
     rows,
-    handleGetPreviewTransactions,
     handleGetChartCategories,
     handleGetOverviewTransactions,
     handleGetBalance,
@@ -75,7 +73,7 @@ export default function Dashboard() {
                 <div className="w-full mx-2 md:mx-0 bg-white dark:bg-black-bg h-20 rounded-2xl flex justify-between px-4 sm:px-10">
                   <div className="flex items-center">
                     <h1 className="text-base md:text-lg lg:text-xl font-semibold text-gray dark:text-softGray">
-                      <span>{getGreeting()}, João</span>
+                      <span>{getGreeting()}</span>
                     </h1>
                   </div>
                   <div className="flex items-center">

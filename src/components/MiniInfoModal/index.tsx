@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, Dispatch, SetStateAction } from 'react'
-import { ITransaction } from '../../types/transactions'
+import React, { useEffect, useRef } from 'react'
+import { ISetOpenModal, ITransaction } from '../../types/transactions'
 import CategoryIcon from '../CategoryIcon'
 import './styles.css'
 import { EllipsisVertical } from 'lucide-react'
@@ -14,13 +14,7 @@ interface IParams {
   ) => Promise<void>
   transactions: ITransaction[]
   type: 'income' | 'outcome' | 'daily'
-  setOpenModal: Dispatch<
-    SetStateAction<{
-      isOpen: boolean
-      transaction: ITransaction
-      type: string
-    }>
-  >
+  setOpenModal: ISetOpenModal
   tdRect: DOMRect | null
 }
 

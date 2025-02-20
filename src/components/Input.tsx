@@ -2,13 +2,12 @@ import React, { FC, forwardRef } from 'react'
 
 interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string
-  required?: boolean
 }
 
 const Input: FC<CustomInputProps> = forwardRef<
   HTMLInputElement,
   CustomInputProps
->(({ label, type, required, ...props }, ref) => {
+>(({ label, type, ...props }, ref) => {
   return (
     <div className="flex flex-col mt-4">
       <label className="text-md font-semibold text-gray dark:text-softGray">

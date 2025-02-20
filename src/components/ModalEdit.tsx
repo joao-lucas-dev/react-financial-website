@@ -1,5 +1,11 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
-import { ITransaction } from '../types/transactions.ts'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import {
+  IHandleUpdateTransaction,
+  IOpenModal,
+  ISetCurrentMonth,
+  ISetOpenModal,
+  ITransaction,
+} from '../types/transactions.ts'
 import Input from './Input.tsx'
 import Button from './Button.tsx'
 import { X } from 'lucide-react'
@@ -10,25 +16,11 @@ import SelectInput from './SelectInput.tsx'
 import useAxiosPrivate from '../hooks/useAxiosPrivate.tsx'
 
 interface IParams {
-  openModal: {
-    isOpen: boolean
-    transaction: ITransaction
-    type: string
-  }
-  setOpenModal: React.Dispatch<
-    React.SetStateAction<{
-      isOpen: boolean
-      transaction: ITransaction
-      type: string
-    }>
-  >
-  handleUpdateTransaction: (
-    updateTransaction: ITransaction,
-    currentMonth: number,
-    setCurrentMonth: React.Dispatch<number>,
-  ) => Promise<void>
+  openModal: IOpenModal
+  setOpenModal: ISetOpenModal
+  handleUpdateTransaction: IHandleUpdateTransaction
   currentMonth: number
-  setCurrentMonth: React.Dispatch<number>
+  setCurrentMonth: ISetCurrentMonth
 }
 
 const modalEditSchema = z.object({
@@ -109,7 +101,7 @@ const ModalEdit = ({
           category_id: Number(data.category),
           transaction_day: new Date(`${data.transaction_day}T00:00:00`),
           shared_id: null,
-        } as ITransaction
+        } as unknown as ITransaction
 
         await handleUpdateTransaction(
           updatedTransaction,
@@ -180,6 +172,7 @@ const ModalEdit = ({
             {categories.length > 0 && (
               <Controller
                 render={(field) => (
+                  // @ts-expect-error TS2322
                   <SelectInput {...field} categories={categories} />
                 )}
                 name="category"

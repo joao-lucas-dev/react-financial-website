@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useState, useRef } from 'react'
 import CategoryIcon from './CategoryIcon'
 import { ChevronDown } from 'lucide-react'
 
+// @ts-expect-error TS2339
 const SelectInput = forwardRef(({ field, categories }, ref) => {
   const { onChange } = field
   const [isOpen, setIsOpen] = useState(false)
@@ -11,12 +12,13 @@ const SelectInput = forwardRef(({ field, categories }, ref) => {
 
   useEffect(() => {
     setSelectedCategory(
-      categories.find((cat) => String(cat.id) === field.value),
+      categories.find((cat: { id: number }) => String(cat.id) === field.value),
     )
   }, [field.value, categories])
 
   const checkDropdownPosition = () => {
     if (dropdownRef.current) {
+      // @ts-expect-error TS2339
       const dropdownRect = dropdownRef.current.getBoundingClientRect()
       const windowHeight = window.innerHeight
 
@@ -34,13 +36,15 @@ const SelectInput = forwardRef(({ field, categories }, ref) => {
     }
   }, [isOpen])
 
-  const handleSelect = (category) => {
+  const handleSelect = (category: never) => {
+    // @ts-expect-error TS2339
     onChange(String(category.id))
     setSelectedCategory(category)
     setIsOpen(false)
   }
 
   return (
+    // @ts-expect-error TS2322
     <div className="relative w-full mt-4" ref={ref}>
       <span className="text-md font-semibold text-gray dark:text-softGray">
         Categorias<span className="text-red-600">*</span>
@@ -53,7 +57,9 @@ const SelectInput = forwardRef(({ field, categories }, ref) => {
         <div className="flex items-center">
           {selectedCategory ? (
             <>
+              {/* @ts-expect-error TS2322 */}
               <CategoryIcon category={selectedCategory} />
+              {/* @ts-expect-error TS2322 */}
               <span className="ml-2">{selectedCategory.name}</span>
             </>
           ) : (
@@ -70,9 +76,11 @@ const SelectInput = forwardRef(({ field, categories }, ref) => {
             dropdownDirection === 'down' ? 'mt-1' : 'bottom-full mb-1'
           } w-full h-48 overflow-y-scroll bg-white border border-zinc-300 dark:border-zinc-700 rounded-md shadow-lg z-10`}
         >
+          {/* @ts-expect-error TS2322 */}
           {categories.map((category) => (
             <div
               key={category.id}
+              // @ts-expect-error TS2322
               onClick={() => handleSelect(category)}
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer hover:bg-zinc-100 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
             >

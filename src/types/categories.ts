@@ -1,4 +1,4 @@
-type IValue = {
+export type IValue = {
   name: string
   total: number
   color: string
