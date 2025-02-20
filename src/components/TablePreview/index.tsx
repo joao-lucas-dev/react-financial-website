@@ -116,12 +116,12 @@ const TablePreview = ({
           className="relative"
         >
           <td
-            className={`${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : 'bg-white'} dark:bg-softBlack-bg dark:text-softGray sm:relative border-b-1 p-2 border-lineGray text-sm text-center font-[600] h-[56px]`}
+            className={`${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : 'bg-white'} dark:bg-black-bg dark:text-softGray sm:relative border-b-1 p-2 border-lineGray text-sm text-center font-[600] h-[56px]`}
           >
             {row.formatted_date}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} dark:bg-softBlack-bg dark:text-softGray sm:relative hover:cursor-pointer group hover:border h-[56px]`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} dark:text-softGray sm:relative hover:cursor-pointer group hover:border h-[56px]`}
             onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 1)}
             onMouseLeave={handleMouseLeave}
           >
@@ -147,7 +147,7 @@ const TablePreview = ({
               )}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} dark:bg-softBlack-bg dark:text-softGray sm:relative hover:cursor-pointer group hover:border h-[56px]`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} dark:text-softGray sm:relative hover:cursor-pointer group hover:border h-[56px]`}
             onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 2)}
             onMouseLeave={handleMouseLeave}
           >
@@ -173,7 +173,7 @@ const TablePreview = ({
               )}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} dark:bg-softBlack-bg dark:text-softGray sm:relative hover:cursor-pointer group hover:border h-[56px]`}
+            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} dark:text-softGray sm:relative hover:cursor-pointer group hover:border h-[56px]`}
             onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 3)}
             onMouseLeave={handleMouseLeave}
           >
@@ -199,7 +199,7 @@ const TablePreview = ({
               )}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray ${color} ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} dark:bg-softBlack-bg font-semibold text-sm text-center h-[56px]`}
+            className={`border-b-1 p-2 border-lineGray ${color} ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} font-semibold text-sm text-center h-[56px]`}
           >
             {row.total.valueFormatted}
           </td>

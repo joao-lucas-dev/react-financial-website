@@ -1,18 +1,8 @@
 import FormSignIn from '../../components/FormSignIn'
 import GoogleButton from '../../components/GoogleLoginButton'
 import LogoIcon from '../../icons/LogoIcon'
-import { useNavigate } from 'react-router-dom'
-import useAuthentication from '../../hooks/useAutentication.ts'
 
 export default function Login() {
-  const navigate = useNavigate()
-
-  const { getUserSession } = useAuthentication()
-
-  const user = getUserSession()
-
-  if (user) navigate('/dashboard')
-
   return (
     <main className="w-screen h-screen flex flex-col items-center justify-center bg-background px-4">
       <div className="mb-8">

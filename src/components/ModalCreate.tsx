@@ -6,7 +6,7 @@ import React, {
   useEffect,
   useState,
 } from 'react'
-import { IRow, ITransaction } from '../types/transactions.ts'
+import { ITransaction } from '../types/transactions.ts'
 import Input from './Input.tsx'
 import Button from './Button.tsx'
 import { X } from 'lucide-react'
@@ -14,7 +14,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import SelectInput from './SelectInput.tsx'
-import api from '../api/axiosInstance.ts'
+import useAxiosPrivate from '../hooks/useAxiosPrivate.tsx'
 
 interface IParams {
   openModal: {
@@ -46,7 +46,7 @@ const modalEditSchema = z.object({
   transaction_day: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Data é obrigatória e deve ser uma data válida',
   }),
-  category: z.string(),
+  category: z.string().min(1, 'Categoria é obrigatória'),
 })
 
 type ModalCreateData = z.infer<typeof modalEditSchema>
@@ -59,6 +59,7 @@ const ModalCreate = ({
   setCurrentMonth,
 }: IParams) => {
   const [categories, setCategories] = useState([])
+  const axiosPrivate = useAxiosPrivate()
 
   const getType = useCallback(() => {
     if (openModal.button === 'income') return 'entrada'
@@ -79,9 +80,9 @@ const ModalCreate = ({
   })
 
   const getCategories = useCallback(async () => {
-    const { data } = await api.get('/categories')
+    const { data } = await axiosPrivate.get('/categories')
     setCategories(data)
-  }, [setCategories])
+  }, [setCategories, axiosPrivate])
 
   useEffect(() => {
     getCategories()
@@ -164,6 +165,7 @@ const ModalCreate = ({
             <Input
               label="Descrição"
               placeholder="Insira um descrição"
+              required={true}
               {...register('description')}
             />
             <span className="text-red-500 my-4 text-sm">
@@ -175,24 +177,28 @@ const ModalCreate = ({
                 <Input
                   label="Valor"
                   placeholder="R$ 0,00"
+                  required={true}
                   {...register('price')}
                   onChange={handleChange}
                 />
-                <span className="text-red-500 my-4 text-sm">
-                  {errors.price?.message}
-                </span>
               </div>
 
               <div className="w-[200px]">
                 <Input
                   label="Data"
                   type="date"
+                  required={true}
                   {...register('transaction_day')}
                 />
-                <span className="text-red-500 my-4 text-sm">
-                  {errors.transaction_day?.message}
-                </span>
               </div>
+            </div>
+            <div className="flex row justify-between items-center">
+              <span className="text-red-500 my-4 text-sm">
+                {errors.price?.message}
+              </span>
+              <span className="text-red-500 my-4 text-sm">
+                {errors.transaction_day?.message}
+              </span>
             </div>
 
             {categories.length > 0 && (
@@ -206,7 +212,9 @@ const ModalCreate = ({
             )}
 
             <span className="text-red-500 my-4 text-sm">
-              {errors.category?.message}
+              {errors.category?.message === 'Required'
+                ? 'Selecione uma categoria'
+                : errors.category?.message}
             </span>
 
             <Button title="Criar" type="submit" />

@@ -20,10 +20,8 @@ import useDashboard from '../../hooks/useDashboard.ts'
 import useTransactions from '../../hooks/useTransactions.ts'
 import CountUp from '../../components/CountUp.tsx'
 import useCategories from '../../hooks/useCategories.ts'
-// import useAuthentication from '../../hooks/useAutentication.ts'
 import { useState } from 'react'
 import { ITransaction } from '../../types/transactions.ts'
-import { useNavigate } from 'react-router-dom'
 
 export default function Dashboard() {
   const [openModal, setOpenModal] = useState({
@@ -31,12 +29,6 @@ export default function Dashboard() {
     transaction: {} as ITransaction,
     type: '',
   })
-
-  const navigate = useNavigate()
-  // const { getUserSession } = useAuthentication()
-  // const user = getUserSession()
-  //
-  // if (!user) navigate('/login')
 
   const { chartCategories, handleGetChartCategories } = useCategories()
   const {
@@ -70,7 +62,7 @@ export default function Dashboard() {
   )
 
   return (
-    <div className="">
+    <div className="dark">
       <div className="w-full h-full bg-background dark:bg-orangeDark">
         <Header title="Dashboard" />
 
@@ -210,7 +202,7 @@ export default function Dashboard() {
                     <div>
                       <button
                         disabled={hasToday()}
-                        className="bg-primary px-4 py-1 text-white rounded-lg disabled:bg-orange-200 dark:disabled:bg-auto flex justify-center items-center"
+                        className="bg-primary px-4 py-1 text-white rounded-lg disabled:bg-orange-300 dark:disabled:bg-auto flex justify-center items-center"
                         onClick={() => getToday()}
                       >
                         <Calendar size={16} className="mr-2" />

@@ -22,7 +22,7 @@ export default function FormLogin() {
   const onSubmit: SubmitHandler<FormData> = async ({ email, password }) => {
     try {
       await login(email, password)
-      navigate('dashboard')
+      navigate('/dashboard')
     } catch (err) {
       console.error(err)
     }

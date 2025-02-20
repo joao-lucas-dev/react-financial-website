@@ -1,4 +1,5 @@
 import { House, MessageCircleQuestion, Settings } from 'lucide-react'
+import LogoutButton from './LoggoutButton.tsx'
 
 const MenuAside = () => {
   return (
@@ -34,8 +35,7 @@ const MenuAside = () => {
         </li>
       </ul>
       <div className="border-t-2 border-lightGray dark:border-gray py-6 flex justify-center items-center">
-        {/* <LogoutButton /> */}
-        <h2 className="dark:text-softGray">Sair</h2>
+        <LogoutButton />
       </div>
     </aside>
   )

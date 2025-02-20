@@ -96,9 +96,9 @@ export default function useDashboard(
 
   useEffect(() => {
     handleGetTransactionsMonth()
-    // handleGetChartCategories()
-    // handleGetOverviewTransactions()
-    // handleGetBalance()
+    handleGetChartCategories()
+    handleGetOverviewTransactions()
+    handleGetBalance()
   }, [])
 
   return {

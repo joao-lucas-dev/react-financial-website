@@ -1,11 +1,11 @@
 import axios from 'axios'
 
-const axiosInstance = axios.create({
+export default axios.create({
   baseURL: 'http://localhost:8080',
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 })
 
-export default axiosInstance
+export const axiosPrivate = axios.create({
+  baseURL: 'http://localhost:8080',
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
+})

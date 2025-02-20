@@ -1,33 +1,50 @@
 import { useCallback } from 'react'
-import Cookies from 'js-cookie'
-import { decodeJwt } from 'jose'
 import api from '../api/axiosInstance'
+import useAuthContext from './useAuthContext.tsx'
 
 export default function useAuthentication() {
-  const login = useCallback(async (email: string, password: string) => {
+  const { setAccessToken } = useAuthContext()
+
+  const login = useCallback(
+    async (email: string, password: string) => {
+      try {
+        const { data } = await api.post(
+          '/auth/login',
+          {
+            email,
+            password,
+          },
+          {
+            withCredentials: true,
+          },
+        )
+
+        setAccessToken(data.accessToken)
+      } catch (err) {
+        console.error('Erro ao fazer login:', err)
+      }
+    },
+    [setAccessToken],
+  )
+
+  const logout = useCallback(async () => {
     try {
-      const { data } = await api.post('/auth/login', {
-        email,
-        password,
-      })
+      await api.post(
+        '/auth/logout',
+        {},
+        {
+          withCredentials: true,
+        },
+      )
 
-      const { accessToken } = data
-
-      Cookies.set('accessToken', accessToken)
+      setAccessToken(null)
     } catch (err) {
       console.error('Erro ao fazer login:', err)
     }
-  }, [])
-
-  const getUserSession = useCallback(() => {
-    const accessToken = Cookies.get('access_token')
-    if (accessToken) return decodeJwt(accessToken)
-
-    return null
-  }, [])
+  }, [setAccessToken])
 
   return {
     login,
-    getUserSession,
+    logout,
   }
 }

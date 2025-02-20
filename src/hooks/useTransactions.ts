@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useCallback, useState } from 'react'
 import { IOverview, IRow, ITransaction } from '../types/transactions.ts'
 import { DateTime } from 'luxon'
-import api from '../api/axiosInstance.ts'
+import useAxiosPrivate from './useAxiosPrivate.tsx'
 
 export default function useTransactions(
   handleGetChartCategories: (date?: DateTime) => Promise<void>,
@@ -25,17 +25,21 @@ export default function useTransactions(
     },
   })
   const [balance, setBalance] = useState(0)
+  const axiosPrivate = useAxiosPrivate()
 
   const handleGetBalance = useCallback(async () => {
     try {
       const date = DateTime.now()
 
-      const { data } = await api.get(`/transactions/balance?date=${date}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      const { data } = await axiosPrivate.get(
+        `/transactions/balance?date=${date}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
         },
-      })
+      )
 
       setBalance(data.balance)
     } catch (err) {
@@ -49,7 +53,7 @@ export default function useTransactions(
       const endDate = date.endOf('month')
 
       try {
-        const { data } = await api.get(
+        const { data } = await axiosPrivate.get(
           `/transactions/overview?startDate=${startDate}&endDate=${endDate}`,
           {
             headers: {
@@ -62,7 +66,7 @@ export default function useTransactions(
         console.log(err)
       }
     },
-    [],
+    [axiosPrivate],
   )
 
   const handleGetTransactionsMonth = useCallback(
@@ -71,25 +75,22 @@ export default function useTransactions(
       const year = date.year
 
       try {
-        const { data } = await api.get(
+        const { data } = await axiosPrivate.get(
           `/transactions?month=${month}&year=${year}`,
           {
             headers: {
               'Content-Type': 'application/json',
               timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-              Authorization:
-                'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzMzNzkyMDAyLCJleHAiOjE3MzM3OTU2MDJ9.9shPDhBRYX38WVeIXXEh3NvshRR00UbwQV8v1H7JZfM',
             },
           },
         )
+
         setRows(data)
       } catch (err) {
-        if (err.status === 401) {
-          const { data } = await api.get('/token')
-        }
+        console.error('Erro ao buscar transações:', err)
       }
     },
-    [],
+    [axiosPrivate],
   )
 
   const handleGetPreviewTransactions = useCallback(
@@ -98,7 +99,7 @@ export default function useTransactions(
       const endDate = date.plus({ days: 3 }).endOf('day')
 
       try {
-        const { data } = await api.get(
+        const { data } = await axiosPrivate.get(
           `/transactions/preview?startDate=${startDate}&endDate=${endDate}`,
           {
             headers: {
@@ -112,7 +113,7 @@ export default function useTransactions(
         console.log(err)
       }
     },
-    [setRows],
+    [setRows, axiosPrivate],
   )
 
   const handleCreateTransaction = useCallback(
@@ -138,7 +139,7 @@ export default function useTransactions(
           millisecond: now.millisecond,
         })
 
-        await api.post('/transactions/create', {
+        await axiosPrivate.post('/transactions/create', {
           description: 'Insira uma descrição',
           price: value.originalValue,
           category_id: type === 'incomes' ? 10 : 4,
@@ -175,13 +176,14 @@ export default function useTransactions(
       handleGetOverviewTransactions,
       handleGetBalance,
       handleGetTransactionsMonth,
+      axiosPrivate,
     ],
   )
 
   const handleCreateCompleteTransaction = useCallback(
     async (createTransaction: any, currentMonth: number) => {
       try {
-        await api.post('/transactions/create', {
+        await axiosPrivate.post('/transactions/create', {
           description: createTransaction.description,
           price: createTransaction.price,
           category_id: createTransaction.category_id,
@@ -213,6 +215,7 @@ export default function useTransactions(
       handleGetChartCategories,
       handleGetBalance,
       handleGetOverviewTransactions,
+      axiosPrivate,
     ],
   )
 
@@ -223,7 +226,7 @@ export default function useTransactions(
       setCurrentMonth: Dispatch<SetStateAction<number>>,
     ) => {
       try {
-        await api.delete(`/transactions/delete/${id}`)
+        await axiosPrivate.delete(`/transactions/delete/${id}`)
 
         const newDate = DateTime.fromISO(rows[3].date) as DateTime
 
@@ -248,6 +251,7 @@ export default function useTransactions(
       handleGetOverviewTransactions,
       handleGetBalance,
       handleGetTransactionsMonth,
+      axiosPrivate,
     ],
   )
 
@@ -258,7 +262,7 @@ export default function useTransactions(
       setCurrentMonth: Dispatch<SetStateAction<number>>,
     ) => {
       try {
-        await api.put(
+        await axiosPrivate.put(
           `/transactions/update/${updateTransaction.id}`,
           updateTransaction,
         )
@@ -286,6 +290,7 @@ export default function useTransactions(
       handleGetOverviewTransactions,
       handleGetBalance,
       handleGetTransactionsMonth,
+      axiosPrivate,
     ],
   )
 

@@ -11,7 +11,7 @@ const SelectInput = forwardRef(({ field, categories }, ref) => {
 
   useEffect(() => {
     setSelectedCategory(
-      categories.find((cat) => String(cat.id) === field.value) || categories[0],
+      categories.find((cat) => String(cat.id) === field.value),
     )
   }, [field.value, categories])
 
@@ -43,7 +43,7 @@ const SelectInput = forwardRef(({ field, categories }, ref) => {
   return (
     <div className="relative w-full mt-4" ref={ref}>
       <span className="text-md font-semibold text-gray dark:text-softGray">
-        Categorias
+        Categorias<span className="text-red-600">*</span>
       </span>
       <button
         type="button"
@@ -51,8 +51,14 @@ const SelectInput = forwardRef(({ field, categories }, ref) => {
         className="w-full flex h-12 mt-2 rounded-lg p-4 border border-softGray items-center justify-between bg-white dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
       >
         <div className="flex items-center">
-          <CategoryIcon category={selectedCategory} />
-          <span className="ml-2">{selectedCategory.name}</span>
+          {selectedCategory ? (
+            <>
+              <CategoryIcon category={selectedCategory} />
+              <span className="ml-2">{selectedCategory.name}</span>
+            </>
+          ) : (
+            <span className="font-sm text-zinc-400">Selecionar opção...</span>
+          )}
         </div>
         <ChevronDown className="w-4 h-4" />
       </button>

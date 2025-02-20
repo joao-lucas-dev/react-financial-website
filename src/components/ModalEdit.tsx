@@ -7,7 +7,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import SelectInput from './SelectInput.tsx'
-import api from '../api/axiosInstance.ts'
+import useAxiosPrivate from '../hooks/useAxiosPrivate.tsx'
 
 interface IParams {
   openModal: {
@@ -50,6 +50,7 @@ const ModalEdit = ({
   setCurrentMonth,
 }: IParams) => {
   const [categories, setCategories] = useState([])
+  const axiosPrivate = useAxiosPrivate()
 
   const {
     register,
@@ -62,9 +63,9 @@ const ModalEdit = ({
   })
 
   const getCategories = useCallback(async () => {
-    const { data } = await api.get('/categories')
+    const { data } = await axiosPrivate.get('/categories')
     setCategories(data)
-  }, [setCategories])
+  }, [setCategories, axiosPrivate])
 
   useEffect(() => {
     getCategories()
