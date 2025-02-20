@@ -62,7 +62,7 @@ export default function Dashboard() {
   )
 
   return (
-    <div className="dark">
+    <div>
       <div className="w-full h-full bg-background dark:bg-orangeDark">
         <Header title="Dashboard" />
 
@@ -170,22 +170,22 @@ export default function Dashboard() {
 
               <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6 pb-2">
                 <div className="h-[600px] flex flex-col bg-white dark:bg-black-bg rounded-xl px-6 py-6 sm:p-6  lg:col-span-2 lg:row-span-2">
-                  <div className="flex flex-none justify-between items-center mb-4">
-                    <h2 className="text-base md:text-lg lg:text-xl font-semibold text-gray dark:text-softGray w-24">
+                  <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center mb-4">
+                    <h2 className="text-[18px] mb-2 sm:mb-0 md:text-lg lg:text-xl font-semibold text-gray dark:text-softGray">
                       {getMonth ? (
                         `${getMonth()}`
                       ) : (
                         <Skeleton height={20} width={100} />
                       )}
                     </h2>
-                    <div className="flex flex-1 items-center justify-center pr-20">
+                    <div className="flex flex-1 items-center justify-center">
                       <button
-                        className="text-xl md:text-md lg:text-lg font-semibold text-gray dark:text-softGray"
+                        className="text-base md:text-md lg:text-lg font-semibold text-gray dark:text-softGray"
                         onClick={() => getNextWeek(true)}
                       >
                         <ChevronLeft />
                       </button>
-                      <span className="text-xl md:text-md lg:text-lg font-semibold text-gray dark:text-softGray mx-2">
+                      <span className="text-base md:text-md lg:text-lg font-semibold text-gray dark:text-softGray mx-2">
                         {rows.length > 0 ? (
                           `${rows[0].formatted_date} a ${rows[rows.length - 1].formatted_date}`
                         ) : (
@@ -199,7 +199,7 @@ export default function Dashboard() {
                         <ChevronRight />
                       </button>
                     </div>
-                    <div>
+                    <div className="hidden sm:block">
                       <button
                         disabled={hasToday()}
                         className="bg-primary px-4 py-1 text-white rounded-lg disabled:bg-orange-300 dark:disabled:bg-auto flex justify-center items-center"

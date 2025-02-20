@@ -116,7 +116,7 @@ const TablePreview = ({
           className="relative"
         >
           <td
-            className={`${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : 'bg-white'} dark:bg-black-bg dark:text-softGray sm:relative border-b-1 p-2 border-lineGray text-sm text-center font-[600] h-[56px]`}
+            className={`sticky left-0 ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : 'bg-white'} dark:bg-black-bg dark:text-softGray sm:relative border-b-1 p-2 border-lineGray text-sm text-center font-[600] h-[56px]`}
           >
             {row.formatted_date}
           </td>
@@ -226,7 +226,7 @@ const TablePreview = ({
           <table className="min-w-640 sm:w-full h-full text-left">
             <thead>
               <tr>
-                <th className="sticky top-0 z-10 bg-background dark:bg-orangeDark rounded-tl-lg text-center p-4 text-gray dark:text-softGray border-b-1 border-lineGray text-sm">
+                <th className="sticky top-0 left-0 z-20 sm:z-10 bg-background dark:bg-orangeDark rounded-tl-lg text-center p-4 text-gray dark:text-softGray border-b-1 border-lineGray text-sm">
                   Data
                 </th>
                 <th className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">

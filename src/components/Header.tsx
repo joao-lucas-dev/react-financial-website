@@ -1,11 +1,22 @@
-import { AlignJustify } from 'lucide-react'
+import { useState } from 'react'
+import {
+  AlignJustify,
+  House,
+  MessageCircleQuestion,
+  Settings,
+  X,
+} from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import LogoIcon from '../icons/LogoIcon'
+import LogoutButton from './LoggoutButton.tsx'
 
 interface IParams {
   title: string
 }
 
 const Header = ({ title }: IParams) => {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
     <header className="fixed z-40 w-full h-24 top-0">
       <div className="w-full h-24 flex bg-white dark:bg-black-bg py-4">
@@ -14,15 +25,75 @@ const Header = ({ title }: IParams) => {
         </div>
 
         <div className="w-full flex justify-between items-center px-6 md:px-10">
-          <div className="flex xl:hidden h-full justify-center items-center">
-            <AlignJustify size={24} className="text-gray" />
-          </div>
-
           <h1 className="text-xl md:text-2xl text-gray dark:text-softGray font-semibold">
             {title}
           </h1>
+
+          <button
+            className="flex xl:hidden h-full justify-center items-center"
+            onClick={() => setIsOpen(true)}
+          >
+            <AlignJustify size={24} className="text-gray" />
+          </button>
         </div>
       </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="fixed h-[100dvh] top-0 right-0 w-full sm:w-64 md:w-60 xl:w-60 bg-white dark:bg-black-bg shadow-lg flex flex-col pt-6 pr-6 pl-6 z-50"
+          >
+            <button className="self-end mb-6" onClick={() => setIsOpen(false)}>
+              <X size={24} className="text-gray" />
+            </button>
+
+            <nav className="flex flex-col space-y-4 text-lg font-semibold text-gray dark:text-softGray flex-grow">
+              <ul className="flex-grow pb-6">
+                <li className="border-l-4 border-primary h-10 flex items-center transition-all cursor-pointer p-4">
+                  <a href="/" className="flex items-center">
+                    <House size={20} className="text-primary mr-5" />
+                    <span className="text-sm md:text-base text-primary">
+                      Dashboard
+                    </span>
+                  </a>
+                </li>
+                <li className="h-12 flex items-center p-4 mt-5">
+                  <a
+                    href="/"
+                    className="flex items-center text-zinc-500 hover:text-primary"
+                  >
+                    <MessageCircleQuestion
+                      size={20}
+                      className="dark:text-softGray mr-5"
+                    />
+                    <span className="text-sm md:text-base dark:text-softGray">
+                      Feedback
+                    </span>
+                  </a>
+                </li>
+                <li className="h-12 flex items-center p-4 mt-5">
+                  <a
+                    href="/"
+                    className="flex items-center text-zinc-500 hover:text-primary"
+                  >
+                    <Settings size={20} className=" dark:text-softGray mr-5" />
+                    <span className="text-sm md:text-base dark:text-softGray">
+                      Configurações
+                    </span>
+                  </a>
+                </li>
+              </ul>
+              <div className="border-t-2 border-lightGray dark:border-gray py-6 flex justify-center items-center">
+                <LogoutButton />
+              </div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   )
 }

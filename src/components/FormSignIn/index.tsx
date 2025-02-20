@@ -66,7 +66,7 @@ export default function FormLogin() {
         </span>
       )}
 
-      <a href="/" className="hover:text-primary transition-all mt-2 text-sm">
+      <a className="hover:text-primary transition-all mt-2 text-sm">
         <span className="text-nam text-sm mt-2 block">Esqueci minha senha</span>
       </a>
 

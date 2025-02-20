@@ -28,7 +28,7 @@ export default function Login() {
 
       <div className="mt-4 flex items-center">
         <span className="text-sm text-zinc-500">Ainda não possui conta?</span>
-        <a href="/signup" className="text-primary ml-1 text-sm hover:underline">
+        <a className="text-primary ml-1 text-sm hover:underline">
           Faça seu cadastro!
         </a>
       </div>
