@@ -15,6 +15,8 @@ if (rootElement) {
       <BrowserRouter>
         <AuthProvider>
           <Routes>
+            <Route path="/" element={<Navigate to="/login" />} />
+
             <Route element={<RedirectIfAuthenticated />}>
               <Route path="/login" element={<Login />} />
             </Route>
@@ -23,8 +25,6 @@ if (rootElement) {
               <Route path="/dashboard" element={<Dashboard />} />
             </Route>
           </Routes>
-
-          <Route path="*" element={<Navigate to="/login" />} />
         </AuthProvider>
       </BrowserRouter>
     </StrictMode>,
