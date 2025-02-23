@@ -74,7 +74,7 @@ const SelectInput = forwardRef(({ field, categories }, ref) => {
           ref={dropdownRef}
           className={`absolute ${
             dropdownDirection === 'down' ? 'mt-1' : 'bottom-full mb-1'
-          } w-full h-48 overflow-y-scroll bg-white border border-zinc-300 dark:border-zinc-700 rounded-md shadow-lg z-10`}
+          } w-full max-h-48 overflow-y-scroll bg-white border border-zinc-300 dark:border-zinc-700 rounded-md shadow-lg z-10`}
         >
           {/* @ts-expect-error TS2322 */}
           {categories.map((category) => (

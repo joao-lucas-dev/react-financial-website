@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import { ChangeEvent, useCallback, useEffect } from 'react'
 import {
   IHandleCreateCompleteTransaction,
   IOpenModal,
@@ -13,8 +13,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import SelectInput from './SelectInput.tsx'
-import useAxiosPrivate from '../hooks/useAxiosPrivate.tsx'
-import { IValue } from '../types/categories.ts'
+import { ICategory } from '../types/categories.ts'
 
 interface IParams {
   openModal: IOpenModal
@@ -22,6 +21,7 @@ interface IParams {
   handleCreateCompleteTransaction: IHandleCreateCompleteTransaction
   currentMonth: number
   setCurrentMonth: ISetCurrentMonth
+  categories: ICategory[]
 }
 
 const modalEditSchema = z.object({
@@ -41,10 +41,8 @@ const ModalCreate = ({
   handleCreateCompleteTransaction,
   currentMonth,
   setCurrentMonth,
+  categories,
 }: IParams) => {
-  const [categories, setCategories] = useState<IValue[]>([])
-  const axiosPrivate = useAxiosPrivate()
-
   const getType = useCallback(() => {
     if (openModal.button === 'income') return 'entrada'
 
@@ -63,15 +61,9 @@ const ModalCreate = ({
     resolver: zodResolver(modalEditSchema),
   })
 
-  const getCategories = useCallback(async () => {
-    const { data } = await axiosPrivate.get('/categories')
-    setCategories(data)
-  }, [setCategories, axiosPrivate])
-
   useEffect(() => {
-    getCategories()
     setValue('transaction_day', new Date().toISOString().split('T')[0])
-  }, [setValue, getCategories])
+  }, [setValue])
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -188,8 +180,18 @@ const ModalCreate = ({
             {categories.length > 0 && (
               <Controller
                 render={(field) => (
-                  // @ts-expect-error TS2322
-                  <SelectInput {...field} categories={categories} />
+                  <SelectInput
+                    {...field}
+                    // @ts-expect-error TS2322
+                    categories={
+                      openModal.transaction.type === 'income'
+                        ? categories.filter(
+                            (cat) =>
+                              cat.type === 'income' || cat.type === 'both',
+                          )
+                        : categories.filter((cat) => cat.type !== 'income')
+                    }
+                  />
                 )}
                 name="category"
                 control={control}

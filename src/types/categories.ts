@@ -1,3 +1,12 @@
+export type ICategory = {
+  color: string
+  iconName: string
+  icon_name: string
+  id: number
+  name: string
+  type: string
+}
+
 export type IValue = {
   name: string
   total: number

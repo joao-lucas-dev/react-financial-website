@@ -1,11 +1,12 @@
 import { DateTime } from 'luxon'
 import { colorsMap } from '../common/constants'
-import { useCallback, useState } from 'react'
-import { CategoryData } from '../types/categories.ts'
+import { useCallback, useEffect, useState } from 'react'
+import { CategoryData, ICategory } from '../types/categories.ts'
 import useAxiosPrivate from './useAxiosPrivate.tsx'
 
 export default function useCategories() {
   const axiosPrivate = useAxiosPrivate()
+  const [categories, setCategories] = useState<ICategory[]>([])
 
   const [chartCategories, setChartCategories] = useState({
     notIncome: {
@@ -96,8 +97,18 @@ export default function useCategories() {
     [axiosPrivate],
   )
 
+  const getCategories = useCallback(async () => {
+    const { data } = await axiosPrivate.get('/categories')
+    setCategories(data)
+  }, [setCategories, axiosPrivate])
+
+  useEffect(() => {
+    getCategories()
+  }, [])
+
   return {
     chartCategories,
     handleGetChartCategories,
+    categories,
   }
 }

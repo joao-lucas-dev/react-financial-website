@@ -30,7 +30,9 @@ export default function Dashboard() {
     type: '',
   })
 
-  const { chartCategories, handleGetChartCategories } = useCategories()
+  const { chartCategories, handleGetChartCategories, categories } =
+    useCategories()
+
   const {
     rows,
     handleCreateTransaction,
@@ -79,7 +81,7 @@ export default function Dashboard() {
                   <div className="flex items-center">
                     <div className="border-l-2 border-primary h-12 px-2 flex flex-col justify-center">
                       <span className="text-xs md:text-sm text-gray dark:text-grayWhite">
-                        Saldo geral
+                        Saldo hoje
                       </span>
                       <div>
                         <strong className="text-lg md:text-xl dark:text-softGray">
@@ -221,6 +223,7 @@ export default function Dashboard() {
                     setCurrentMonth={setCurrentMonth}
                     openModal={openModal}
                     setOpenModal={setOpenModal}
+                    categories={categories}
                   />
                 </div>
 

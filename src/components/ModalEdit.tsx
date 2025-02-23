@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import { ChangeEvent, useCallback, useEffect } from 'react'
 import {
   IHandleUpdateTransaction,
   IOpenModal,
@@ -13,7 +13,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import SelectInput from './SelectInput.tsx'
-import useAxiosPrivate from '../hooks/useAxiosPrivate.tsx'
+import { ICategory } from '../types/categories.ts'
 
 interface IParams {
   openModal: IOpenModal
@@ -21,6 +21,7 @@ interface IParams {
   handleUpdateTransaction: IHandleUpdateTransaction
   currentMonth: number
   setCurrentMonth: ISetCurrentMonth
+  categories: ICategory[]
 }
 
 const modalEditSchema = z.object({
@@ -40,10 +41,8 @@ const ModalEdit = ({
   handleUpdateTransaction,
   currentMonth,
   setCurrentMonth,
+  categories,
 }: IParams) => {
-  const [categories, setCategories] = useState([])
-  const axiosPrivate = useAxiosPrivate()
-
   const {
     register,
     handleSubmit,
@@ -54,14 +53,7 @@ const ModalEdit = ({
     resolver: zodResolver(modalEditSchema),
   })
 
-  const getCategories = useCallback(async () => {
-    const { data } = await axiosPrivate.get('/categories')
-    setCategories(data)
-  }, [setCategories, axiosPrivate])
-
   useEffect(() => {
-    getCategories()
-
     setValue('description', openModal.transaction.description)
     setValue('price', String(openModal.transaction.price))
     setValue(
@@ -71,7 +63,7 @@ const ModalEdit = ({
         .split('T')[0],
     )
     setValue('category', String(openModal.transaction.category.id))
-  }, [openModal.transaction, setValue, getCategories])
+  }, [openModal.transaction, setValue])
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -118,7 +110,13 @@ const ModalEdit = ({
         console.error(err)
       }
     },
-    [handleUpdateTransaction, openModal.transaction, setOpenModal],
+    [
+      handleUpdateTransaction,
+      openModal.transaction,
+      setOpenModal,
+      currentMonth,
+      setCurrentMonth,
+    ],
   )
 
   return (
@@ -172,8 +170,18 @@ const ModalEdit = ({
             {categories.length > 0 && (
               <Controller
                 render={(field) => (
-                  // @ts-expect-error TS2322
-                  <SelectInput {...field} categories={categories} />
+                  <SelectInput
+                    {...field}
+                    // @ts-expect-error TS2322
+                    categories={
+                      openModal.transaction.type === 'income'
+                        ? categories.filter(
+                            (cat) =>
+                              cat.type === 'income' || cat.type === 'both',
+                          )
+                        : categories.filter((cat) => cat.type !== 'income')
+                    }
+                  />
                 )}
                 name="category"
                 control={control}
