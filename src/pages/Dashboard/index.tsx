@@ -180,7 +180,7 @@ export default function Dashboard() {
                     </h2>
                     <div className="flex flex-1 items-center justify-center">
                       <button
-                        className="text-base md:text-md lg:text-lg font-semibold text-gray dark:text-softGray"
+                        className="text-base md:text-md lg:text-lg font-semibold text-gray dark:text-softGray active:opacity-50"
                         onClick={() => getNextWeek(true)}
                       >
                         <ChevronLeft />
@@ -193,7 +193,7 @@ export default function Dashboard() {
                         )}
                       </span>
                       <button
-                        className="text-sm md:text-md lg:text-lg font-semibold text-gray dark:text-softGray"
+                        className="text-sm md:text-md lg:text-lg font-semibold text-gray dark:text-softGray active:opacity-50"
                         onClick={() => getNextWeek(false)}
                       >
                         <ChevronRight />
@@ -202,7 +202,7 @@ export default function Dashboard() {
                     <div className="hidden sm:block">
                       <button
                         disabled={hasToday()}
-                        className="bg-primary px-4 py-1 text-white rounded-lg disabled:bg-orange-300 dark:disabled:bg-auto flex justify-center items-center"
+                        className="bg-primary px-4 py-1 text-white rounded-lg disabled:bg-orange-300 dark:disabled:bg-auto flex justify-center items-center active:opacity-50"
                         onClick={() => getToday()}
                       >
                         <Calendar size={16} className="mr-2" />

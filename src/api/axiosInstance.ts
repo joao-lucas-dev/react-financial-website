@@ -6,6 +6,9 @@ export default axios.create({
 
 export const axiosPrivate = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  },
   withCredentials: true,
 })

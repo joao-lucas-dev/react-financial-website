@@ -33,19 +33,13 @@ export default function useTransactions(
 
       const { data } = await axiosPrivate.get(
         `/transactions/balance?date=${date}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          },
-        },
       )
 
       setBalance(data.balance)
     } catch (err) {
       console.log(err)
     }
-  }, [setBalance])
+  }, [setBalance, axiosPrivate])
 
   const handleGetOverviewTransactions = useCallback(
     async (date = DateTime.now()) => {
@@ -77,12 +71,6 @@ export default function useTransactions(
       try {
         const { data } = await axiosPrivate.get(
           `/transactions?month=${month}&year=${year}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            },
-          },
         )
 
         setRows(data)
