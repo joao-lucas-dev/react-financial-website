@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { ISetOpenModal, ITransaction } from '../../types/transactions'
 import CategoryIcon from '../CategoryIcon'
 import './styles.css'
@@ -33,13 +33,43 @@ const MiniInfoModal = ({
     value,
     setValue,
     checkIfClipped,
-    modalRef,
     isClipped,
     findTextColor,
     handleOnKeyDown,
   } = useMiniInfoAux()
 
+  const modalRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  const [position, setPosition] = useState<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  })
+
+  useLayoutEffect(() => {
+    if (modalRef.current) {
+      if (tdRect) {
+        const modalHeight = modalRef.current.offsetHeight
+        const modalWidth = modalRef.current.offsetWidth
+        let newTop = tdRect.top
+        let newLeft = tdRect.right + 2
+
+        if (tdRect.top + modalHeight > window.innerHeight) {
+          newTop = tdRect.top - modalHeight
+          if (newTop < 0) newTop = 0
+        }
+
+        if (newLeft + modalWidth > window.innerWidth) {
+          newLeft = tdRect.left - modalWidth - 2
+          if (newLeft < 0) newLeft = 0
+        }
+
+        setPosition({ top: newTop, left: newLeft })
+      } else {
+        setPosition({ top: 0, left: 0 })
+      }
+    }
+  }, [tdRect, isClipped])
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -63,8 +93,8 @@ const MiniInfoModal = ({
         ref={modalRef}
         className="fixed z-50 bg-white dark:bg-black-bg shadow-lg rounded-lg w-80"
         style={{
-          left: tdRect ? tdRect.right + 2 : 0,
-          top: tdRect ? (isClipped ? tdRect.top - 50 : tdRect.top) : 0,
+          left: position.left,
+          top: position.top,
         }}
       >
         <div ref={scrollRef} className="max-h-52 card-miniinfo">
@@ -164,10 +194,7 @@ const MiniInfoModal = ({
                               onClick={() => {
                                 setOpenModal({
                                   isOpen: true,
-                                  transaction: {
-                                    ...transaction,
-                                    type,
-                                  },
+                                  transaction: { ...transaction, type },
                                   type: 'edit',
                                 })
                               }}
