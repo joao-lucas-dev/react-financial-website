@@ -67,7 +67,7 @@ export default function Dashboard() {
         <Header title="Dashboard" />
 
         <div className="flex h-screen">
-          <MenuAside />
+          <MenuAside activePage="dashboard" />
 
           <main className="flex w-full h-full pt-24 overflow-auto">
             <div className="w-full px-2 md:px-10 py-6">

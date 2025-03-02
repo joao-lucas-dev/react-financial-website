@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import Dashboard from './pages/Dashboard'
+import Transactions from './pages/Transactions'
 import Login from './pages/Login'
 import AuthProvider from './context/AuthProvider.tsx'
 import ProtectPage from './pages/ProtectPage.tsx'
@@ -21,6 +22,7 @@ if (rootElement) {
 
             <Route element={<ProtectPage />}>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/transacoes" element={<Transactions />} />
             </Route>
           </Routes>
         </AuthProvider>
