@@ -47,7 +47,7 @@ const Transactions = () => {
     <div className="w-full h-full bg-background dark:bg-orangeDark">
       <Header title="Transações" />
 
-      <div className="flex h-screen">
+      <div className="flex h-dvh">
         <MenuAside activePage="transacoes" />
 
         <main className="flex justify-center items-center w-full h-full pt-28 pb-4">
