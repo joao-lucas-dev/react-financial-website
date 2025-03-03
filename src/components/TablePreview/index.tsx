@@ -29,6 +29,7 @@ interface IParams {
   openModal: IOpenModal
   setOpenModal: ISetOpenModal
   categories: any[]
+  from: string
 }
 
 const TablePreview = ({
@@ -42,6 +43,7 @@ const TablePreview = ({
   openModal,
   setOpenModal,
   categories,
+  from = 'transacoes',
 }: IParams) => {
   const targetRowRef = useRef<HTMLTableRowElement>(null)
   const tableContainerRef = useRef<HTMLDivElement>(null)
@@ -119,6 +121,7 @@ const TablePreview = ({
                       setValue,
                       currentMonth,
                       setCurrentMonth,
+                      from,
                     )
                   }
                   transactions={row.incomes.transactions}
@@ -145,6 +148,7 @@ const TablePreview = ({
                       setValue,
                       currentMonth,
                       setCurrentMonth,
+                      from,
                     )
                   }
                   transactions={row.outcomes.transactions}
@@ -171,6 +175,7 @@ const TablePreview = ({
                       setValue,
                       currentMonth,
                       setCurrentMonth,
+                      from,
                     )
                   }
                   transactions={row.dailies.transactions}
@@ -196,6 +201,7 @@ const TablePreview = ({
     hoveredCell,
     currentMonth,
     setCurrentMonth,
+    from,
   ])
 
   return (
@@ -243,6 +249,7 @@ const TablePreview = ({
                 currentMonth={currentMonth}
                 setCurrentMonth={setCurrentMonth}
                 categories={categories}
+                from={from}
               />
             ) : openModal.type === 'delete' ? (
               <ModalDelete
@@ -251,6 +258,7 @@ const TablePreview = ({
                 handleDeleteTransaction={handleDeleteTransaction}
                 currentMonth={currentMonth}
                 setCurrentMonth={setCurrentMonth}
+                from={from}
               />
             ) : (
               <ModalCreate

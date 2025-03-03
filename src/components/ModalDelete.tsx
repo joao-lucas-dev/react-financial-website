@@ -12,6 +12,7 @@ interface IParams {
   handleDeleteTransaction: IHandleDeleteTransaction
   currentMonth: number
   setCurrentMonth: ISetCurrentMonth
+  from: string
 }
 
 const ModalDelete = ({
@@ -20,6 +21,7 @@ const ModalDelete = ({
   handleDeleteTransaction,
   currentMonth,
   setCurrentMonth,
+  from,
 }: IParams) => {
   return (
     <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -47,6 +49,7 @@ const ModalDelete = ({
                 openModal.transaction.id,
                 currentMonth,
                 setCurrentMonth,
+                from,
               )
               setOpenModal({
                 isOpen: false,

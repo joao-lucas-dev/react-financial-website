@@ -69,6 +69,7 @@ export type IHandleCreateTransaction = (
   setCurrentMonth: React.Dispatch<
     React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
   >,
+  from?: string,
 ) => Promise<void>
 
 export type IHandleCreateCompleteTransaction = (
@@ -85,6 +86,7 @@ export type IHandleUpdateTransaction = (
   setCurrentMonth: React.Dispatch<
     React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
   >,
+  from: string,
 ) => Promise<void>
 
 export type IHandleDeleteTransaction = (
@@ -94,6 +96,7 @@ export type IHandleDeleteTransaction = (
   setCurrentMonth: React.Dispatch<
     React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
   >,
+  from: string,
 ) => Promise<void>
 
 export type ISetCurrentMonth = React.Dispatch<

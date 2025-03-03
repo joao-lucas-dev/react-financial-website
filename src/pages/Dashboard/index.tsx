@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   Calendar,
 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 import TablePreview from '../../components/TablePreview'
 import ChartComponent from '../../components/ChartComponent.tsx'
@@ -43,7 +44,7 @@ export default function Dashboard() {
     overview,
     handleGetBalance,
     balance,
-    handleGetTransactionsMonth,
+    handleGetPreviewTransactions,
   } = useTransactions(handleGetChartCategories)
   const {
     getMonth,
@@ -58,7 +59,7 @@ export default function Dashboard() {
     handleGetChartCategories,
     handleGetOverviewTransactions,
     handleGetBalance,
-    handleGetTransactionsMonth,
+    handleGetPreviewTransactions,
   )
 
   return (
@@ -169,7 +170,7 @@ export default function Dashboard() {
               </div>
 
               <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6 pb-2">
-                <div className="h-[550px] flex flex-col bg-white dark:bg-black-bg rounded-xl px-6 py-6 sm:p-6  lg:col-span-2 lg:row-span-2">
+                <div className="h-[600px] flex flex-col bg-white dark:bg-black-bg rounded-xl px-6 py-6 sm:p-6  lg:col-span-2 lg:row-span-2">
                   <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center mb-4">
                     <h2 className="text-[18px] mb-2 sm:mb-0 md:text-lg lg:text-xl font-semibold text-gray dark:text-softGray">
                       {getMonth ? (
@@ -224,18 +225,28 @@ export default function Dashboard() {
                     openModal={openModal}
                     setOpenModal={setOpenModal}
                     categories={categories}
+                    from="dashboard"
                   />
+                  <div className="w-full flex justify-end items-center mt-6">
+                    <Link
+                      to={{ pathname: '/transacoes' }}
+                      className="text-sm text-gray flex justify-center items-center hover:opacity-40"
+                    >
+                      Ver transações por mês
+                      <ChevronRight size={16} className="text-gray" />
+                    </Link>
+                  </div>
                 </div>
 
                 <div>
-                  <div className="h-[262px] w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6">
+                  <div className="h-72 w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6">
                     <h1 className="text-lg font-bold text-gray dark:text-softGray">
                       Entradas
                     </h1>
                     <ChartComponent categories={chartCategories.income} />
                   </div>
 
-                  <div className="h-[262px] w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6 mt-6">
+                  <div className="h-72 w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6 mt-6">
                     <h1 className="text-lg font-bold text-gray dark:text-softGray">
                       Saídas
                     </h1>

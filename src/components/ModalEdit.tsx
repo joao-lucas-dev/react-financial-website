@@ -22,6 +22,7 @@ interface IParams {
   currentMonth: number
   setCurrentMonth: ISetCurrentMonth
   categories: ICategory[]
+  from: string
 }
 
 const modalEditSchema = z.object({
@@ -42,6 +43,7 @@ const ModalEdit = ({
   currentMonth,
   setCurrentMonth,
   categories,
+  from,
 }: IParams) => {
   const {
     register,
@@ -99,6 +101,7 @@ const ModalEdit = ({
           updatedTransaction,
           currentMonth,
           setCurrentMonth,
+          from,
         )
 
         setOpenModal({

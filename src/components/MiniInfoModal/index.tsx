@@ -55,13 +55,19 @@ const MiniInfoModal = ({
         let newLeft = tdRect.right + 2
 
         if (tdRect.top + modalHeight > window.innerHeight) {
-          newTop = tdRect.top - modalHeight
+          newTop = window.innerHeight - modalHeight - 10
           if (newTop < 0) newTop = 0
         }
 
         if (newLeft + modalWidth > window.innerWidth) {
           newLeft = tdRect.left - modalWidth - 2
-          if (newLeft < 0) newLeft = 0
+          if (newLeft < 0) {
+            newLeft = window.innerWidth - modalWidth - 10
+            newTop = Math.min(
+              tdRect.bottom + 10,
+              window.innerHeight - modalHeight - 10,
+            )
+          }
         }
 
         setPosition({ top: newTop, left: newLeft })

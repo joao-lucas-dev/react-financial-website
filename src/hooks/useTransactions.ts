@@ -81,6 +81,24 @@ export default function useTransactions(
     [axiosPrivate],
   )
 
+  const handleGetPreviewTransactions = useCallback(
+    async (date = DateTime.now()) => {
+      const startDate = date.minus({ day: 3 })
+      const endDate = date.plus({ day: 3 })
+
+      try {
+        const { data } = await axiosPrivate.get(
+          `/transactions/preview?startDate=${startDate}&endDate=${endDate}`,
+        )
+
+        setRows(data)
+      } catch (err) {
+        console.error('Erro ao buscar transações:', err)
+      }
+    },
+    [axiosPrivate],
+  )
+
   const handleCreateTransaction = useCallback(
     async (
       type: 'incomes' | 'outcomes' | 'dailies',
@@ -96,6 +114,7 @@ export default function useTransactions(
       setCurrentMonth: Dispatch<
         React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
       >,
+      from?: string,
     ) => {
       try {
         const now = DateTime.now()
@@ -118,7 +137,13 @@ export default function useTransactions(
 
         const newDate = DateTime.fromISO(rows[3].date) as DateTime
 
-        const promises = [await handleGetTransactionsMonth(newDate)]
+        const promises = []
+
+        if (from === 'dashboard') {
+          promises.push(await handleGetPreviewTransactions(newDate))
+        } else {
+          promises.push(await handleGetTransactionsMonth(newDate))
+        }
 
         if (newDate.month !== currentMonth) {
           promises.push(await handleGetChartCategories(newDate))
@@ -145,6 +170,7 @@ export default function useTransactions(
       handleGetBalance,
       handleGetTransactionsMonth,
       axiosPrivate,
+      handleGetPreviewTransactions,
     ],
   )
 
@@ -195,13 +221,20 @@ export default function useTransactions(
       setCurrentMonth: Dispatch<
         React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
       >,
+      from: string,
     ) => {
       try {
         await axiosPrivate.delete(`/transactions/delete/${id}`)
 
         const newDate = DateTime.fromISO(rows[3].date) as DateTime
 
-        const promises = [await handleGetTransactionsMonth(newDate)]
+        const promises = []
+
+        if (from === 'dashboard') {
+          promises.push(await handleGetPreviewTransactions(newDate))
+        } else {
+          promises.push(await handleGetTransactionsMonth(newDate))
+        }
 
         if (newDate.month !== currentMonth) {
           promises.push(await handleGetChartCategories(newDate))
@@ -223,6 +256,7 @@ export default function useTransactions(
       handleGetBalance,
       handleGetTransactionsMonth,
       axiosPrivate,
+      handleGetPreviewTransactions,
     ],
   )
 
@@ -233,6 +267,7 @@ export default function useTransactions(
       setCurrentMonth: Dispatch<
         React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
       >,
+      from: string,
     ) => {
       try {
         await axiosPrivate.put(
@@ -242,7 +277,13 @@ export default function useTransactions(
 
         const newDate = DateTime.fromISO(rows[3].date) as DateTime
 
-        const promises = [await handleGetTransactionsMonth(newDate)]
+        const promises = []
+
+        if (from === 'dashboard') {
+          promises.push(await handleGetPreviewTransactions(newDate))
+        } else {
+          promises.push(await handleGetTransactionsMonth(newDate))
+        }
 
         if (newDate.month !== currentMonth) {
           promises.push(await handleGetChartCategories(newDate))
@@ -264,6 +305,7 @@ export default function useTransactions(
       handleGetBalance,
       handleGetTransactionsMonth,
       axiosPrivate,
+      handleGetPreviewTransactions,
     ],
   )
 
@@ -278,6 +320,7 @@ export default function useTransactions(
     handleGetBalance,
     balance,
     handleGetTransactionsMonth,
+    handleGetPreviewTransactions,
     handleCreateCompleteTransaction,
   }
 }
