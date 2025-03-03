@@ -65,7 +65,7 @@ export default function Dashboard() {
   return (
     <div>
       <div className="w-full h-dvh bg-background dark:bg-orangeDark">
-        <Header title="Dashboard" />
+        <Header title="Dashboard" activePage="dashboard" />
 
         <div className="flex h-screen">
           <MenuAside activePage="dashboard" />

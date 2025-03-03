@@ -5,16 +5,19 @@ import {
   MessageCircleQuestion,
   Settings,
   X,
+  Newspaper,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import LogoIcon from '../icons/LogoIcon'
 import LogoutButton from './LoggoutButton.tsx'
+import { Link } from 'react-router-dom'
 
 interface IParams {
   title: string
+  activePage: string
 }
 
-const Header = ({ title }: IParams) => {
+const Header = ({ title, activePage }: IParams) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -53,17 +56,47 @@ const Header = ({ title }: IParams) => {
 
             <nav className="flex flex-col space-y-4 text-lg font-semibold text-gray dark:text-softGray flex-grow">
               <ul className="flex-grow pb-6">
-                <li className="border-l-4 border-primary h-10 flex items-center transition-all cursor-pointer p-4">
-                  <a href="/" className="flex items-center">
-                    <House size={20} className="text-primary mr-5" />
-                    <span className="text-sm md:text-base text-primary">
+                <li
+                  className={`${activePage === 'dashboard' && 'border-l-4 border-primary'} h-10 flex items-center transition-all cursor-pointer p-4`}
+                >
+                  <Link
+                    to={{ pathname: '/dashboard' }}
+                    className="flex items-center"
+                  >
+                    <House
+                      size={20}
+                      className={`${activePage === 'dashboard' ? 'text-primary' : 'text-zinc-500'} mr-5`}
+                    />
+                    <span
+                      className={`text-sm md:text-base ${activePage === 'dashboard' ? 'text-primary' : 'text-zinc-500'}`}
+                    >
                       Dashboard
                     </span>
-                  </a>
+                  </Link>
                 </li>
-                <li className="h-12 flex items-center p-4 mt-5">
-                  <a
-                    href="/"
+                <li
+                  className={`${activePage === 'transacoes' && 'border-l-4 border-primary'} h-12 flex items-center p-4 mt-5`}
+                >
+                  <Link
+                    to={{ pathname: '/transacoes' }}
+                    className="flex items-center text-zinc-500 hover:text-primary"
+                  >
+                    <Newspaper
+                      size={20}
+                      className={`${activePage === 'transacoes' ? 'text-primary' : 'text-zinc-500'} mr-5`}
+                    />
+                    <span
+                      className={`text-sm md:text-base ${activePage === 'transacoes' ? 'text-primary' : 'text-zinc-500'} dark:text-softGray`}
+                    >
+                      Transações
+                    </span>
+                  </Link>
+                </li>
+                <li
+                  className={`${activePage === 'feedback' && 'border-r-4 border-primary'} h-12 flex items-center p-4 mt-5`}
+                >
+                  <Link
+                    to={{ pathname: '/feedback' }}
                     className="flex items-center text-zinc-500 hover:text-primary"
                   >
                     <MessageCircleQuestion
@@ -73,7 +106,7 @@ const Header = ({ title }: IParams) => {
                     <span className="text-sm md:text-base dark:text-softGray">
                       Feedback
                     </span>
-                  </a>
+                  </Link>
                 </li>
                 <li className="h-12 flex items-center p-4 mt-5">
                   <a

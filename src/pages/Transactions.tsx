@@ -45,7 +45,7 @@ const Transactions = () => {
 
   return (
     <div className="w-full h-full bg-background dark:bg-orangeDark">
-      <Header title="Transações" />
+      <Header title="Transações" activePage="transacoes" />
 
       <div className="flex h-dvh">
         <MenuAside activePage="transacoes" />
