@@ -107,6 +107,7 @@ const Transactions = () => {
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 categories={categories}
+                from="transacoes"
               />
             </div>
           </div>
