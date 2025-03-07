@@ -70,7 +70,7 @@ export default function Dashboard() {
         <div className="flex h-full">
           <MenuAside activePage="dashboard" />
 
-          <main className="flex w-full h-full justify-center items-center mt-24 overflow-auto pl-[210px]">
+          <main className="flex w-full h-full justify-center items-center mt-24 overflow-auto xl:pl-[210px]">
             <div className="w-full px-2 md:px-10 py-6">
               <div className="flex justify-center">
                 <div className="w-full mx-2 md:mx-0 bg-white dark:bg-black-bg h-20 rounded-2xl flex justify-between px-4 sm:px-10">
