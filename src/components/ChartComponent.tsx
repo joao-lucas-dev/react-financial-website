@@ -38,7 +38,7 @@ const DonutChart = ({ categories }: IParams) => {
       {categories && categories.labels.length > 0 ? (
         <Doughnut data={categories} options={options} />
       ) : (
-        <h3 className="flex justify-center items-center h-full dark:text-softGray">
+        <h3 className="flex justify-center items-center text-[#A0A0A0] h-full dark:text-softGray">
           Sem valores registrados
         </h3>
       )}

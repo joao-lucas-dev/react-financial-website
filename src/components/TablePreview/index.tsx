@@ -100,7 +100,7 @@ const TablePreview = ({
           className="relative"
         >
           <td
-            className={`sticky left-0 ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : 'bg-white'} dark:bg-black-bg dark:text-softGray sm:relative border-b-1 p-2 border-lineGray text-sm text-center font-[600] h-[56px]`}
+            className={`sticky left-0 ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : 'bg-white'} dark:bg-black-bg dark:text-softGray sm:relative border-b-1 p-2 border-lineGray text-sm text-center font-medium h-[56px]`}
           >
             {row.formatted_date}
           </td>

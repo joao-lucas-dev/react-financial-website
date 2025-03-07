@@ -21,7 +21,7 @@ const Header = ({ title, activePage }: IParams) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <header className="fixed z-40 w-full h-24 top-0">
+    <header className="fixed z-20 w-full h-24 top-0">
       <div className="w-full h-24 flex bg-white dark:bg-black-bg py-4">
         <div className="hidden xl:flex w-52 h-full justify-center items-center">
           <LogoIcon />

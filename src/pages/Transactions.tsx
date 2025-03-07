@@ -54,7 +54,7 @@ const Transactions = () => {
           <div className="flex w-full h-full px-2 md:px-10">
             <div className="w-full h-full flex flex-col bg-white dark:bg-black-bg rounded-xl px-6 py-6 sm:p-6">
               <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center mb-4">
-                <h2 className="text-[18px] mb-2 sm:mb-0 md:text-lg lg:text-xl font-semibold text-gray dark:text-softGray">
+                <h2 className="text-[18px] mb-2 sm:mb-0 md:text-lg lg:text-xl font-medium text-gray dark:text-softGray">
                   {getMonth ? (
                     `${getMonth()}`
                   ) : (
@@ -63,23 +63,23 @@ const Transactions = () => {
                 </h2>
                 <div className="flex flex-1 items-center justify-center">
                   <button
-                    className="text-base md:text-md lg:text-lg font-semibold text-gray dark:text-softGray active:opacity-50"
+                    className="text-base md:text-md lg:text-lg font-semibold text-gray dark:text-softGray active:opacity-50 rounded-2xl hover:bg-zinc-100 p-2"
                     onClick={() => getNextWeek(true)}
                   >
-                    <ChevronLeft />
+                    <ChevronLeft size={18} />
                   </button>
                   <span className="text-base md:text-md lg:text-lg font-semibold text-gray dark:text-softGray mx-2">
                     {rows.length > 0 ? (
-                      `${rows[0].formatted_date} a ${rows[rows.length - 1].formatted_date}`
+                      `${rows[0].formatted_date} à ${rows[rows.length - 1].formatted_date}`
                     ) : (
                       <Skeleton height={20} width={100} />
                     )}
                   </span>
                   <button
-                    className="text-sm md:text-md lg:text-lg font-semibold text-gray dark:text-softGray active:opacity-50"
+                    className="text-sm md:text-md lg:text-lg font-semibold text-gray dark:text-softGray active:opacity-50 rounded-2xl hover:bg-zinc-100 p-2"
                     onClick={() => getNextWeek(false)}
                   >
-                    <ChevronRight />
+                    <ChevronRight size={18} />
                   </button>
                 </div>
                 <div className="hidden sm:block">

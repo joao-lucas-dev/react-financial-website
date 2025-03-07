@@ -8,7 +8,7 @@ interface IParams {
 
 const MenuAside = ({ activePage }: IParams) => {
   return (
-    <aside className="pt-28 h-dvh w-52 bg-white dark:bg-black-bg hidden xl:flex flex-col justify-between shadow-lg shadow-background dark:shadow-black-bg">
+    <aside className="fixed pt-28 h-dvh w-52 bg-white dark:bg-black-bg hidden xl:flex flex-col justify-between shadow-lg shadow-background dark:shadow-black-bg">
       <ul>
         <li
           className={`${activePage === 'dashboard' && 'border-r-4 border-primary'} h-10 flex items-center transition-all cursor-pointer p-4`}

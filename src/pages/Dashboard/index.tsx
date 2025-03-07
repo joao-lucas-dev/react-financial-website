@@ -64,18 +64,18 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="w-full h-dvh bg-background dark:bg-orangeDark">
+      <div className="w-full h-full bg-background dark:bg-orangeDark">
         <Header title="Dashboard" activePage="dashboard" />
 
-        <div className="flex h-screen">
+        <div className="flex h-full">
           <MenuAside activePage="dashboard" />
 
-          <main className="flex w-full h-full pt-24 overflow-auto">
+          <main className="flex w-full h-full justify-center items-center mt-24 overflow-auto pl-[210px]">
             <div className="w-full px-2 md:px-10 py-6">
               <div className="flex justify-center">
                 <div className="w-full mx-2 md:mx-0 bg-white dark:bg-black-bg h-20 rounded-2xl flex justify-between px-4 sm:px-10">
                   <div className="flex items-center">
-                    <h1 className="text-base md:text-lg lg:text-xl font-semibold text-gray dark:text-softGray">
+                    <h1 className="text-lg font-semibold text-gray dark:text-softGray">
                       <span>{getGreeting()}</span>
                     </h1>
                   </div>
@@ -85,7 +85,7 @@ export default function Dashboard() {
                         Saldo hoje
                       </span>
                       <div>
-                        <strong className="text-lg md:text-xl dark:text-softGray">
+                        <strong className="text-lg dark:text-softGray">
                           <CountUp valueNumber={balance} />
                         </strong>
                       </div>
@@ -104,7 +104,7 @@ export default function Dashboard() {
                       <h3 className="text-xs text-gray dark:text-softGray">
                         Total de entradas
                       </h3>
-                      <span className="text-xl font-semibold text-green-600 mt-4">
+                      <span className="text-lg font-semibold text-green-600 mt-4">
                         <CountUp valueNumber={overview?.income?.total} />
                       </span>
                     </div>
@@ -128,7 +128,7 @@ export default function Dashboard() {
                       <h3 className="text-xs text-gray dark:text-softGray">
                         Total de saídas
                       </h3>
-                      <span className="text-xl font-semibold text-red-600 mt-4">
+                      <span className="text-lg font-semibold text-red-600 mt-4">
                         <CountUp valueNumber={overview?.outcome?.total} />
                       </span>
                     </div>
@@ -152,7 +152,7 @@ export default function Dashboard() {
                       <h3 className="text-xs text-gray dark:text-softGray">
                         Média Diária
                       </h3>
-                      <span className="text-xl font-semibold text-purple-600 mt-4">
+                      <span className="text-lg font-semibold text-purple-600 mt-4">
                         <CountUp valueNumber={overview?.daily?.total} />
                       </span>
                     </div>
@@ -172,7 +172,7 @@ export default function Dashboard() {
               <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6 pb-2">
                 <div className="h-[600px] flex flex-col bg-white dark:bg-black-bg rounded-xl px-6 py-6 sm:p-6  lg:col-span-2 lg:row-span-2">
                   <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center mb-4">
-                    <h2 className="text-[18px] mb-2 sm:mb-0 md:text-lg lg:text-xl font-semibold text-gray dark:text-softGray">
+                    <h2 className="text-base mb-2 sm:mb-0 font-medium text-gray dark:text-softGray">
                       {getMonth ? (
                         `${getMonth()}`
                       ) : (
@@ -181,23 +181,23 @@ export default function Dashboard() {
                     </h2>
                     <div className="flex flex-1 items-center justify-center">
                       <button
-                        className="text-base md:text-md lg:text-lg font-semibold text-gray dark:text-softGray active:opacity-50"
+                        className="text-base font-semibold text-gray dark:text-softGray active:opacity-50 rounded-2xl hover:bg-zinc-100 p-2"
                         onClick={() => getNextWeek(true)}
                       >
-                        <ChevronLeft />
+                        <ChevronLeft size={18} />
                       </button>
-                      <span className="text-base md:text-md lg:text-lg font-semibold text-gray dark:text-softGray mx-2">
+                      <span className="text-base font-medium text-gray dark:text-softGray mx-2">
                         {rows.length > 0 ? (
-                          `${rows[0].formatted_date} a ${rows[rows.length - 1].formatted_date}`
+                          `${rows[0].formatted_date} à ${rows[rows.length - 1].formatted_date}`
                         ) : (
                           <Skeleton height={20} width={100} />
                         )}
                       </span>
                       <button
-                        className="text-sm md:text-md lg:text-lg font-semibold text-gray dark:text-softGray active:opacity-50"
+                        className="text-sm font-semibold text-gray dark:text-softGray active:opacity-50 rounded-2xl hover:bg-zinc-100 p-2"
                         onClick={() => getNextWeek(false)}
                       >
-                        <ChevronRight />
+                        <ChevronRight size={18} />
                       </button>
                     </div>
                     <div className="hidden sm:block">
@@ -240,14 +240,14 @@ export default function Dashboard() {
 
                 <div>
                   <div className="h-72 w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6">
-                    <h1 className="text-lg font-bold text-gray dark:text-softGray">
+                    <h1 className="text-base font-semibold text-gray dark:text-softGray">
                       Entradas
                     </h1>
                     <ChartComponent categories={chartCategories.income} />
                   </div>
 
                   <div className="h-72 w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6 mt-6">
-                    <h1 className="text-lg font-bold text-gray dark:text-softGray">
+                    <h1 className="text-base font-semibold text-gray dark:text-softGray">
                       Saídas
                     </h1>
                     <ChartComponent categories={chartCategories.notIncome} />
