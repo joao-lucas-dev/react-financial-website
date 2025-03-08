@@ -30,6 +30,9 @@ const DonutChart = ({ categories }: IParams) => {
           },
         },
       },
+      legend: {
+        display: false,
+      },
     },
   }
 
