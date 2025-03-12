@@ -1,4 +1,5 @@
 import React from 'react'
+import { ICategory } from './categories.ts'
 
 export type IType = {
   total: number
@@ -15,13 +16,6 @@ export interface IOverview {
 interface IShared {
   name: string
   profileImage: string
-}
-
-export type ICategory = {
-  id: string
-  name: string
-  iconName: string
-  color: string
 }
 
 export type ITransaction = {

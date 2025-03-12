@@ -5,17 +5,13 @@ export type ICategory = {
   id: number
   name: string
   type: string
-}
-
-export type IValue = {
-  name: string
+  percentage: string
   total: number
-  color: string
 }
 
 export interface CategoryData {
-  notIncome: IValue[]
-  income: IValue[]
+  notIncome: ICategory[]
+  income: ICategory[]
 }
 
 export interface ChartData {

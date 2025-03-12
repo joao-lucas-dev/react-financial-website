@@ -10,24 +10,30 @@ export default function useCategories() {
 
   const [chartCategories, setChartCategories] = useState({
     notIncome: {
-      labels: ['sem valor'],
-      datasets: [
-        {
-          data: [0],
-          backgroundColor: ['#000'],
-          hoverBackgroundColor: ['#000'],
-        },
-      ],
+      config: [] as ICategory[],
+      chartConfig: {
+        labels: ['sem valor'],
+        datasets: [
+          {
+            data: [0],
+            backgroundColor: ['#000'],
+            hoverBackgroundColor: ['#000'],
+          },
+        ],
+      },
     },
     income: {
-      labels: ['sem valor'],
-      datasets: [
-        {
-          data: [0],
-          backgroundColor: ['#000'],
-          hoverBackgroundColor: ['#000'],
-        },
-      ],
+      config: [] as ICategory[],
+      chartConfig: {
+        labels: ['sem valor'],
+        datasets: [
+          {
+            data: [0],
+            backgroundColor: ['#000'],
+            hoverBackgroundColor: ['#000'],
+          },
+        ],
+      },
     },
   })
 
@@ -38,7 +44,7 @@ export default function useCategories() {
         const endDate = date.endOf('month')
 
         const { data } = await axiosPrivate.get<CategoryData>(
-          `/categories/chart?startDate=${startDate}&endDate=${endDate}`,
+          `/categories/overview/chart?startDate=${startDate}&endDate=${endDate}`,
         )
 
         const pricesNotIncome: number[] = []
@@ -66,28 +72,34 @@ export default function useCategories() {
 
         setChartCategories({
           notIncome: {
-            labels: labelsNotIncome,
-            datasets: [
-              {
-                data: pricesNotIncome,
-                // @ts-expect-error TS2322
-                backgroundColor: backgroundColorNotIncome,
-                // @ts-expect-error TS2322
-                hoverBackgroundColor: hoverBackgroundColorNotIncome,
-              },
-            ],
+            config: data.notIncome,
+            chartConfig: {
+              labels: labelsNotIncome,
+              datasets: [
+                {
+                  data: pricesNotIncome,
+                  // @ts-expect-error TS2322
+                  backgroundColor: backgroundColorNotIncome,
+                  // @ts-expect-error TS2322
+                  hoverBackgroundColor: hoverBackgroundColorNotIncome,
+                },
+              ],
+            },
           },
           income: {
-            labels: labelsIncome,
-            datasets: [
-              {
-                data: pricesIncome,
-                // @ts-expect-error TS2322
-                backgroundColor: backgroundColorIncome,
-                // @ts-expect-error TS2322
-                hoverBackgroundColor: hoverBackgroundColorIncome,
-              },
-            ],
+            config: data.income,
+            chartConfig: {
+              labels: labelsIncome,
+              datasets: [
+                {
+                  data: pricesIncome,
+                  // @ts-expect-error TS2322
+                  backgroundColor: backgroundColorIncome,
+                  // @ts-expect-error TS2322
+                  hoverBackgroundColor: hoverBackgroundColorIncome,
+                },
+              ],
+            },
           },
         })
       } catch (err) {

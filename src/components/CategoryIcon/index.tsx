@@ -1,6 +1,6 @@
 import React from 'react'
 import { DynamicIcon } from 'lucide-react/dynamic'
-import { ICategory } from '../../types/transactions.ts'
+import { ICategory } from '../../types/categories.ts'
 import './styles.css'
 
 interface CategoryIconProps {
@@ -8,7 +8,10 @@ interface CategoryIconProps {
   size?: string
 }
 
-const Index: React.FC<CategoryIconProps> = ({ category, size = 'small' }) => {
+const CategoryIcon: React.FC<CategoryIconProps> = ({
+  category,
+  size = 'small',
+}) => {
   const { color, iconName } = category
 
   return color && iconName ? (
@@ -28,4 +31,4 @@ const Index: React.FC<CategoryIconProps> = ({ category, size = 'small' }) => {
   )
 }
 
-export default Index
+export default CategoryIcon

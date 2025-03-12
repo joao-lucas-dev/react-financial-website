@@ -21,7 +21,7 @@ import useDashboard from '../../hooks/useDashboard.ts'
 import useTransactions from '../../hooks/useTransactions.ts'
 import CountUp from '../../components/CountUp.tsx'
 import useCategories from '../../hooks/useCategories.ts'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { ITransaction } from '../../types/transactions.ts'
 import CategoryIcon from '../../components/CategoryIcon'
 
@@ -71,7 +71,7 @@ export default function Dashboard() {
         <div className="flex h-full">
           <MenuAside activePage="dashboard" />
 
-          <main className="flex w-full h-full justify-center items-center mt-24 overflow-auto xl:pl-[210px]">
+          <main className="flex w-full h-full justify-center items-center mt-24 pl-0 xl-lg:pl-[210px]">
             <div className="w-full px-2 md:px-10 pt-6 pb-2">
               <div className="flex justify-center">
                 <div className="w-full mx-2 md:mx-0 bg-white dark:bg-black-bg h-20 rounded-2xl flex justify-between px-4 sm:px-10">
@@ -239,173 +239,128 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div>
-                  {/* <div className="h-72 w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6"> */}
-                  {/*  <h1 className="text-base font-semibold text-gray dark:text-softGray"> */}
-                  {/*    Entradas */}
-                  {/*  </h1> */}
-                  {/*  <ChartComponent categories={chartCategories.income} /> */}
-                  {/* </div> */}
-
-                  <div className="h-72 w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6">
-                    <div className="flex justify-center items-center w-full h-full">
+                <div className="h-[600px]">
+                  <div className="h-[288px] w-full bg-white dark:bg-black-bg rounded-xl p-6">
+                    {chartCategories.income.config.length === 0 ? (
                       <div className="h-full w-full">
                         <h3 className="font-base font-medium">
                           Maiores entradas do mês atual
                         </h3>
-                        <ul className="h-full flex flex-col justify-center">
-                          <li className="flex py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 justify-center items-center border-b-[1px] border-b-zinc-100">
-                            <div className="flex h-full">
-                              <CategoryIcon
-                                size="large"
-                                category={{
-                                  id: '1',
-                                  name: 'Teste',
-                                  iconName: 'landmark',
-                                  color: 'bg-green',
-                                }}
-                              />
-                            </div>
-                            <div className="flex flex-1">
-                              <p className="px-4 max-w-32 text-sm">
-                                Outras receitas
-                              </p>
-                            </div>
-                            <div>
-                              <span className="text-sm">50,00%</span>
-                            </div>
-                          </li>
-                          <li className="flex py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 justify-center items-center border-b-[1px] border-b-zinc-100">
-                            <div className="flex h-full">
-                              <CategoryIcon
-                                size="large"
-                                category={{
-                                  id: '1',
-                                  name: 'Teste',
-                                  iconName: 'circle-dollar-sign',
-                                  color: 'bg-green-strong',
-                                }}
-                              />
-                            </div>
-                            <div className="flex flex-1">
-                              <p className="px-4 max-w-32 text-sm">Salário</p>
-                            </div>
-                            <div>
-                              <span className="text-sm">50,00%</span>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                      <div className="flex flex-col w-56 pt-6">
-                        <div>
-                          <ChartComponent categories={chartCategories.income} />
-                        </div>
-                        <div className="flex justify-center items-center">
-                          <button className="border border-zinc-300 px-4 py-1 rounded text-[#A0A0A0] text-sm hover:bg-primary hover:text-white transition-all duration-200 hover:border-primary">
-                            Ver relatório
-                          </button>
+                        <div className="h-full flex justify-center items-center">
+                          <h3 className="flex justify-center items-center text-[#A0A0A0] h-full dark:text-softGray">
+                            Sem valores registrados
+                          </h3>
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="flex justify-center items-center w-full h-full">
+                        <div className="h-full w-[70%] pr-8">
+                          <h3 className="font-base font-medium">
+                            Maiores entradas do mês atual
+                          </h3>
+                          <ul className="h-full flex flex-col justify-center">
+                            {chartCategories.income.config.map((item) => {
+                              return (
+                                <li
+                                  key={item.id}
+                                  className="flex py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 justify-center items-center border-b-[1px] border-b-zinc-100"
+                                >
+                                  <div className="flex h-full">
+                                    <CategoryIcon
+                                      size="large"
+                                      category={item}
+                                    />
+                                  </div>
+                                  <div className="flex flex-1">
+                                    <p className="px-4 max-w-32 text-sm">
+                                      {item.name}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm">
+                                      {item.percentage}%
+                                    </span>
+                                  </div>
+                                </li>
+                              )
+                            })}
+                          </ul>
+                        </div>
+                        <div className="flex flex-col w-[30%] pt-6">
+                          <div>
+                            <ChartComponent
+                              categories={chartCategories.income.chartConfig}
+                            />
+                          </div>
+                          <div className="flex justify-center items-center">
+                            <button className="border border-zinc-300 px-4 py-1 rounded text-[#A0A0A0] text-sm hover:bg-primary hover:text-white transition-all duration-200 hover:border-primary">
+                              Ver relatório
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="h-72 w-full bg-white dark:bg-black-bg rounded-xl px-3 py-6 sm:p-6 mt-6">
-                    <div className="flex justify-center items-center w-full h-full">
+                  <div className="h-[288px] w-full bg-white dark:bg-black-bg rounded-xl p-6 mt-6">
+                    {chartCategories.notIncome.config.length === 0 ? (
                       <div className="h-full w-full">
                         <h3 className="font-base font-medium">
                           Maiores saídas do mês atual
                         </h3>
-                        <ul className="h-full flex flex-col justify-center">
-                          <li className="flex py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 justify-center items-center border-b-[1px] border-b-zinc-100">
-                            <div className="flex h-full">
-                              <CategoryIcon
-                                size="large"
-                                category={{
-                                  id: '1',
-                                  name: 'Teste',
-                                  iconName: 'house',
-                                  color: 'bg-blue',
-                                }}
-                              />
-                            </div>
-                            <div className="flex flex-1">
-                              <p className="px-4 max-w-32 text-sm">Casa</p>
-                            </div>
-                            <div>
-                              <span className="text-sm">69,88%</span>
-                            </div>
-                          </li>
-                          <li className="flex py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 justify-center items-center border-b-[1px] border-b-zinc-100">
-                            <div className="flex h-full">
-                              <CategoryIcon
-                                size="large"
-                                category={{
-                                  id: '1',
-                                  name: 'Teste',
-                                  iconName: 'bike',
-                                  color: 'bg-red',
-                                }}
-                              />
-                            </div>
-                            <div className="flex flex-1">
-                              <p className="px-4 max-w-32 text-sm">Delivery</p>
-                            </div>
-                            <div>
-                              <span className="text-sm">39,88%</span>
-                            </div>
-                          </li>
-                          <li className="flex py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 justify-center items-center border-b-[1px] border-b-zinc-100">
-                            <div className="flex h-full">
-                              <CategoryIcon
-                                size="large"
-                                category={{
-                                  id: '1',
-                                  name: 'Teste',
-                                  iconName: 'cross',
-                                  color: 'bg-green',
-                                }}
-                              />
-                            </div>
-                            <div className="flex flex-1">
-                              <p className="px-4 max-w-32 text-sm">Saúde</p>
-                            </div>
-                            <div>
-                              <span className="text-sm">19,88%</span>
-                            </div>
-                          </li>
-                          <li className="flex py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 justify-center items-center">
-                            <div className="flex h-full">
-                              <CategoryIcon
-                                size="large"
-                                category={{
-                                  id: '1',
-                                  name: 'Teste',
-                                  iconName: 'credit-card',
-                                  color: 'bg-purple',
-                                }}
-                              />
-                            </div>
-                            <div className="flex flex-1">
-                              <p className="px-4 max-w-32 text-sm">Cartões</p>
-                            </div>
-                            <div>
-                              <span className="text-sm">9,88%</span>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                      <div className="flex flex-col w-56 pt-6">
-                        <div>
-                          <ChartComponent
-                            categories={chartCategories.notIncome}
-                          />
-                        </div>
-                        <div className="flex justify-center items-center">
-                          <button className="border border-zinc-300 px-4 py-1 rounded text-[#A0A0A0] text-sm hover:bg-primary hover:text-white transition-all duration-200 hover:border-primary">
-                            Ver relatório
-                          </button>
+                        <div className="h-full flex justify-center items-center">
+                          <h3 className="flex justify-center items-center text-[#A0A0A0] h-full dark:text-softGray">
+                            Sem valores registrados
+                          </h3>
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="flex justify-center items-center w-full h-full">
+                        <div className="h-full w-[70%] pr-8">
+                          <h3 className="font-base font-medium">
+                            Maiores saídas do mês atual
+                          </h3>
+                          <ul className="h-full flex flex-col justify-center">
+                            {chartCategories.notIncome.config.map((item) => {
+                              return (
+                                <li
+                                  key={item.id}
+                                  className="flex py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 justify-center items-center border-b-[1px] border-b-zinc-100"
+                                >
+                                  <div className="flex h-full">
+                                    <CategoryIcon
+                                      size="large"
+                                      category={item}
+                                    />
+                                  </div>
+                                  <div className="flex flex-1">
+                                    <p className="px-4 max-w-32 text-sm">
+                                      {item.name}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm">
+                                      {item.percentage}%
+                                    </span>
+                                  </div>
+                                </li>
+                              )
+                            })}
+                          </ul>
+                        </div>
+                        <div className="flex flex-col w-[30%] pt-6">
+                          <div>
+                            <ChartComponent
+                              categories={chartCategories.notIncome.chartConfig}
+                            />
+                          </div>
+                          <div className="flex justify-center items-center">
+                            <button className="border border-zinc-300 px-4 py-1 rounded text-[#A0A0A0] text-sm hover:bg-primary hover:text-white transition-all duration-200 hover:border-primary">
+                              Ver relatório
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -50,7 +50,7 @@ const Transactions = () => {
       <div className="flex h-dvh">
         <MenuAside activePage="transacoes" />
 
-        <main className="flex justify-center items-center w-full h-full pt-28 pb-4 xl:pl-[210px]">
+        <main className="flex justify-center items-center w-full h-full pt-28 pb-4 xl-lg:pl-[210px]">
           <div className="flex w-full h-full px-2 md:px-10">
             <div className="w-full h-full flex flex-col bg-white dark:bg-black-bg rounded-xl px-6 py-6 sm:p-6">
               <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center mb-4">

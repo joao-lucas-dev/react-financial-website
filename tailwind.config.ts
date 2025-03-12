@@ -4,6 +4,9 @@ const config: Config = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      screens: {
+        'xl-lg': '1650px',
+      },
       keyframes: {
         'fade-in-up': {
           '0%': {

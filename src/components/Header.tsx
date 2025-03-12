@@ -23,7 +23,7 @@ const Header = ({ title, activePage }: IParams) => {
   return (
     <header className="fixed z-20 w-full h-24 top-0">
       <div className="w-full h-24 flex bg-white dark:bg-black-bg py-4">
-        <div className="hidden xl:flex w-52 h-full justify-center items-center">
+        <div className="hidden xl-lg:flex w-52 h-full justify-center items-center">
           <LogoIcon />
         </div>
 
@@ -33,7 +33,7 @@ const Header = ({ title, activePage }: IParams) => {
           </h1>
 
           <button
-            className="flex xl:hidden h-full justify-center items-center"
+            className="flex xl-lg:hidden h-full justify-center items-center"
             onClick={() => setIsOpen(true)}
           >
             <AlignJustify size={24} className="text-gray" />

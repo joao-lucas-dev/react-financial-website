@@ -145,7 +145,7 @@ export default function useTransactions(
           promises.push(await handleGetTransactionsMonth(newDate))
         }
 
-        if (newDate.month !== currentMonth) {
+        if (newDate.month === currentMonth) {
           promises.push(await handleGetChartCategories(newDate))
           promises.push(await handleGetBalance())
           promises.push(await handleGetOverviewTransactions(newDate))
@@ -236,7 +236,7 @@ export default function useTransactions(
           promises.push(await handleGetTransactionsMonth(newDate))
         }
 
-        if (newDate.month !== currentMonth) {
+        if (newDate.month === currentMonth) {
           promises.push(await handleGetChartCategories(newDate))
           promises.push(await handleGetOverviewTransactions(newDate))
           promises.push(await handleGetBalance())
@@ -285,7 +285,7 @@ export default function useTransactions(
           promises.push(await handleGetTransactionsMonth(newDate))
         }
 
-        if (newDate.month !== currentMonth) {
+        if (newDate.month === currentMonth) {
           promises.push(await handleGetChartCategories(newDate))
           promises.push(await handleGetBalance())
           promises.push(await handleGetOverviewTransactions(newDate))
