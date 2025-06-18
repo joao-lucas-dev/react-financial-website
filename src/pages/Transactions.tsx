@@ -27,6 +27,7 @@ const Transactions = () => {
     handleGetOverviewTransactions,
     handleGetBalance,
     handleGetTransactionsMonth,
+    handleGetRecentTransactions,
   } = useTransactions(handleGetChartCategories)
   const {
     getMonth,
@@ -41,6 +42,7 @@ const Transactions = () => {
     handleGetOverviewTransactions,
     handleGetBalance,
     handleGetTransactionsMonth,
+    handleGetRecentTransactions,
   )
 
   return (

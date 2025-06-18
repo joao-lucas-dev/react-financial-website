@@ -9,6 +9,7 @@ export default function useDashboard(
   handleGetOverviewTransactions: (date?: DateTime) => Promise<void>,
   handleGetBalance: () => Promise<void>,
   handleGetPreviewTransactions: (date?: DateTime) => Promise<void>,
+  handleGetRecentTransactions: () => Promise<void>,
 ) {
   const [currentMonth, setCurrentMonth] = useState(DateTime.now().month)
 
@@ -97,6 +98,7 @@ export default function useDashboard(
     handleGetChartCategories()
     handleGetOverviewTransactions()
     handleGetBalance()
+    handleGetRecentTransactions()
   }, [])
 
   return {

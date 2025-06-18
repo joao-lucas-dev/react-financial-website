@@ -1,0 +1,13 @@
+.button-config {
+    display: block;
+
+    div {
+        display: none;
+    }
+}
+
+.button-config:hover {
+    div {
+        display: block;
+    }
+}

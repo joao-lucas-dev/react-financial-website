@@ -24,7 +24,7 @@ const FloatingButton = ({ setOpenModal }: IParams) => {
   }
 
   return (
-    <div className="fixed bottom-10 right-10">
+    <div className="fixed bottom-10 right-10 z-30">
       <button
         onClick={toggleMenu}
         className="bg-primary text-white p-4 rounded-full shadow-lg hover:bg-softOrange transition duration-300"

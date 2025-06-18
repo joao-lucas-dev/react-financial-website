@@ -209,7 +209,7 @@ const TablePreview = ({
       {rows.length > 0 ? (
         <div
           ref={tableContainerRef}
-          className="w-full overflow-y-scroll scrollbar-hide flex flex-auto relative"
+          className="w-full overflow-y-scroll flex flex-auto relative"
         >
           <table className="min-w-640 sm:w-full h-full text-left">
             <thead>

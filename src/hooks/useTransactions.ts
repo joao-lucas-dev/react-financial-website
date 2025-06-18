@@ -25,7 +25,29 @@ export default function useTransactions(
     },
   })
   const [balance, setBalance] = useState(0)
+  const [recentTransactions, setRecentTransactions] = useState([])
   const axiosPrivate = useAxiosPrivate()
+
+  const handleGetRecentTransactions = useCallback(
+    async (filter = 'both', sortBy = '', sortOrder = 'asc') => {
+      try {
+        let url = `/transactions/recent`;
+        const params = new URLSearchParams();
+        params.append('filter', filter);
+        if (sortBy) {
+          params.append('sort', sortBy);
+          params.append('direction', sortOrder.toUpperCase());
+        }
+        url += `?${params.toString()}`;
+        const { data } = await axiosPrivate.get(url);
+
+        setRecentTransactions(data);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [setRecentTransactions, axiosPrivate],
+  );
 
   const handleGetBalance = useCallback(async () => {
     try {
@@ -149,6 +171,7 @@ export default function useTransactions(
           promises.push(await handleGetChartCategories(newDate))
           promises.push(await handleGetBalance())
           promises.push(await handleGetOverviewTransactions(newDate))
+          promises.push(await handleGetRecentTransactions())
           // @ts-expect-error TS2345
           setCurrentMonth(newDate.month)
         }
@@ -171,6 +194,7 @@ export default function useTransactions(
       handleGetTransactionsMonth,
       axiosPrivate,
       handleGetPreviewTransactions,
+      handleGetRecentTransactions,
     ],
   )
 
@@ -197,6 +221,7 @@ export default function useTransactions(
           promises.push(await handleGetChartCategories(newDate))
           promises.push(await handleGetBalance())
           promises.push(await handleGetOverviewTransactions(newDate))
+          promises.push(await handleGetRecentTransactions())
 
           await Promise.all(promises)
         }
@@ -210,6 +235,7 @@ export default function useTransactions(
       handleGetBalance,
       handleGetOverviewTransactions,
       axiosPrivate,
+      handleGetRecentTransactions,
     ],
   )
 
@@ -240,6 +266,7 @@ export default function useTransactions(
           promises.push(await handleGetChartCategories(newDate))
           promises.push(await handleGetOverviewTransactions(newDate))
           promises.push(await handleGetBalance())
+          promises.push(await handleGetRecentTransactions())
           // @ts-expect-error TS2345
           setCurrentMonth(newDate.month)
         }
@@ -257,6 +284,7 @@ export default function useTransactions(
       handleGetTransactionsMonth,
       axiosPrivate,
       handleGetPreviewTransactions,
+      handleGetRecentTransactions,
     ],
   )
 
@@ -289,6 +317,7 @@ export default function useTransactions(
           promises.push(await handleGetChartCategories(newDate))
           promises.push(await handleGetBalance())
           promises.push(await handleGetOverviewTransactions(newDate))
+          promises.push(await handleGetRecentTransactions())
           // @ts-expect-error TS2345
           setCurrentMonth(newDate.month)
         }
@@ -306,6 +335,7 @@ export default function useTransactions(
       handleGetTransactionsMonth,
       axiosPrivate,
       handleGetPreviewTransactions,
+      handleGetRecentTransactions,
     ],
   )
 
@@ -322,5 +352,7 @@ export default function useTransactions(
     handleGetTransactionsMonth,
     handleGetPreviewTransactions,
     handleCreateCompleteTransaction,
+    handleGetRecentTransactions,
+    recentTransactions,
   }
 }

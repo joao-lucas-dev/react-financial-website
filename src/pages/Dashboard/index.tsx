@@ -21,9 +21,11 @@ import useDashboard from '../../hooks/useDashboard.ts'
 import useTransactions from '../../hooks/useTransactions.ts'
 import CountUp from '../../components/CountUp.tsx'
 import useCategories from '../../hooks/useCategories.ts'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ITransaction } from '../../types/transactions.ts'
 import CategoryIcon from '../../components/CategoryIcon'
+import TableTransactions from '../../components/TableTransactions'
+import { Filter } from '../../components/Filter'
 
 export default function Dashboard() {
   const [openModal, setOpenModal] = useState({
@@ -46,6 +48,8 @@ export default function Dashboard() {
     handleGetBalance,
     balance,
     handleGetPreviewTransactions,
+    handleGetRecentTransactions,
+    recentTransactions,
   } = useTransactions(handleGetChartCategories)
   const {
     getMonth,
@@ -61,7 +65,21 @@ export default function Dashboard() {
     handleGetOverviewTransactions,
     handleGetBalance,
     handleGetPreviewTransactions,
+    handleGetRecentTransactions,
   )
+
+  const [sortBy, setSortBy] = useState('updated_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>('desc');
+
+  const handleSort = (field: string, order: 'asc' | 'desc') => {
+    setSortBy(field);
+    setSortOrder(order);
+    handleGetRecentTransactions('both', field, order);
+  };
+
+  useEffect(() => {
+    handleGetRecentTransactions('both', 'updated_at', 'desc');
+  }, []);
 
   return (
     <div>
@@ -170,7 +188,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6 pb-2">
+              <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6">
                 <div className="h-[600px] flex flex-col bg-white dark:bg-black-bg rounded-xl px-6 py-6 sm:p-6  lg:col-span-2 lg:row-span-2">
                   <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center mb-4">
                     <h2 className="text-base mb-2 sm:mb-0 font-medium text-gray dark:text-softGray">
@@ -363,6 +381,23 @@ export default function Dashboard() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              <div className="max-h-[600px] flex flex-col bg-white dark:bg-black-bg rounded-xl sm:p-6 lg:col-span-2 lg:row-span-2">
+                <div className="flex justify-between items-center px-2 mb-4">
+                  <h3 className="font-base font-medium">
+                    Transações cadastradas
+                  </h3>
+
+                  <Filter />
+                </div>
+
+                <TableTransactions
+                  recentTransactions={recentTransactions}
+                  onSort={handleSort}
+                  sortBy={sortBy}
+                  sortOrder={sortOrder}
+                />
               </div>
             </div>
           </main>

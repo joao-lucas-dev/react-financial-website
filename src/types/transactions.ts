@@ -25,7 +25,8 @@ export type ITransaction = {
   price: string | number
   category: ICategory
   shared?: IShared
-  createdAt?: string
+  created_at?: string
+  updated_at?: string
   transaction_day: string | Date
   type?: 'income' | 'outcome' | 'daily'
 }

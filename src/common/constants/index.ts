@@ -90,3 +90,27 @@ export const colorsMap = new Map<string, IColorMap>([
     },
   ],
 ])
+
+export const typeMap = new Map<string, { title: string; bgColor: string }>([
+  [
+    'income',
+    {
+      title: 'Entrada',
+      bgColor: 'bg-green-400',
+    },
+  ],
+  [
+    'outcome',
+    {
+      title: 'Saída',
+      bgColor: 'bg-red-400',
+    },
+  ],
+  [
+    'daily',
+    {
+      title: 'Diário',
+      bgColor: 'bg-purple-400',
+    },
+  ],
+])
