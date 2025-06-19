@@ -15,9 +15,9 @@ const TYPE_FILTERS = {
 }
 
 const DATE_FILTER_LABELS = {
-  [DATE_FILTERS.BEFORE]: 'Passadas',
-  [DATE_FILTERS.AFTER]: 'Futuras',
-  [DATE_FILTERS.BOTH]: 'Passadas + Futuras',
+  [DATE_FILTERS.BEFORE]: 'De hoje para trás',
+  [DATE_FILTERS.AFTER]: 'De hoje para frente',
+  [DATE_FILTERS.BOTH]: 'Todo o período',
 }
 
 const TYPE_FILTER_LABELS = {
@@ -61,7 +61,7 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
       {/* Badges de filtros selecionados */}
       <div className="flex gap-2">
         <div className="bg-orange-500 text-white rounded-full px-4 py-1 text-xs font-semibold flex items-center">
-          Data - {DATE_FILTER_LABELS[currentFilter]}
+          Dia - {DATE_FILTER_LABELS[currentFilter]}
         </div>
         <div className="bg-orange-500 text-white rounded-full px-4 py-1 text-xs font-semibold flex items-center">
           Tipo - {TYPE_FILTER_LABELS[currentType]}
@@ -79,7 +79,7 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
             <div className="relative w-96 bg-white rounded-lg shadow-xl border border-zinc-300 p-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[14px] font-medium text-gray-900">
-                  Filtros
+                  Filtros colunas
                 </h3>
                 <button
                   className="text-gray-400 hover:text-gray-600 text-xl leading-none"
@@ -91,7 +91,7 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
 
               <div className="flex gap-6">
                 <div className="flex-1">
-                  <h4 className="text-xs font-medium text-gray-500 mb-2">Data</h4>
+                  <h4 className="text-xs font-medium text-gray-500 mb-2">Dia</h4>
                   {[
                     [DATE_FILTERS.BOTH, DATE_FILTER_LABELS[DATE_FILTERS.BOTH]],
                     [DATE_FILTERS.BEFORE, DATE_FILTER_LABELS[DATE_FILTERS.BEFORE]],
