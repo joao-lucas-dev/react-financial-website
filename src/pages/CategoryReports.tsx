@@ -55,14 +55,16 @@ function formatChartData(categories: Category[]) {
 const CategoryReports: React.FC = () => {
     const axiosPrivate = useAxiosPrivate();
     const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const initialDate = params.get('date') || DateTime.now().toFormat('yyyy-MM');
     const [tab, setTab] = useState<'incomes' | 'outcomes'>('incomes');
     const [data, setData] = useState<CategorySummaryResponse | null>(null);
     const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
     const [loading, setLoading] = useState(false);
-    const [date, setDate] = useState(() => DateTime.now().toFormat('yyyy-MM'));
+    const [date, setDate] = useState(initialDate);
     const { chartCategories, handleGetChartCategories } = useCategories();
 
-    // Detect query param on mount
+    // Detect query param on mount (apenas para tab)
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const type = params.get('type');
