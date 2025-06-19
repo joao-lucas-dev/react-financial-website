@@ -411,6 +411,14 @@ export default function Dashboard() {
                   onSort={handleSort}
                   sortBy={sortBy}
                   sortOrder={sortOrder}
+                  openModal={openModal}
+                  setOpenModal={setOpenModal}
+                  handleUpdateTransaction={handleUpdateTransaction}
+                  handleDeleteTransaction={handleDeleteTransaction}
+                  currentMonth={currentMonth}
+                  setCurrentMonth={setCurrentMonth}
+                  categories={categories}
+                  from="dashboard"
                 />
               </div>
             </div>

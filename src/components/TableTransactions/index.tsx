@@ -15,11 +15,27 @@ interface TableRecentTransactionsProps {
   onSort?: (field: string, order: 'asc' | 'desc') => void
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
+  openModal: {
+    isOpen: boolean
+    transaction: ITransaction
+    type: string
+  }
+  setOpenModal: React.Dispatch<React.SetStateAction<{
+    isOpen: boolean
+    transaction: ITransaction
+    type: string
+  }>>
+  handleUpdateTransaction: any
+  handleDeleteTransaction: any
+  currentMonth: number
+  setCurrentMonth: any
+  categories: any[]
+  from: string
 }
 
 const ITEMS_PER_PAGE = 7;
 
-const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder }: TableRecentTransactionsProps) => {
+const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder, openModal, setOpenModal, handleUpdateTransaction, handleDeleteTransaction, currentMonth, setCurrentMonth, categories, from }: TableRecentTransactionsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -151,10 +167,16 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                   </button>
 
                   <div className="absolute z-20 bottom-5 right-0 mt-2 w-28 bg-white dark:bg-black-bg shadow-md rounded-lg">
-                    <button className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                    <button
+                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                      onClick={() => setOpenModal({ isOpen: true, transaction: recentTransaction, type: 'edit' })}
+                    >
                       Editar
                     </button>
-                    <button className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                    <button
+                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                      onClick={() => setOpenModal({ isOpen: true, transaction: recentTransaction, type: 'delete' })}
+                    >
                       Excluir
                     </button>
                   </div>
@@ -165,7 +187,7 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
         )
       })
     )
-  }, [paginatedTransactions])
+  }, [paginatedTransactions, setOpenModal])
 
   return (
     <>
@@ -260,6 +282,28 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
         </button>
         <span className="ml-4 text-sm text-gray-500">Página {currentPage}</span>
       </div>
+      {/* Modais de Editar/Excluir */}
+      {openModal.isOpen && openModal.type === 'edit' && (
+        <ModalEdit
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+          handleUpdateTransaction={handleUpdateTransaction}
+          currentMonth={currentMonth}
+          setCurrentMonth={setCurrentMonth}
+          categories={categories}
+          from={from}
+        />
+      )}
+      {openModal.isOpen && openModal.type === 'delete' && (
+        <ModalDelete
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+          handleDeleteTransaction={handleDeleteTransaction}
+          currentMonth={currentMonth}
+          setCurrentMonth={setCurrentMonth}
+          from={from}
+        />
+      )}
     </>
   )
 }
