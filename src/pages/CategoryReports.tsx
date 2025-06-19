@@ -174,20 +174,42 @@ const CategoryReports: React.FC = () => {
                                                 {cat.transactions.length === 0 ? (
                                                     <div className="text-gray-500 text-sm">Nenhuma transação nesta categoria.</div>
                                                 ) : (
-                                                    <ul className="divide-y divide-gray-200 dark:divide-zinc-700">
-                                                        {cat.transactions.map((tx) => (
-                                                            <li key={tx.id} className="py-2 flex justify-between items-center">
-                                                                <div>
-                                                                    <div className="text-sm text-gray-800 dark:text-grayWhite">{tx.description}</div>
-                                                                    <div className="text-xs text-gray-500">{DateTime.fromISO(tx.transaction_day).toFormat('dd/MM/yyyy')}</div>
-                                                                </div>
-                                                                <div className={tab === 'incomes' ? 'text-green-600' : 'text-red-600'}>
-                                                                    {tab === 'incomes' ? '+' : '-'}
-                                                                    {tx.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                                                </div>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
+                                                    (() => {
+                                                        // Ordenar transações por data decrescente
+                                                        const sortedTx = [...cat.transactions].sort((a, b) => DateTime.fromISO(b.transaction_day).toMillis() - DateTime.fromISO(a.transaction_day).toMillis());
+                                                        // Agrupar por dia
+                                                        const grouped = sortedTx.reduce((acc: Record<string, Transaction[]>, tx) => {
+                                                            const day = DateTime.fromISO(tx.transaction_day).toFormat('dd/MM/yyyy');
+                                                            if (!acc[day]) acc[day] = [];
+                                                            acc[day].push(tx);
+                                                            return acc;
+                                                        }, {});
+                                                        return (
+                                                            <ul>
+                                                                {Object.entries(grouped).map(([day, txs], idx) => (
+                                                                    <React.Fragment key={day}>
+                                                                        <li
+                                                                            className={`py-1 text-xs font-semibold rounded px-2 ${idx !== 0 ? 'mt-4' : ''}`}
+                                                                            style={{ background: 'var(--gray-100, #f3f4f6)', color: '#374151' }}
+                                                                        >
+                                                                            {day}
+                                                                        </li>
+                                                                        {txs.map((tx) => (
+                                                                            <li key={tx.id} className="py-2 flex justify-between items-center pl-4">
+                                                                                <div>
+                                                                                    <div className="text-sm text-gray-800 dark:text-grayWhite">{tx.description}</div>
+                                                                                </div>
+                                                                                <div className={tab === 'incomes' ? 'text-green-600' : 'text-red-600'}>
+                                                                                    {tab === 'incomes' ? '+' : '-'}
+                                                                                    {tx.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                                                                </div>
+                                                                            </li>
+                                                                        ))}
+                                                                    </React.Fragment>
+                                                                ))}
+                                                            </ul>
+                                                        );
+                                                    })()
                                                 )}
                                             </div>
                                         )}
