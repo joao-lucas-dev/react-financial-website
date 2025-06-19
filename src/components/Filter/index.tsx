@@ -41,18 +41,20 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
     setIsModalOpen(false)
   }, [onFilterChange])
 
-  const getActiveFiltersCount = useCallback(() => {
-    // Considera que sempre temos 2 filtros ativos, já que eles sempre têm um valor
-    return 2;
-  }, []);
-
   return (
-    <div className="flex justify-center items-center mr-2">
+    <div className="flex justify-center items-center mr-2 gap-2">
+      {/* Badges de filtros selecionados */}
+      <div className="flex gap-2">
+        <div className="bg-orange-500 text-white rounded-full px-4 py-1 text-xs font-semibold flex items-center">
+          Data - {DATE_FILTER_LABELS[currentFilter]}
+        </div>
+        <div className="bg-orange-500 text-white rounded-full px-4 py-1 text-xs font-semibold flex items-center">
+          Tipo - {TYPE_FILTER_LABELS[currentType]}
+        </div>
+      </div>
       <div className="relative">
         <div className="absolute -top-2 -right-2 z-10">
-          <div className="flex items-center justify-center w-5 h-5 bg-orange-500 text-white text-xs rounded-full">
-            {getActiveFiltersCount()}
-          </div>
+          {/* Removido o contador de filtros */}
         </div>
         <button onClick={() => setIsModalOpen(!isModalOpen)}>
           <ListFilter size={24} className="text-zinc-500 hover:opacity-60" />

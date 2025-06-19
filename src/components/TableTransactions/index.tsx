@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import 'react-loading-skeleton/dist/skeleton.css'
 import CategoryIcon from '../CategoryIcon'
 import { EllipsisVertical } from 'lucide-react'
@@ -17,7 +17,23 @@ interface TableRecentTransactionsProps {
   sortOrder?: 'asc' | 'desc'
 }
 
+const ITEMS_PER_PAGE = 7;
+
 const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder }: TableRecentTransactionsProps) => {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [recentTransactions]);
+
+  const totalPages = Math.ceil(recentTransactions.length / ITEMS_PER_PAGE);
+
+  const paginatedTransactions = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    return recentTransactions.slice(start, end);
+  }, [recentTransactions, currentPage]);
+
   const memoizedTransactions = useMemo(() => {
     const getTag = (type: string) => {
       const item = typeMap.get(type)
@@ -34,8 +50,8 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
     }
 
     return (
-      recentTransactions.length > 0 &&
-      recentTransactions.map((recentTransaction: ITransaction) => {
+      paginatedTransactions.length > 0 &&
+      paginatedTransactions.map((recentTransaction: ITransaction) => {
         const formattedPrice = Number(recentTransaction.price).toLocaleString(
           'pt-BR',
           {
@@ -143,7 +159,7 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
         )
       })
     )
-  }, [recentTransactions])
+  }, [paginatedTransactions])
 
   return (
     <>
@@ -197,44 +213,33 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
           </table>
         </div>
       )}
-
-      {/* {openModal.isOpen && ( */}
-      {/*  <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50"> */}
-      {/*    <div className="bg-white w-96 rounded-lg shadow-lg p-6 relative"> */}
-      {/*      {openModal.type === 'edit' ? ( */}
-      {/*        <ModalEdit */}
-      {/*          openModal={openModal} */}
-      {/*          setOpenModal={setOpenModal} */}
-      {/*          handleUpdateTransaction={handleUpdateTransaction} */}
-      {/*          currentMonth={currentMonth} */}
-      {/*          setCurrentMonth={setCurrentMonth} */}
-      {/*          categories={categories} */}
-      {/*          from={from} */}
-      {/*        /> */}
-      {/*      ) : openModal.type === 'delete' ? ( */}
-      {/*        <ModalDelete */}
-      {/*          setOpenModal={setOpenModal} */}
-      {/*          openModal={openModal} */}
-      {/*          handleDeleteTransaction={handleDeleteTransaction} */}
-      {/*          currentMonth={currentMonth} */}
-      {/*          setCurrentMonth={setCurrentMonth} */}
-      {/*          from={from} */}
-      {/*        /> */}
-      {/*      ) : ( */}
-      {/*        <ModalCreate */}
-      {/*          openModal={openModal} */}
-      {/*          setOpenModal={setOpenModal} */}
-      {/*          handleCreateCompleteTransaction={ */}
-      {/*            handleCreateCompleteTransaction */}
-      {/*          } */}
-      {/*          currentMonth={currentMonth} */}
-      {/*          setCurrentMonth={setCurrentMonth} */}
-      {/*          categories={categories} */}
-      {/*        /> */}
-      {/*      )} */}
-      {/*    </div> */}
-      {/*  </div> */}
-      {/* )} */}
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center gap-2 mt-4">
+        <button
+          className="px-2 py-1 rounded border text-sm disabled:opacity-50"
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          disabled={currentPage === 1}
+        >
+          Anterior
+        </button>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i + 1}
+            className={`px-2 py-1 rounded border text-sm ${currentPage === i + 1 ? 'bg-orange-500 text-white' : ''}`}
+            onClick={() => setCurrentPage(i + 1)}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button
+          className="px-2 py-1 rounded border text-sm disabled:opacity-50"
+          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          disabled={currentPage === totalPages}
+        >
+          Próxima
+        </button>
+        <span className="ml-4 text-sm text-gray-500">Página {currentPage}</span>
+      </div>
     </>
   )
 }

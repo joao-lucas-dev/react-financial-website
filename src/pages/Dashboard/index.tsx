@@ -86,7 +86,9 @@ export default function Dashboard() {
   const handleFilterChange = (newFilter: 'before' | 'after' | 'both', newType: 'income' | 'outcome' | 'daily' | 'all') => {
     setFilter(newFilter);
     setTypeFilter(newType);
-    handleGetRecentTransactions(newFilter, sortBy, sortOrder || 'desc', newType);
+    setSortBy('updated_at');
+    setSortOrder('desc');
+    handleGetRecentTransactions(newFilter, 'updated_at', 'desc', newType);
   };
 
   return (
@@ -391,7 +393,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="max-h-[600px] flex flex-col bg-white dark:bg-black-bg rounded-xl sm:p-6 lg:col-span-2 lg:row-span-2">
+              <div className="min-h-[600px] flex flex-col bg-white dark:bg-black-bg rounded-xl sm:p-6 lg:col-span-2 lg:row-span-2">
                 <div className="flex justify-between items-center px-2 mb-4">
                   <h3 className="font-base font-medium">
                     Transações cadastradas
