@@ -56,15 +56,29 @@ const ModalEdit = ({
   })
 
   useEffect(() => {
-    setValue('description', openModal.transaction.description)
-    setValue('price', String(openModal.transaction.price))
+    setValue('description', openModal.transaction.description || '')
+    // Formatar valor como moeda brasileira
+    const price = openModal.transaction.price
+    let formattedPrice = ''
+    if (typeof price === 'number' && !isNaN(price)) {
+      formattedPrice = price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    } else if (typeof price === 'string') {
+      // Se já vier string, tenta formatar
+      const num = Number(price)
+      if (!isNaN(num)) {
+        formattedPrice = num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+      } else {
+        formattedPrice = price
+      }
+    }
+    setValue('price', formattedPrice)
     setValue(
       'transaction_day',
-      new Date(openModal.transaction.transaction_day)
-        .toISOString()
-        .split('T')[0],
+      openModal.transaction.transaction_day
+        ? new Date(openModal.transaction.transaction_day).toISOString().split('T')[0]
+        : ''
     )
-    setValue('category', String(openModal.transaction.category.id))
+    setValue('category', openModal.transaction.category?.id ? String(openModal.transaction.category.id) : '')
   }, [openModal.transaction, setValue])
 
   const handleChange = useCallback(
@@ -172,20 +186,29 @@ const ModalEdit = ({
 
             {categories.length > 0 && (
               <Controller
-                render={(field) => (
-                  <SelectInput
-                    {...field}
-                    // @ts-expect-error TS2322
-                    categories={
-                      openModal.transaction.type === 'income'
-                        ? categories.filter(
-                            (cat) =>
-                              cat.type === 'income' || cat.type === 'both',
-                          )
-                        : categories.filter((cat) => cat.type !== 'income')
-                    }
-                  />
-                )}
+                render={(field) => {
+                  let filteredCategories = categories;
+                  if (openModal.transaction.type === 'income') {
+                    filteredCategories = categories.filter(
+                      (cat) => cat.type === 'income' || cat.type === 'both',
+                    );
+                  } else if (openModal.transaction.type === 'outcome') {
+                    filteredCategories = categories.filter(
+                      (cat) => cat.type === 'outcome' || cat.type === 'both',
+                    );
+                  }
+                  // Se o filtro retornar vazio, mostra todas
+                  if (!filteredCategories.length) {
+                    filteredCategories = categories;
+                  }
+                  return (
+                    <SelectInput
+                      {...field}
+                      // @ts-expect-error TS2322
+                      categories={filteredCategories}
+                    />
+                  );
+                }}
                 name="category"
                 control={control}
               />
