@@ -32,6 +32,7 @@ const modalEditSchema = z.object({
     message: 'Data é obrigatória e deve ser uma data válida',
   }),
   category: z.string(),
+  type: z.string().min(1, 'Tipo é obrigatório'),
 })
 
 type ModalEditData = z.infer<typeof modalEditSchema>
@@ -79,6 +80,7 @@ const ModalEdit = ({
         : ''
     )
     setValue('category', openModal.transaction.category?.id ? String(openModal.transaction.category.id) : '')
+    setValue('type', openModal.transaction.type || '')
   }, [openModal.transaction, setValue])
 
   const handleChange = useCallback(
@@ -109,6 +111,7 @@ const ModalEdit = ({
           category_id: Number(data.category),
           transaction_day: new Date(`${data.transaction_day}T00:00:00`),
           shared_id: null,
+          type: data.type,
         } as unknown as ITransaction
 
         await handleUpdateTransaction(
@@ -217,6 +220,24 @@ const ModalEdit = ({
             <span className="text-red-500 my-4 text-sm">
               {errors.category?.message}
             </span>
+
+            <div className="flex flex-col mt-4">
+              <label className="text-md font-semibold text-gray dark:text-softGray">
+                Tipo de transação
+                <span className="text-red-600">*</span>
+              </label>
+              <select
+                {...register('type')}
+                className="focus:outline-primary border border-softGray dark:bg-zinc-800 dark:border-zinc-700 dark:text-softGray h-12 rounded-lg mt-2 px-5"
+              >
+                <option value="income">Entrada</option>
+                <option value="outcome">Saída</option>
+                <option value="daily">Diário</option>
+              </select>
+              <span className="text-red-500 my-4 text-sm">
+                {errors.type?.message}
+              </span>
+            </div>
 
             <Button title="Atualizar" type="submit" />
           </form>
