@@ -1,4 +1,4 @@
-import { House, MessageCircleQuestion, Settings, Newspaper } from 'lucide-react'
+import { House, MessageCircleQuestion, Settings, Newspaper, ChartColumn } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import LogoutButton from './LoggoutButton.tsx'
 
@@ -37,6 +37,21 @@ const MenuAside = ({ activePage }: IParams) => {
               className={`text-sm md:text-base ${activePage === 'transacoes' ? 'text-primary' : 'text-zinc-500'} dark:text-softGray`}
             >
               Transações
+            </span>
+          </Link>
+        </li>
+        <li
+          className={`${activePage === 'relatorios' && 'border-r-4 border-primary'} h-12 flex items-center p-4 mt-5`}
+        >
+          <Link to={{ pathname: '/relatorios' }} className="flex items-center">
+            <ChartColumn
+              size={20}
+              className={`${activePage === 'relatorios' ? 'text-primary' : 'text-zinc-500'} mr-5`}
+            />
+            <span
+              className={`text-sm md:text-base ${activePage === 'relatorios' ? 'text-primary' : 'text-zinc-500'} dark:text-softGray`}
+            >
+              Relatórios
             </span>
           </Link>
         </li>

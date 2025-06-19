@@ -21,3 +21,12 @@
         flex-shrink: 0;
     }
 }
+
+:root {
+  --bg-green-strong: #16a34a;
+  --bg-purple: #a21caf;
+  --bg-blue: #2563eb;
+  --bg-orange: #ea580c;
+  --bg-blue-soft: #60a5fa;
+  --bg-purple-soft: #c4b5fd;
+}

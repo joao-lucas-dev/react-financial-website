@@ -321,9 +321,9 @@ export default function Dashboard() {
                             />
                           </div>
                           <div className="flex justify-center items-center">
-                            <button className="border border-zinc-300 px-4 py-1 rounded text-[#A0A0A0] text-sm hover:bg-primary hover:text-white transition-all duration-200 hover:border-primary">
+                            <Link to={{ pathname: '/relatorios', search: '?type=incomes' }} className="border border-zinc-300 px-4 py-1 rounded text-[#A0A0A0] text-sm hover:bg-primary hover:text-white transition-all duration-200 hover:border-primary">
                               Ver relatório
-                            </button>
+                            </Link>
                           </div>
                         </div>
                       </div>
@@ -382,9 +382,9 @@ export default function Dashboard() {
                             />
                           </div>
                           <div className="flex justify-center items-center">
-                            <button className="border border-zinc-300 px-4 py-1 rounded text-[#A0A0A0] text-sm hover:bg-primary hover:text-white transition-all duration-200 hover:border-primary">
+                          <Link to={{ pathname: '/relatorios', search: '?type=outcomes' }} className="border border-zinc-300 px-4 py-1 rounded text-[#A0A0A0] text-sm hover:bg-primary hover:text-white transition-all duration-200 hover:border-primary">
                               Ver relatório
-                            </button>
+                            </Link>
                           </div>
                         </div>
                       </div>

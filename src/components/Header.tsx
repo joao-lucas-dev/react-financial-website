@@ -6,6 +6,7 @@ import {
   Settings,
   X,
   Newspaper,
+  ChartColumn
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import LogoIcon from '../icons/LogoIcon'
@@ -89,6 +90,24 @@ const Header = ({ title, activePage }: IParams) => {
                       className={`text-sm md:text-base ${activePage === 'transacoes' ? 'text-primary' : 'text-zinc-500'} dark:text-softGray`}
                     >
                       Transações
+                    </span>
+                  </Link>
+                </li>
+                <li
+                  className={`${activePage === 'relatorios' && 'border-l-4 border-primary'} h-12 flex items-center p-4 mt-5`}
+                >
+                  <Link
+                    to={{ pathname: '/relatorios' }}
+                    className="flex items-center text-zinc-500 hover:text-primary"
+                  >
+                    <ChartColumn
+                      size={20}
+                      className={`${activePage === 'relatorios' ? 'text-primary' : 'text-zinc-500'} mr-5`}
+                    />
+                    <span
+                      className={`text-sm md:text-base ${activePage === 'relatorios' ? 'text-primary' : 'text-zinc-500'} dark:text-softGray`}
+                    >
+                      Relatórios
                     </span>
                   </Link>
                 </li>
