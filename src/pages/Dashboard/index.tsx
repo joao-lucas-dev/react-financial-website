@@ -70,16 +70,24 @@ export default function Dashboard() {
 
   const [sortBy, setSortBy] = useState('updated_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>('desc');
+  const [filter, setFilter] = useState<'before' | 'after' | 'both'>('both');
+  const [typeFilter, setTypeFilter] = useState<'income' | 'outcome' | 'daily' | 'all'>('all');
 
   const handleSort = (field: string, order: 'asc' | 'desc') => {
     setSortBy(field);
     setSortOrder(order);
-    handleGetRecentTransactions('both', field, order);
+    handleGetRecentTransactions(filter, field, order, typeFilter);
   };
 
   useEffect(() => {
-    handleGetRecentTransactions('both', 'updated_at', 'desc');
+    handleGetRecentTransactions('both', 'updated_at', 'desc', 'all');
   }, []);
+
+  const handleFilterChange = (newFilter: 'before' | 'after' | 'both', newType: 'income' | 'outcome' | 'daily' | 'all') => {
+    setFilter(newFilter);
+    setTypeFilter(newType);
+    handleGetRecentTransactions(newFilter, sortBy, sortOrder || 'desc', newType);
+  };
 
   return (
     <div>
@@ -389,7 +397,11 @@ export default function Dashboard() {
                     Transações cadastradas
                   </h3>
 
-                  <Filter />
+                  <Filter 
+                    currentFilter={filter}
+                    currentType={typeFilter}
+                    onFilterChange={handleFilterChange}
+                  />
                 </div>
 
                 <TableTransactions

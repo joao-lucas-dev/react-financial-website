@@ -160,7 +160,7 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                 </th>
                 <th
                   className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm cursor-pointer select-none"
-                  onClick={() => onSort && onSort('price', sortBy === 'price' && sortOrder === 'asc' ? 'desc' : 'asc')}
+                  onClick={() => onSort && onSort('price', sortBy === 'price' ? (sortOrder === 'desc' ? 'asc' : 'desc') : 'desc')}
                 >
                   Valor
                   {sortBy === 'price' && (
@@ -169,13 +169,16 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                 </th>
                 <th
                   className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm cursor-pointer select-none"
-                  onClick={() => onSort && onSort('transaction_day', sortBy === 'transaction_day' && sortOrder === 'asc' ? 'desc' : 'asc')}
+                  onClick={() => onSort && onSort('transaction_day', sortBy === 'transaction_day' ? (sortOrder === 'desc' ? 'asc' : 'desc') : 'desc')}
                 >
                   Dia
+                  {sortBy === 'transaction_day' && (
+                    <span>{sortOrder === 'asc' ? ' ▲' : ' ▼'}</span>
+                  )}
                 </th>
                 <th
                   className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm cursor-pointer select-none"
-                  onClick={() => onSort && onSort('updated_at', sortBy === 'updated_at' && sortOrder === 'asc' ? 'desc' : 'asc')}
+                  onClick={() => onSort && onSort('updated_at', sortBy === 'updated_at' ? (sortOrder === 'desc' ? 'asc' : 'desc') : 'desc')}
                 >
                   Última modificação
                   {sortBy === 'updated_at' && (

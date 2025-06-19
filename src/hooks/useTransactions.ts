@@ -29,25 +29,24 @@ export default function useTransactions(
   const axiosPrivate = useAxiosPrivate()
 
   const handleGetRecentTransactions = useCallback(
-    async (filter = 'both', sortBy = '', sortOrder = 'asc') => {
+    async (
+      filter: 'before' | 'after' | 'both' = 'both',
+      sort: string = 'updated_at',
+      direction: 'asc' | 'desc' = 'desc',
+      type: 'income' | 'outcome' | 'daily' | 'all' = 'all',
+    ) => {
       try {
-        let url = `/transactions/recent`;
-        const params = new URLSearchParams();
-        params.append('filter', filter);
-        if (sortBy) {
-          params.append('sort', sortBy);
-          params.append('direction', sortOrder.toUpperCase());
-        }
-        url += `?${params.toString()}`;
-        const { data } = await axiosPrivate.get(url);
+        const response = await axiosPrivate.get(
+          `/transactions/recent?filter=${filter}&sort=${sort}&direction=${direction.toUpperCase()}&type=${type}`,
+        )
 
-        setRecentTransactions(data);
+        setRecentTransactions(response.data)
       } catch (err) {
-        console.log(err);
+        console.log(err)
       }
     },
-    [setRecentTransactions, axiosPrivate],
-  );
+    [axiosPrivate],
+  )
 
   const handleGetBalance = useCallback(async () => {
     try {
