@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import 'react-loading-skeleton/dist/skeleton.css'
 import CategoryIcon from '../CategoryIcon'
-import { EllipsisVertical } from 'lucide-react'
+import { EllipsisVertical, Search } from 'lucide-react'
 import './styles.css'
 import { DateTime } from 'luxon'
 import { typeMap } from '../../common/constants'
@@ -21,18 +21,26 @@ const ITEMS_PER_PAGE = 7;
 
 const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder }: TableRecentTransactionsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     setCurrentPage(1);
   }, [recentTransactions]);
 
-  const totalPages = Math.ceil(recentTransactions.length / ITEMS_PER_PAGE);
+  const filteredTransactions = useMemo(() => {
+    if (!searchTerm) return recentTransactions;
+    return recentTransactions.filter(t =>
+      t.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [recentTransactions, searchTerm]);
+
+  const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
 
   const paginatedTransactions = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     const end = start + ITEMS_PER_PAGE;
-    return recentTransactions.slice(start, end);
-  }, [recentTransactions, currentPage]);
+    return filteredTransactions.slice(start, end);
+  }, [filteredTransactions, currentPage]);
 
   const memoizedTransactions = useMemo(() => {
     const getTag = (type: string) => {
@@ -161,7 +169,21 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
 
   return (
     <>
-      {recentTransactions.length > 0 && (
+      <div className="flex justify-between items-center mb-4">
+        <div className="relative w-full max-w-[250px]">
+          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400">
+            <Search size={16} />
+          </span>
+          <input
+            type="text"
+            placeholder="Buscar transação"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="pl-8 pr-2 py-1 border border-zinc-300 rounded-md bg-white shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition w-full"
+          />
+        </div>
+      </div>
+      {filteredTransactions.length > 0 && (
         <div className="w-full overflow-y-scroll flex flex-auto relative">
           <table className="min-w-640 sm:w-full h-full text-left">
             <thead>
