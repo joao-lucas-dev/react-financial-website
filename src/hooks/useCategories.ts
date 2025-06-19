@@ -38,13 +38,13 @@ export default function useCategories() {
   })
 
   const handleGetChartCategories = useCallback(
-    async (date = DateTime.now()) => {
+    async (date = DateTime.now(), limited = true) => {
       try {
         const startDate = date.startOf('month')
         const endDate = date.endOf('month')
 
         const { data } = await axiosPrivate.get<CategoryData>(
-          `/categories/overview/chart?startDate=${startDate}&endDate=${endDate}`,
+          `/categories/overview/chart?startDate=${startDate}&endDate=${endDate}&limited=${limited}`,
         )
 
         const pricesNotIncome: number[] = []

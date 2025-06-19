@@ -7,6 +7,8 @@ import { DateTime } from 'luxon';
 import MenuAside from '../components/MenuAside';
 import Header from '../components/Header';
 import { useLocation } from 'react-router-dom';
+import useCategories from '../hooks/useCategories';
+import { MessageCircleQuestion } from 'lucide-react';
 
 interface Transaction {
     id: number;
@@ -58,6 +60,7 @@ const CategoryReports: React.FC = () => {
     const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
     const [loading, setLoading] = useState(false);
     const [date, setDate] = useState(() => DateTime.now().toFormat('yyyy-MM'));
+    const { chartCategories, handleGetChartCategories } = useCategories();
 
     // Detect query param on mount
     useEffect(() => {
@@ -85,6 +88,19 @@ const CategoryReports: React.FC = () => {
         fetchData();
     }, [date, axiosPrivate]);
 
+    // Buscar dados do gráfico ao mudar data ou aba
+    useEffect(() => {
+        const fetchChart = async () => {
+            try {
+                const luxonDate = DateTime.fromFormat(date, 'yyyy-MM').setZone('utc', { keepLocalTime: true }) as import("luxon").DateTime;
+                await handleGetChartCategories(luxonDate, false);
+            } catch (e) {
+                console.log(e);
+            }
+        };
+        fetchChart();
+    }, [date, tab, handleGetChartCategories]);
+
     const categories = data ? data[tab] : [];
 
     return (
@@ -111,7 +127,18 @@ const CategoryReports: React.FC = () => {
                                 {loading ? (
                                     <div className="text-center py-8">Carregando...</div>
                                 ) : (
-                                    <ChartComponent categories={formatChartData(categories)} />
+                                    (() => {
+                                        const chartData = tab === 'incomes' ? chartCategories.income.chartConfig : chartCategories.notIncome.chartConfig;
+                                        if (!chartData.labels || chartData.labels.length === 0 || !chartData.datasets[0].data.some((v: number) => v > 0)) {
+                                            return (
+                                                <div className="flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-500">
+                                                    <MessageCircleQuestion size={48} className="mb-2" />
+                                                    <span className="text-lg">Nenhum dado para exibir neste período.</span>
+                                                </div>
+                                            );
+                                        }
+                                        return <ChartComponent categories={chartData} />;
+                                    })()
                                 )}
                             </div>
                             <div className="space-y-4">
@@ -133,7 +160,8 @@ const CategoryReports: React.FC = () => {
                                                 <span className="font-medium text-gray-800 dark:text-grayWhite">{cat.name}</span>
                                             </div>
                                             <div className="flex items-center gap-4">
-                                                <span className="font-semibold text-lg text-gray-700 dark:text-grayWhite">
+                                                <span className={tab === 'incomes' ? 'text-green-600' : 'text-red-600'}>
+                                                    {tab === 'incomes' ? '+' : '-'}
                                                     {cat.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                                 </span>
                                                 <svg className={`w-5 h-5 transition-transform ${expanded[cat.id] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
@@ -151,7 +179,8 @@ const CategoryReports: React.FC = () => {
                                                                     <div className="text-sm text-gray-800 dark:text-grayWhite">{tx.description}</div>
                                                                     <div className="text-xs text-gray-500">{DateTime.fromISO(tx.transaction_day).toFormat('dd/MM/yyyy')}</div>
                                                                 </div>
-                                                                <div className="text-sm font-semibold text-gray-700 dark:text-grayWhite">
+                                                                <div className={tab === 'incomes' ? 'text-green-600' : 'text-red-600'}>
+                                                                    {tab === 'incomes' ? '+' : '-'}
                                                                     {tx.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                                                 </div>
                                                             </li>
@@ -162,6 +191,16 @@ const CategoryReports: React.FC = () => {
                                         )}
                                     </div>
                                 ))}
+                            </div>
+                            {/* Total geral de entradas ou saídas */}
+                            <div className="flex justify-end mt-8">
+                                <span className={tab === 'incomes' ? 'text-green-600' : 'text-red-600'}>
+                                <span className="ml-2 text-base font-medium text-gray-500">Total: </span>
+                                    <span className="font-semibold text-lg">
+                                        {tab === 'incomes' ? '+' : '-'}
+                                        {categories.reduce((acc, cat) => acc + (cat.total || 0), 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                    </span>
+                                </span>
                             </div>
                         </div>
                     </div>
