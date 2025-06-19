@@ -31,13 +31,13 @@ interface TableRecentTransactionsProps {
   setCurrentMonth: any
   categories: any[]
   from: string
+  searchTerm?: string
 }
 
 const ITEMS_PER_PAGE = 7;
 
-const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder, openModal, setOpenModal, handleUpdateTransaction, handleDeleteTransaction, currentMonth, setCurrentMonth, categories, from }: TableRecentTransactionsProps) => {
+const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder, openModal, setOpenModal, handleUpdateTransaction, handleDeleteTransaction, currentMonth, setCurrentMonth, categories, from, searchTerm = '' }: TableRecentTransactionsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     setCurrentPage(1);
@@ -191,20 +191,6 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
 
   return (
     <>
-      <div className="flex justify-between items-center mb-4">
-        <div className="relative w-full max-w-[250px]">
-          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400">
-            <Search size={16} />
-          </span>
-          <input
-            type="text"
-            placeholder="Buscar transação"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="pl-8 pr-2 py-1 border border-zinc-300 rounded-md bg-white shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition w-full"
-          />
-        </div>
-      </div>
       {filteredTransactions.length > 0 && (
         <div className="w-full overflow-y-scroll flex flex-auto relative">
           <table className="min-w-640 sm:w-full h-full text-left">

@@ -5,6 +5,7 @@ import {
   ChevronRight,
   ChevronLeft,
   Calendar,
+  Search,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -72,6 +73,7 @@ export default function Dashboard() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>('desc');
   const [filter, setFilter] = useState<'before' | 'after' | 'both'>('both');
   const [typeFilter, setTypeFilter] = useState<'income' | 'outcome' | 'daily' | 'all'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleSort = (field: string, order: 'asc' | 'desc') => {
     setSortBy(field);
@@ -394,16 +396,29 @@ export default function Dashboard() {
               </div>
 
               <div className="min-h-[600px] flex flex-col bg-white dark:bg-black-bg rounded-xl sm:p-6 lg:col-span-2 lg:row-span-2">
-                <div className="flex justify-between items-center px-2 mb-4">
-                  <h3 className="font-base font-medium">
+                <div className="px-2 mb-4">
+                  <h3 className="font-base font-medium mb-4fix">
                     Transações cadastradas
                   </h3>
-
-                  <Filter 
-                    currentFilter={filter}
-                    currentType={typeFilter}
-                    onFilterChange={handleFilterChange}
-                  />
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
+                    <div className="relative w-full max-w-[250px]">
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400">
+                        <Search size={16} />
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="Buscar transação"
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="pl-8 pr-2 py-1 border border-zinc-300 rounded-md bg-white shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition w-full"
+                      />
+                    </div>
+                    <Filter 
+                      currentFilter={filter}
+                      currentType={typeFilter}
+                      onFilterChange={handleFilterChange}
+                    />
+                  </div>
                 </div>
 
                 <TableTransactions
@@ -419,6 +434,7 @@ export default function Dashboard() {
                   setCurrentMonth={setCurrentMonth}
                   categories={categories}
                   from="dashboard"
+                  searchTerm={searchTerm}
                 />
               </div>
             </div>
