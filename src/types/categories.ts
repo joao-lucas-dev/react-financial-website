@@ -5,8 +5,8 @@ export type ICategory = {
   id: number
   name: string
   type: string
-  percentage: string
-  total: number
+  percentage?: string
+  total?: number
 }
 
 export interface CategoryData {

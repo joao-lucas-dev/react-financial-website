@@ -13,6 +13,7 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({
   size = 'small',
 }) => {
   const { color, iconName } = category
+  console.log(category)
 
   return color && iconName ? (
     <div

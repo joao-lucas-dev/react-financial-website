@@ -97,8 +97,6 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                       id: recentTransaction.category.id,
                       name: recentTransaction.category.name,
                       type: recentTransaction.category.type,
-                      percentage: recentTransaction.category.percentage,
-                      total: recentTransaction.category.total,
                     }}
                     size="large"
                   />
