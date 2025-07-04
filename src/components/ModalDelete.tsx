@@ -24,7 +24,15 @@ const ModalDelete = ({
   from,
 }: IParams) => {
   return (
-    <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={e => {
+      if (e.target === e.currentTarget) {
+        setOpenModal({
+          isOpen: false,
+          transaction: {} as ITransaction,
+          type: '',
+        })
+      }
+    }}>
       <div className="bg-white dark:bg-black-bg w-96 rounded-lg shadow-lg p-6 relative">
         <h2 className="text-lg font-semibold mb-6 text-center dark:text-softGray">
           Deseja realmente excluir o item?

@@ -1,5 +1,5 @@
 import { ListFilter, X } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useRef, useEffect } from 'react'
 
 const DATE_FILTERS = {
   BEFORE: 'before',
@@ -37,6 +37,24 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [pendingFilter, setPendingFilter] = useState<'before' | 'after' | 'both'>(currentFilter)
   const [pendingType, setPendingType] = useState<'income' | 'outcome' | 'daily' | 'all'>(currentType)
+  const modalRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsModalOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isModalOpen])
 
   const handleRadioChange = (filterType: 'before' | 'after' | 'both', transactionType: 'income' | 'outcome' | 'daily' | 'all') => {
     setPendingFilter(filterType)
@@ -71,11 +89,11 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
         <div className="absolute -top-2 -right-2 z-10">
           {/* Removido o contador de filtros */}
         </div>
-        <button onClick={handleOpenModal}>
+        <button ref={buttonRef} onClick={handleOpenModal}>
           <ListFilter size={24} className="text-zinc-500 hover:opacity-60" />
         </button>
         {isModalOpen && (
-          <div className="absolute right-0 top-full mt-2 z-30">
+          <div ref={modalRef} className="absolute right-0 top-full mt-2 z-30">
             <div className="relative w-96 bg-white rounded-lg shadow-xl border border-zinc-300 p-4">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[14px] font-medium text-gray-900">

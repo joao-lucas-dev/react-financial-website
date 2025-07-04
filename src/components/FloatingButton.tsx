@@ -35,61 +35,64 @@ const FloatingButton = ({ setOpenModal }: IParams) => {
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-16 right-2 space-y-2">
-          <button
-            onClick={() => {
-              setIsOpen(false)
-              setOpenModal({
-                isOpen: true,
-                transaction: {} as ITransaction,
-                type: 'create',
-                button: 'income',
-              })
-            }}
-            className="relative flex items-center bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition duration-300 transform opacity-0 scale-95 animate-fade-in-up"
-          >
-            <MoveDownLeft />
-            <span className="absolute -left-16 bg-zinc-800 opacity-90 p-1 rounded-md text-xs">
-              Entrada
-            </span>
-          </button>
+        <>
+          <div className="fixed inset-0 z-20" onClick={() => setIsOpen(false)} />
+          <div className="absolute bottom-16 right-2 space-y-2 z-30">
+            <button
+              onClick={() => {
+                setIsOpen(false)
+                setOpenModal({
+                  isOpen: true,
+                  transaction: {} as ITransaction,
+                  type: 'create',
+                  button: 'income',
+                })
+              }}
+              className="relative flex items-center bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition duration-300 transform opacity-0 scale-95 animate-fade-in-up"
+            >
+              <MoveDownLeft />
+              <span className="absolute -left-16 bg-zinc-800 opacity-90 p-1 rounded-md text-xs">
+                Entrada
+              </span>
+            </button>
 
-          <button
-            onClick={() => {
-              setIsOpen(false)
-              setOpenModal({
-                isOpen: true,
-                transaction: {} as ITransaction,
-                type: 'create',
-                button: 'outcome',
-              })
-            }}
-            className="relative flex items-center bg-red-500 text-white p-3 rounded-full shadow-lg hover:bg-red-600 transition duration-300 transform opacity-0 scale-95 animate-fade-in-up delay-100"
-          >
-            <MoveUpRight />
-            <span className="absolute -left-14 bg-zinc-800 opacity-90 p-1 rounded-md text-xs">
-              Saída
-            </span>
-          </button>
+            <button
+              onClick={() => {
+                setIsOpen(false)
+                setOpenModal({
+                  isOpen: true,
+                  transaction: {} as ITransaction,
+                  type: 'create',
+                  button: 'outcome',
+                })
+              }}
+              className="relative flex items-center bg-red-500 text-white p-3 rounded-full shadow-lg hover:bg-red-600 transition duration-300 transform opacity-0 scale-95 animate-fade-in-up delay-100"
+            >
+              <MoveUpRight />
+              <span className="absolute -left-14 bg-zinc-800 opacity-90 p-1 rounded-md text-xs">
+                Saída
+              </span>
+            </button>
 
-          <button
-            onClick={() => {
-              setIsOpen(false)
-              setOpenModal({
-                isOpen: true,
-                transaction: {} as ITransaction,
-                type: 'create',
-                button: 'daily',
-              })
-            }}
-            className="relative flex items-center bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-400 transition duration-300 transform opacity-0 scale-95 animate-fade-in-up delay-200"
-          >
-            <ChartColumnDecreasing />
-            <span className="absolute -left-14 bg-zinc-800 opacity-90 p-1 rounded-md text-xs">
-              Diário
-            </span>
-          </button>
-        </div>
+            <button
+              onClick={() => {
+                setIsOpen(false)
+                setOpenModal({
+                  isOpen: true,
+                  transaction: {} as ITransaction,
+                  type: 'create',
+                  button: 'daily',
+                })
+              }}
+              className="relative flex items-center bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-400 transition duration-300 transform opacity-0 scale-95 animate-fade-in-up delay-200"
+            >
+              <ChartColumnDecreasing />
+              <span className="absolute -left-14 bg-zinc-800 opacity-90 p-1 rounded-md text-xs">
+                Diário
+              </span>
+            </button>
+          </div>
+        </>
       )}
     </div>
   )

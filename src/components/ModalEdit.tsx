@@ -140,7 +140,15 @@ const ModalEdit = ({
   )
 
   return (
-    <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={e => {
+      if (e.target === e.currentTarget) {
+        setOpenModal({
+          isOpen: false,
+          transaction: {} as ITransaction,
+          type: '',
+        })
+      }
+    }}>
       <div className="bg-white dark:bg-black-bg w-[490px] rounded-lg shadow-lg p-6 relative">
         <div className="flex justify-between  dark:text-softGray">
           <h2 className="text-lg font-semibold">Editar item</h2>
