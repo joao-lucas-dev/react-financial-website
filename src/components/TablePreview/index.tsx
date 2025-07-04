@@ -30,6 +30,7 @@ interface IParams {
   setOpenModal: ISetOpenModal
   categories: any[]
   from: string
+  resetScroll?: boolean
 }
 
 const TablePreview = ({
@@ -44,6 +45,7 @@ const TablePreview = ({
   setOpenModal,
   categories,
   from = 'transacoes',
+  resetScroll = false,
 }: IParams) => {
   const targetRowRef = useRef<HTMLTableRowElement>(null)
   const tableContainerRef = useRef<HTMLDivElement>(null)
@@ -67,6 +69,15 @@ const TablePreview = ({
       })
     }
   }, [rows])
+
+  useEffect(() => {
+    if (resetScroll && tableContainerRef.current) {
+      tableContainerRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+    }
+  }, [resetScroll])
 
   const handleMouseEnter = (
     event: React.MouseEvent<HTMLTableCellElement>,

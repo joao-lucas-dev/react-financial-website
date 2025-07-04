@@ -15,6 +15,7 @@ const Transactions = () => {
     transaction: {} as ITransaction,
     type: '',
   })
+  const [resetScroll, setResetScroll] = useState(false)
 
   const { handleGetChartCategories, categories } = useCategories()
 
@@ -45,6 +46,20 @@ const Transactions = () => {
     handleGetRecentTransactions,
   )
 
+  const handleNextWeek = async (isBeforeWeek: boolean) => {
+    setResetScroll(true)
+    await getNextWeek(isBeforeWeek)
+    // Reset the flag after a short delay to allow the scroll to complete
+    setTimeout(() => setResetScroll(false), 100)
+  }
+
+  const handleToday = async () => {
+    setResetScroll(true)
+    await getToday()
+    // Reset the flag after a short delay to allow the scroll to complete
+    setTimeout(() => setResetScroll(false), 100)
+  }
+
   return (
     <div className="w-full h-full bg-background dark:bg-orangeDark">
       <Header title="Transações" activePage="transacoes" />
@@ -66,7 +81,7 @@ const Transactions = () => {
                 <div className="flex flex-1 items-center justify-center">
                   <button
                     className="text-base font-medium text-gray dark:text-softGray active:opacity-50 rounded-2xl hover:bg-zinc-100 p-2"
-                    onClick={() => getNextWeek(true)}
+                    onClick={() => handleNextWeek(true)}
                   >
                     <ChevronLeft size={18} />
                   </button>
@@ -79,7 +94,7 @@ const Transactions = () => {
                   </span>
                   <button
                     className="text-sm font-medium text-gray dark:text-softGray active:opacity-50 rounded-2xl hover:bg-zinc-100 p-2"
-                    onClick={() => getNextWeek(false)}
+                    onClick={() => handleNextWeek(false)}
                   >
                     <ChevronRight size={18} />
                   </button>
@@ -88,7 +103,7 @@ const Transactions = () => {
                   <button
                     disabled={hasToday()}
                     className="bg-primary px-4 py-1 text-white rounded-lg disabled:bg-orange-300 dark:disabled:bg-auto flex justify-center items-center active:opacity-50"
-                    onClick={() => getToday()}
+                    onClick={handleToday}
                   >
                     <Calendar size={16} className="mr-2" />
                     Hoje
@@ -110,6 +125,7 @@ const Transactions = () => {
                 setOpenModal={setOpenModal}
                 categories={categories}
                 from="transacoes"
+                resetScroll={resetScroll}
               />
             </div>
           </div>
