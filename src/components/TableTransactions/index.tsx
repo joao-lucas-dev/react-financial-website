@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import 'react-loading-skeleton/dist/skeleton.css'
 import CategoryIcon from '../CategoryIcon'
-import { EllipsisVertical, Search } from 'lucide-react'
+import { EllipsisVertical, Search, MessageCircleQuestion } from 'lucide-react'
 import './styles.css'
 import { DateTime } from 'luxon'
 import { typeMap } from '../../common/constants'
@@ -191,7 +191,7 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
 
   return (
     <>
-      {filteredTransactions.length > 0 && (
+      {filteredTransactions.length > 0 ? (
         <div className="w-full overflow-y-scroll flex flex-auto relative">
           <table className="min-w-640 sm:w-full h-full text-left">
             <thead>
@@ -239,6 +239,11 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
             </thead>
             <tbody>{memoizedTransactions}</tbody>
           </table>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center w-full h-64 py-8">
+          <span style={{ color: 'rgb(160 160 160)' }} className="text-lg font-medium">Nenhuma transação cadastrada ainda</span>
+          <span style={{ color: 'rgb(160 160 160)' }} className="text-sm mt-1">Adicione sua primeira transação para começar!</span>
         </div>
       )}
       {/* Pagination Controls */}
