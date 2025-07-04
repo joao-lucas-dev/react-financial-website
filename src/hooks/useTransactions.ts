@@ -338,6 +338,54 @@ export default function useTransactions(
     ],
   )
 
+  const handleDeleteMultipleTransactions = useCallback(
+    async (
+      ids: string[],
+      currentMonth: number,
+      setCurrentMonth: Dispatch<
+        React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
+      >,
+      from: string,
+    ) => {
+      try {
+        await axiosPrivate.delete('/transactions/delete-multiple', { data: { ids } })
+
+        const newDate = DateTime.fromISO(rows[3].date) as DateTime
+
+        const promises = []
+
+        if (from === 'dashboard') {
+          promises.push(await handleGetPreviewTransactions(newDate))
+        } else {
+          promises.push(await handleGetTransactionsMonth(newDate))
+        }
+
+        if (newDate.month === currentMonth) {
+          promises.push(await handleGetChartCategories(newDate))
+          promises.push(await handleGetOverviewTransactions(newDate))
+          promises.push(await handleGetBalance())
+          promises.push(await handleGetRecentTransactions())
+          // @ts-expect-error TS2345
+          setCurrentMonth(newDate.month)
+        }
+
+        await Promise.all(promises)
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [
+      rows,
+      handleGetChartCategories,
+      handleGetOverviewTransactions,
+      handleGetBalance,
+      handleGetTransactionsMonth,
+      axiosPrivate,
+      handleGetPreviewTransactions,
+      handleGetRecentTransactions,
+    ],
+  )
+
   return {
     rows,
     setRows,
@@ -353,5 +401,6 @@ export default function useTransactions(
     handleCreateCompleteTransaction,
     handleGetRecentTransactions,
     recentTransactions,
+    handleDeleteMultipleTransactions,
   }
 }

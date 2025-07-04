@@ -51,6 +51,7 @@ export default function Dashboard() {
     handleGetPreviewTransactions,
     handleGetRecentTransactions,
     recentTransactions,
+    handleDeleteMultipleTransactions,
   } = useTransactions(handleGetChartCategories)
   const {
     getMonth,
@@ -430,6 +431,7 @@ export default function Dashboard() {
                   setOpenModal={setOpenModal}
                   handleUpdateTransaction={handleUpdateTransaction}
                   handleDeleteTransaction={handleDeleteTransaction}
+                  handleDeleteMultipleTransactions={handleDeleteMultipleTransactions}
                   currentMonth={currentMonth}
                   setCurrentMonth={setCurrentMonth}
                   categories={categories}

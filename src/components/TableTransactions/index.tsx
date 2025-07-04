@@ -27,6 +27,7 @@ interface TableRecentTransactionsProps {
   }>>
   handleUpdateTransaction: any
   handleDeleteTransaction: any
+  handleDeleteMultipleTransactions: any
   currentMonth: number
   setCurrentMonth: any
   categories: any[]
@@ -36,8 +37,10 @@ interface TableRecentTransactionsProps {
 
 const ITEMS_PER_PAGE = 7;
 
-const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder, openModal, setOpenModal, handleUpdateTransaction, handleDeleteTransaction, currentMonth, setCurrentMonth, categories, from, searchTerm = '' }: TableRecentTransactionsProps) => {
+const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder, openModal, setOpenModal, handleUpdateTransaction, handleDeleteTransaction, handleDeleteMultipleTransactions, currentMonth, setCurrentMonth, categories, from, searchTerm = '' }: TableRecentTransactionsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -57,6 +60,32 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
     const end = start + ITEMS_PER_PAGE;
     return filteredTransactions.slice(start, end);
   }, [filteredTransactions, currentPage]);
+
+  const allChecked = paginatedTransactions.length > 0 && paginatedTransactions.every(t => t.id && selectedIds.includes(t.id));
+
+  const handleCheckAll = () => {
+    if (allChecked) {
+      setSelectedIds(selectedIds.filter(id => !paginatedTransactions.some(t => t.id === id)));
+    } else {
+      setSelectedIds([
+        ...selectedIds,
+        ...paginatedTransactions
+          .map(t => t.id)
+          .filter((id): id is string => !!id && !selectedIds.includes(id))
+      ]);
+    }
+  };
+
+  const handleCheck = (id?: string) => {
+    if (!id) return;
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleBulkDelete = async () => {
+    await handleDeleteMultipleTransactions(selectedIds, currentMonth, setCurrentMonth, from);
+    setSelectedIds([]);
+    setShowBulkDeleteModal(false);
+  };
 
   const memoizedTransactions = useMemo(() => {
     const getTag = (type: string) => {
@@ -110,6 +139,20 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
         })()
         return (
           <tr key={recentTransaction.id} className="relative">
+            <td className="border-b-[1px] p-3 border-lineGray text-sm font-medium h-[56px] text-center">
+              <label className="checkbox-orange">
+                <input
+                  type="checkbox"
+                  checked={!!recentTransaction.id && selectedIds.includes(recentTransaction.id)}
+                  onChange={() => handleCheck(recentTransaction.id)}
+                />
+                <span className="custom-check">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 8.5L7 11.5L12 6.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </label>
+            </td>
             <td className="border-b-[1px] p-3 border-lineGray text-sm font-medium h-[56px]">
               <div className="flex justify-center items-center">
                 {recentTransaction.category ? (
@@ -187,15 +230,62 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
         )
       })
     )
-  }, [paginatedTransactions, setOpenModal])
+  }, [paginatedTransactions, setOpenModal, selectedIds])
 
   return (
     <>
+      {selectedIds.length > 0 && (
+        <div className="flex justify-end mb-2">
+          <button
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow text-sm font-medium transition-colors"
+            onClick={() => setShowBulkDeleteModal(true)}
+          >
+            Excluir selecionados
+          </button>
+        </div>
+      )}
+      {showBulkDeleteModal && (
+        <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white dark:bg-black-bg w-96 rounded-lg shadow-lg p-6 relative">
+            <h2 className="text-lg font-semibold mb-6 text-center dark:text-softGray">
+              Deseja realmente excluir os itens selecionados?
+            </h2>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setShowBulkDeleteModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 dark:text-softGray"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                className="px-4 py-2 bg-primary hover:bg-orange-400 rounded-lg text-center text-white font-semibold text-md"
+              >
+                Sim, apagar!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {filteredTransactions.length > 0 ? (
         <div className="w-full overflow-y-scroll flex flex-auto relative">
           <table className="min-w-640 sm:w-full h-full text-left">
             <thead>
               <tr>
+                <th className="sticky top-0 z-10 text-center bg-background dark:bg-orangeDark rounded-tl-lg p-4 text-gray dark:text-softGray border-b-1 border-lineGray text-sm w-12">
+                  <label className="checkbox-orange">
+                    <input
+                      type="checkbox"
+                      checked={allChecked}
+                      onChange={handleCheckAll}
+                    />
+                    <span className="custom-check">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 8.5L7 11.5L12 6.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                  </label>
+                </th>
                 <th className="sticky top-0 z-10 text-center bg-background dark:bg-orangeDark rounded-tl-lg p-4 text-gray dark:text-softGray border-b-1 border-lineGray text-sm">
                   Categoria
                 </th>
@@ -247,32 +337,34 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
         </div>
       )}
       {/* Pagination Controls */}
-      <div className="flex justify-center items-center gap-2 mt-4">
-        <button
-          className="px-2 py-1 rounded border text-sm disabled:opacity-50"
-          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-          disabled={currentPage === 1}
-        >
-          Anterior
-        </button>
-        {Array.from({ length: totalPages }, (_, i) => (
+      {filteredTransactions.length > 0 && (
+        <div className="flex justify-center items-center gap-2 mt-4">
           <button
-            key={i + 1}
-            className={`px-2 py-1 rounded border text-sm ${currentPage === i + 1 ? 'bg-orange-500 text-white' : ''}`}
-            onClick={() => setCurrentPage(i + 1)}
+            className="px-2 py-1 rounded border text-sm disabled:opacity-50"
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
           >
-            {i + 1}
+            Anterior
           </button>
-        ))}
-        <button
-          className="px-2 py-1 rounded border text-sm disabled:opacity-50"
-          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-          disabled={currentPage === totalPages}
-        >
-          Próxima
-        </button>
-        <span className="ml-4 text-sm text-gray-500">Página {currentPage}</span>
-      </div>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              className={`px-2 py-1 rounded border text-sm ${currentPage === i + 1 ? 'bg-orange-500 text-white' : ''}`}
+              onClick={() => setCurrentPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            className="px-2 py-1 rounded border text-sm disabled:opacity-50"
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Próxima
+          </button>
+          <span className="ml-4 text-sm text-gray-500">Página {currentPage}</span>
+        </div>
+      )}
       {/* Modais de Editar/Excluir */}
       {openModal.isOpen && openModal.type === 'edit' && (
         <ModalEdit
