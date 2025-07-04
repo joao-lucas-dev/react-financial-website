@@ -267,8 +267,8 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
           </div>
         </div>
       )}
-      {filteredTransactions.length > 0 ? (
-        <div className="w-full overflow-y-scroll flex flex-auto relative">
+      <div className="w-full flex flex-auto relative">
+        <div className="w-full min-h-[56px]">
           <table className="min-w-640 sm:w-full h-full text-left">
             <thead>
               <tr>
@@ -327,15 +327,22 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                 </th>
               </tr>
             </thead>
-            <tbody>{memoizedTransactions}</tbody>
+            {filteredTransactions.length > 0 ? (
+              <tbody>{memoizedTransactions}</tbody>
+            ) : (
+              <tbody>
+                <tr>
+                  <td colSpan={8} className="text-center py-8">
+                    <span style={{ color: 'rgb(160 160 160)' }} className="text-lg font-medium">Nenhuma transação cadastrada ainda</span>
+                    <br />
+                    <span style={{ color: 'rgb(160 160 160)' }} className="text-sm mt-1">Adicione sua primeira transação para começar!</span>
+                  </td>
+                </tr>
+              </tbody>
+            )}
           </table>
         </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center w-full h-64 py-8">
-          <span style={{ color: 'rgb(160 160 160)' }} className="text-lg font-medium">Nenhuma transação cadastrada ainda</span>
-          <span style={{ color: 'rgb(160 160 160)' }} className="text-sm mt-1">Adicione sua primeira transação para começar!</span>
-        </div>
-      )}
+      </div>
       {/* Pagination Controls */}
       {filteredTransactions.length > 0 && (
         <div className="flex justify-center items-center gap-2 mt-4">

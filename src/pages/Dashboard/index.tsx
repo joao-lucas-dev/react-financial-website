@@ -396,7 +396,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="min-h-[600px] flex flex-col bg-white dark:bg-black-bg rounded-xl sm:p-6 lg:col-span-2 lg:row-span-2">
+              <div className="flex flex-col bg-white dark:bg-black-bg rounded-xl sm:p-6 lg:col-span-2 lg:row-span-2 mb-6">
                 <div className="px-2 mb-4">
                   <h3 className="font-base font-medium mb-4">
                     Transações cadastradas
