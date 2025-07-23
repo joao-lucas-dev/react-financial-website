@@ -21,54 +21,29 @@ export default function useDashboard(
     return ''
   }, [rows])
 
-  const getNextWeek = useCallback(
-    async (isBeforeWeek: boolean) => {
-      let newDate
+  const getNextMonth = useCallback(async () => {
+    const newDate = DateTime.now().set({ month: currentMonth }).plus({ months: 1 });
+    await handleGetPreviewTransactions(newDate);
+    await handleGetChartCategories(newDate);
+    await handleGetOverviewTransactions(newDate);
+    setCurrentMonth(newDate.month);
+  }, [currentMonth, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
 
-      if (isBeforeWeek) {
-        newDate = DateTime.fromISO(rows[0].date).minus({ days: 4 })
-      } else {
-        newDate = DateTime.fromISO(rows[rows.length - 1].date).plus({ days: 4 })
-      }
-
-      const promises = [await handleGetPreviewTransactions(newDate)]
-
-      if (newDate.month !== currentMonth) {
-        promises.push(await handleGetChartCategories(newDate))
-        promises.push(await handleGetOverviewTransactions(newDate))
-        // @ts-expect-error TS2322
-        setCurrentMonth(newDate.month)
-      }
-
-      await Promise.all(promises)
-    },
-    [
-      rows,
-      handleGetChartCategories,
-      handleGetOverviewTransactions,
-      setCurrentMonth,
-      currentMonth,
-      handleGetPreviewTransactions,
-    ],
-  )
+  const getPreviousMonth = useCallback(async () => {
+    const newDate = DateTime.now().set({ month: currentMonth }).minus({ months: 1 });
+    await handleGetPreviewTransactions(newDate);
+    await handleGetChartCategories(newDate);
+    await handleGetOverviewTransactions(newDate);
+    setCurrentMonth(newDate.month);
+  }, [currentMonth, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
 
   const getToday = useCallback(async () => {
-    const newDate = DateTime.now()
-    const promises = [await handleGetPreviewTransactions(newDate)]
-
-    if (newDate.month !== currentMonth) {
-      promises.push(await handleGetChartCategories(newDate))
-      promises.push(await handleGetOverviewTransactions(newDate))
-      setCurrentMonth(newDate.month)
-    }
-
-    await Promise.all(promises)
-  }, [
-    handleGetChartCategories,
-    handleGetOverviewTransactions,
-    currentMonth,
-    handleGetPreviewTransactions,
-  ])
+    const newDate = DateTime.now();
+    await handleGetPreviewTransactions(newDate);
+    await handleGetChartCategories(newDate);
+    await handleGetOverviewTransactions(newDate);
+    setCurrentMonth(newDate.month);
+  }, [handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
 
   const getGreeting = useCallback(() => {
     const now = new Date()
@@ -103,7 +78,8 @@ export default function useDashboard(
 
   return {
     getMonth,
-    getNextWeek,
+    getNextMonth,
+    getPreviousMonth,
     getToday,
     getGreeting,
     hasToday,

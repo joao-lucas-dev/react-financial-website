@@ -33,6 +33,7 @@ const modalEditSchema = z.object({
   }),
   category: z.string(),
   type: z.string().min(1, 'Tipo é obrigatório'),
+  recurrence: z.string().min(1, 'Recorrência é obrigatória'),
 })
 
 type ModalEditData = z.infer<typeof modalEditSchema>
@@ -57,6 +58,7 @@ const ModalEdit = ({
   })
 
   useEffect(() => {
+    console.log(openModal.transaction)
     setValue('description', openModal.transaction.description || '')
     // Formatar valor como moeda brasileira
     const price = openModal.transaction.price
@@ -81,6 +83,7 @@ const ModalEdit = ({
     )
     setValue('category', openModal.transaction.category?.id ? String(openModal.transaction.category.id) : '')
     setValue('type', openModal.transaction.type || '')
+    setValue('recurrence', openModal.transaction.is_recurring ? 'true' : 'false')
   }, [openModal.transaction, setValue])
 
   const handleChange = useCallback(
@@ -245,6 +248,19 @@ const ModalEdit = ({
               <span className="text-red-500 my-4 text-sm">
                 {errors.type?.message}
               </span>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="text-md font-semibold text-gray dark:text-softGray">
+                Recorrência mensal?
+              </label>
+              <select
+                className="focus:outline-primary border border-softGray dark:bg-zinc-800 dark:border-zinc-700 dark:text-softGray h-12 rounded-lg mt-2 px-5"
+                {...register('recurrence')}
+              >
+                <option value="false">Não</option>
+                <option value="true">Sim</option>
+              </select>
             </div>
 
             <Button title="Atualizar" type="submit" />

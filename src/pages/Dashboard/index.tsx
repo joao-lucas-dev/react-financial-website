@@ -56,7 +56,8 @@ export default function Dashboard() {
   const {
     getMonth,
     getGreeting,
-    getNextWeek,
+    getNextMonth,
+    getPreviousMonth,
     getToday,
     hasToday,
     currentMonth,
@@ -158,7 +159,7 @@ export default function Dashboard() {
                     </div>
                     <div className="ml-4">
                       <h3 className="text-xs text-gray dark:text-softGray">
-                        Total de saídas
+                        Total de (saídas + diário)
                       </h3>
                       <span className="text-lg font-semibold text-red-600 mt-4">
                         <CountUp valueNumber={overview?.outcome?.total} />
@@ -182,7 +183,7 @@ export default function Dashboard() {
                     </div>
                     <div className="ml-4">
                       <h3 className="text-xs text-gray dark:text-softGray">
-                        Gastos p/dia
+                        Limite Restante
                       </h3>
                       <span className="text-lg font-semibold text-purple-600 mt-4">
                         <CountUp valueNumber={overview?.daily?.total} />
@@ -214,7 +215,7 @@ export default function Dashboard() {
                     <div className="flex flex-1 items-center justify-center">
                       <button
                         className="text-base font-semibold text-gray dark:text-softGray active:opacity-50 rounded-2xl hover:bg-zinc-100 p-2"
-                        onClick={() => getNextWeek(true)}
+                        onClick={() => getPreviousMonth()}
                       >
                         <ChevronLeft size={18} />
                       </button>
@@ -227,7 +228,7 @@ export default function Dashboard() {
                       </span>
                       <button
                         className="text-sm font-semibold text-gray dark:text-softGray active:opacity-50 rounded-2xl hover:bg-zinc-100 p-2"
-                        onClick={() => getNextWeek(false)}
+                        onClick={() => getNextMonth()}
                       >
                         <ChevronRight size={18} />
                       </button>

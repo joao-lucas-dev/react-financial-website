@@ -104,21 +104,21 @@ export default function useTransactions(
 
   const handleGetPreviewTransactions = useCallback(
     async (date = DateTime.now()) => {
-      const startDate = date.minus({ day: 3 })
-      const endDate = date.plus({ day: 3 })
+      const startDate = date.startOf('month');
+      const endDate = date.endOf('month');
 
       try {
         const { data } = await axiosPrivate.get(
           `/transactions/preview?startDate=${startDate}&endDate=${endDate}`,
-        )
+        );
 
-        setRows(data)
+        setRows(data);
       } catch (err) {
-        console.error('Erro ao buscar transações:', err)
+        console.error('Erro ao buscar transações:', err);
       }
     },
     [axiosPrivate],
-  )
+  );
 
   const handleCreateTransaction = useCallback(
     async (
@@ -207,6 +207,7 @@ export default function useTransactions(
           type: createTransaction.type,
           shared_id: null,
           transaction_day: createTransaction.transaction_day,
+          is_recurring: createTransaction.is_recurring,
         })
 
         const newDate = DateTime.fromJSDate(

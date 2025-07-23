@@ -29,6 +29,7 @@ export type ITransaction = {
   updated_at?: string
   transaction_day: string | Date
   type?: 'income' | 'outcome' | 'daily'
+  is_recurring?: boolean
 }
 
 interface IColumn {

@@ -31,6 +31,7 @@ const modalEditSchema = z.object({
     message: 'Data é obrigatória e deve ser uma data válida',
   }),
   category: z.string().min(1, 'Categoria é obrigatória'),
+  recurrence: z.string().min(1, 'Recorrência é obrigatória'),
 })
 
 type ModalCreateData = z.infer<typeof modalEditSchema>
@@ -63,6 +64,7 @@ const ModalCreate = ({
 
   useEffect(() => {
     setValue('transaction_day', new Date().toISOString().split('T')[0])
+    setValue('recurrence', 'false')
   }, [setValue])
 
   const handleChange = useCallback(
@@ -93,6 +95,7 @@ const ModalCreate = ({
           category_id: Number(data.category),
           transaction_day: new Date(`${data.transaction_day}T00:00:00`),
           shared_id: null,
+          is_recurring: data.recurrence === 'true',
         } as unknown as ITransaction
 
         await handleCreateCompleteTransaction(
@@ -176,7 +179,7 @@ const ModalCreate = ({
                 />
               </div>
             </div>
-            <div className="flex row justify-between items-center">
+            <div className={`hidden row justify-between items-center ${errors.price || errors.transaction_day ? 'flex' : ''}`}>
               <span className="text-red-500 my-4 text-sm">
                 {errors.price?.message}
               </span>
@@ -211,6 +214,19 @@ const ModalCreate = ({
                 ? 'Selecione uma categoria'
                 : errors.category?.message}
             </span>
+
+            <div className="flex flex-col mt-4">
+              <label className="text-md font-semibold text-gray dark:text-softGray">
+                Recorrência mensal?
+              </label>
+              <select
+                className="focus:outline-primary border border-softGray dark:bg-zinc-800 dark:border-zinc-700 dark:text-softGray h-12 rounded-lg mt-2 px-5"
+                {...register('recurrence')}
+              >
+                <option value="false">Não</option>
+                <option value="true">Sim</option>
+              </select>
+            </div>
 
             <Button title="Criar" type="submit" />
           </form>
