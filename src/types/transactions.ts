@@ -27,7 +27,7 @@ export type ITransaction = {
   shared?: IShared
   created_at?: string
   updated_at?: string
-  transaction_day: string | Date
+  transaction_day: string
   type?: 'income' | 'outcome'
   is_recurring?: boolean
 }

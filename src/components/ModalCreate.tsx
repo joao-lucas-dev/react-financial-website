@@ -14,6 +14,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import SelectInput from './SelectInput.tsx'
 import { ICategory } from '../types/categories.ts'
+import { DateTime } from 'luxon'
 
 interface IParams {
   openModal: IOpenModal
@@ -61,7 +62,7 @@ const ModalCreate = ({
   })
 
   useEffect(() => {
-    setValue('transaction_day', new Date().toISOString().split('T')[0])
+    setValue('transaction_day', DateTime.fromJSDate(new Date(), { zone: Intl.DateTimeFormat().resolvedOptions().timeZone }).toFormat('yyyy-MM-dd'))
     setValue('recurrence', 'false')
   }, [setValue])
 

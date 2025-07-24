@@ -209,8 +209,8 @@ export default function useTransactions(
           is_recurring: createTransaction.is_recurring,
         })
 
-        const newDate = DateTime.fromJSDate(
-          <Date>createTransaction.transaction_day,
+        const newDate = DateTime.fromISO(
+          createTransaction.transaction_day,
         ) as DateTime
 
         const promises = []

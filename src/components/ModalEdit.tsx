@@ -58,7 +58,6 @@ const ModalEdit = ({
   })
 
   useEffect(() => {
-    console.log(openModal.transaction)
     setValue('description', openModal.transaction.description || '')
     // Formatar valor como moeda brasileira
     const price = openModal.transaction.price
@@ -78,7 +77,7 @@ const ModalEdit = ({
     setValue(
       'transaction_day',
       openModal.transaction.transaction_day
-        ? new Date(openModal.transaction.transaction_day).toISOString().split('T')[0]
+        ? openModal.transaction.transaction_day.split('T')[0]
         : ''
     )
     setValue('category', openModal.transaction.category?.id ? String(openModal.transaction.category.id) : '')
