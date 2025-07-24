@@ -13,7 +13,7 @@ interface IParams {
     >,
   ) => Promise<void>
   transactions: ITransaction[]
-  type: 'income' | 'outcome' | 'daily'
+  type: 'income' | 'outcome'
   setOpenModal: ISetOpenModal
   tdRect: DOMRect | null
 }

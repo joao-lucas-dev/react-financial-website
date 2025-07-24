@@ -106,11 +106,4 @@ export const typeMap = new Map<string, { title: string; bgColor: string }>([
       bgColor: 'bg-red-400',
     },
   ],
-  [
-    'daily',
-    {
-      title: 'Diário',
-      bgColor: 'bg-purple-400',
-    },
-  ],
 ])

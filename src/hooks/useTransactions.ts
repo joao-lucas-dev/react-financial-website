@@ -18,9 +18,9 @@ export default function useTransactions(
       type: 'outcome',
       percentage: 0,
     },
-    daily: {
+    remaining: {
       total: 0,
-      type: 'daily',
+      type: 'remaining',
       percentage: 0,
     },
   })
@@ -33,7 +33,7 @@ export default function useTransactions(
       filter: 'before' | 'after' | 'both' = 'both',
       sort: string = 'updated_at',
       direction: 'asc' | 'desc' = 'desc',
-      type: 'income' | 'outcome' | 'daily' | 'all' = 'all',
+      type: 'income' | 'outcome' | 'all' = 'all',
     ) => {
       try {
         const response = await axiosPrivate.get(
@@ -122,7 +122,7 @@ export default function useTransactions(
 
   const handleCreateTransaction = useCallback(
     async (
-      type: 'incomes' | 'outcomes' | 'dailies',
+      type: 'incomes' | 'outcomes',
       row: IRow,
       value = {
         formattedValue: '',
@@ -150,8 +150,7 @@ export default function useTransactions(
           description: 'Insira uma descrição',
           price: value.originalValue,
           category_id: type === 'incomes' ? 10 : 4,
-          type:
-            type === 'dailies' ? 'daily' : type.substring(0, type.length - 1),
+          type: type.substring(0, type.length - 1),
           shared_id: null,
           transaction_day: transactionDay,
         })

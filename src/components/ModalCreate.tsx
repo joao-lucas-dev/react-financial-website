@@ -48,8 +48,6 @@ const ModalCreate = ({
     if (openModal.button === 'income') return 'entrada'
 
     if (openModal.button === 'outcome') return 'saída'
-
-    return 'diário'
   }, [openModal.button])
 
   const {

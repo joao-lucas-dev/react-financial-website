@@ -16,9 +16,6 @@ const TableSkeleton = ({ rows = 7 }) => {
             <th className="text-center text-gray border-b-1 border-lineGray bg-background text-sm max-w-8">
               Saídas
             </th>
-            <th className="text-center text-gray border-b-1 border-lineGray bg-background text-sm max-w-8">
-              Diário
-            </th>
             <th className="rounded-tr-lg text-center text-gray border-b-1 border-lineGray bg-background text-sm max-w-8">
               Saldo
             </th>

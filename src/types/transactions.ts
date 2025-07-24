@@ -3,14 +3,14 @@ import { ICategory } from './categories.ts'
 
 export type IType = {
   total: number
-  type: 'income' | 'outcome' | 'daily'
+  type: 'income' | 'outcome' | 'remaining'
   percentage: number
 }
 
 export interface IOverview {
   income: IType
   outcome: IType
-  daily: IType
+  remaining: IType
 }
 
 interface IShared {
@@ -28,7 +28,7 @@ export type ITransaction = {
   created_at?: string
   updated_at?: string
   transaction_day: string | Date
-  type?: 'income' | 'outcome' | 'daily'
+  type?: 'income' | 'outcome'
   is_recurring?: boolean
 }
 
@@ -45,7 +45,6 @@ export type IRow = {
   isToday?: boolean
   incomes: IColumn
   outcomes: IColumn
-  dailies: IColumn
   total: {
     valueFormatted: string
     value: number
@@ -55,7 +54,7 @@ export type IRow = {
 }
 
 export type IHandleCreateTransaction = (
-  type: 'incomes' | 'outcomes' | 'dailies',
+  type: 'incomes' | 'outcomes',
   row: IRow,
   value: { formattedValue: string; originalValue: number },
   setValue: React.Dispatch<

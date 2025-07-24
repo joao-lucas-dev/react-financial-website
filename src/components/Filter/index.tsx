@@ -1,5 +1,5 @@
 import { ListFilter, X } from 'lucide-react'
-import { useCallback, useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 const DATE_FILTERS = {
   BEFORE: 'before',
@@ -11,7 +11,6 @@ const TYPE_FILTERS = {
   ALL: 'all',
   INCOME: 'income',
   OUTCOME: 'outcome',
-  DAILY: 'daily',
 }
 
 const DATE_FILTER_LABELS = {
@@ -24,19 +23,18 @@ const TYPE_FILTER_LABELS = {
   [TYPE_FILTERS.ALL]: 'Todos',
   [TYPE_FILTERS.INCOME]: 'Entrada',
   [TYPE_FILTERS.OUTCOME]: 'Saída',
-  [TYPE_FILTERS.DAILY]: 'Diária',
 }
 
 interface FilterProps {
-  onFilterChange: (filter: 'before' | 'after' | 'both', type: 'income' | 'outcome' | 'daily' | 'all') => void
+  onFilterChange: (filter: 'before' | 'after' | 'both', type: 'income' | 'outcome' | 'all') => void
   currentFilter: 'before' | 'after' | 'both'
-  currentType: 'income' | 'outcome' | 'daily' | 'all'
+  currentType: 'income' | 'outcome' | 'all'
 }
 
 export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [pendingFilter, setPendingFilter] = useState<'before' | 'after' | 'both'>(currentFilter)
-  const [pendingType, setPendingType] = useState<'income' | 'outcome' | 'daily' | 'all'>(currentType)
+  const [pendingType, setPendingType] = useState<'income' | 'outcome' | 'all'>(currentType)
   const modalRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -56,7 +54,7 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isModalOpen])
 
-  const handleRadioChange = (filterType: 'before' | 'after' | 'both', transactionType: 'income' | 'outcome' | 'daily' | 'all') => {
+  const handleRadioChange = (filterType: 'before' | 'after' | 'both', transactionType: 'income' | 'outcome' | 'all') => {
     setPendingFilter(filterType)
     setPendingType(transactionType)
   }
@@ -145,7 +143,7 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
                         name="typeFilter"
                         className="w-4 h-4 appearance-none border border-gray-300 rounded-full checked:bg-orange-500 checked:border-orange-500 checked:before:content-[''] checked:before:w-2 checked:before:h-2 checked:before:bg-white checked:before:rounded-full checked:before:absolute checked:before:top-1/2 checked:before:left-1/2 checked:before:-translate-x-1/2 checked:before:-translate-y-1/2 focus:ring-2 focus:ring-orange-500 relative"
                         checked={pendingType === filterType}
-                        onChange={() => handleRadioChange(pendingFilter, filterType as 'income' | 'outcome' | 'daily' | 'all')}
+                        onChange={() => handleRadioChange(pendingFilter, filterType as 'income' | 'outcome' | 'all')}
                       />
                       <span className="text-sm text-gray-700 select-none">
                         {label}

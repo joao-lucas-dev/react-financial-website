@@ -243,7 +243,6 @@ const ModalEdit = ({
               >
                 <option value="income">Entrada</option>
                 <option value="outcome">Saída</option>
-                <option value="daily">Diário</option>
               </select>
               <span className="text-red-500 my-4 text-sm">
                 {errors.type?.message}

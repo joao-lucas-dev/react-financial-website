@@ -74,7 +74,7 @@ export default function Dashboard() {
   const [sortBy, setSortBy] = useState('updated_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>('desc');
   const [filter, setFilter] = useState<'before' | 'after' | 'both'>('both');
-  const [typeFilter, setTypeFilter] = useState<'income' | 'outcome' | 'daily' | 'all'>('all');
+  const [typeFilter, setTypeFilter] = useState<'income' | 'outcome' | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSort = (field: string, order: 'asc' | 'desc') => {
@@ -87,7 +87,7 @@ export default function Dashboard() {
     handleGetRecentTransactions('both', 'updated_at', 'desc', 'all');
   }, []);
 
-  const handleFilterChange = (newFilter: 'before' | 'after' | 'both', newType: 'income' | 'outcome' | 'daily' | 'all') => {
+  const handleFilterChange = (newFilter: 'before' | 'after' | 'both', newType: 'income' | 'outcome' | 'all') => {
     setFilter(newFilter);
     setTypeFilter(newType);
     setSortBy('updated_at');
@@ -159,7 +159,7 @@ export default function Dashboard() {
                     </div>
                     <div className="ml-4">
                       <h3 className="text-xs text-gray dark:text-softGray">
-                        Total de (saídas + diário)
+                        Total de saídas
                       </h3>
                       <span className="text-lg font-semibold text-red-600 mt-4">
                         <CountUp valueNumber={overview?.outcome?.total} />
@@ -186,13 +186,13 @@ export default function Dashboard() {
                         Limite Restante
                       </h3>
                       <span className="text-lg font-semibold text-purple-600 mt-4">
-                        <CountUp valueNumber={overview?.daily?.total} />
+                        <CountUp valueNumber={overview?.remaining?.total} />
                       </span>
                     </div>
                     <div className="ml-8 flex items-end ">
                       <span className="flex justify-center items-center bg-purple-200 text-purple-600 dark:text-purple-400 dark:bg-purple-700 rounded-full w-16 h-6 text-xs px-4 py-2">
                         <CountUp
-                          valueNumber={overview?.daily?.percentage}
+                          valueNumber={overview?.remaining?.percentage}
                           isPercentage={true}
                         />
                         %

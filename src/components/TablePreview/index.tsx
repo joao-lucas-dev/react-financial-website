@@ -170,33 +170,6 @@ const TablePreview = ({
               )}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} dark:text-softGray sm:relative hover:cursor-pointer group hover:border h-[56px]`}
-            onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 3)}
-            onMouseLeave={handleMouseLeave}
-          >
-            {row.dailies.valueFormatted}
-            {hoveredCell?.rowIndex === rowIndex &&
-              hoveredCell?.colIndex === 3 && (
-                <MiniInfoModal
-                  handleCreateTransaction={(value, setValue) =>
-                    handleCreateTransaction(
-                      'dailies',
-                      row,
-                      value,
-                      setValue,
-                      currentMonth,
-                      setCurrentMonth,
-                      from,
-                    )
-                  }
-                  transactions={row.dailies.transactions}
-                  type="daily"
-                  setOpenModal={setOpenModal}
-                  tdRect={hoveredCell?.tdRect}
-                />
-              )}
-          </td>
-          <td
             className={`border-b-1 p-2 border-lineGray ${color} ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} font-semibold text-sm text-center h-[56px]`}
           >
             {row.total.valueFormatted}
@@ -233,9 +206,6 @@ const TablePreview = ({
                 </th>
                 <th className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
                   Saídas
-                </th>
-                <th className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
-                  Diário
                 </th>
                 <th className="sticky top-0 z-10 rounded-tr-lg text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
                   Saldo
