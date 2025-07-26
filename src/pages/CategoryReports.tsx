@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Tabs from '../components/Tabs';
-import ChartComponent from '../components/ChartComponent';
+import EnhancedChartComponent from '../components/EnhancedChartComponent';
 import CategoryIcon from '../components/CategoryIcon';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { DateTime } from 'luxon';
@@ -106,131 +106,368 @@ const CategoryReports: React.FC = () => {
     const categories = data ? data[tab] : [];
 
     return (
-        <div>
-            <div className="w-full h-full bg-background dark:bg-orangeDark">
+        <>
+            <style>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
+            <div style={{ 
+                backgroundColor: '#F5F5F5', 
+                minHeight: '100vh',
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+            }}>
                 <Header title="Relatórios" activePage="relatorios" />
 
-                <div className="flex h-full">
-                    <MenuAside activePage="relatorios" />
-                    
-                    <div className="w-full min-h-screen bg-background dark:bg-orangeDark mt-24">
-                        <div className="max-w-4xl mx-auto py-8 px-4">
-                            <h1 className="text-2xl font-bold mb-4 text-gray-800 dark:text-grayWhite">Relatórios por Categoria</h1>
-                            <div className="flex items-center justify-between mb-4">
-                                <Tabs tabs={TABS} selected={tab} onChange={(v) => setTab(v as 'incomes' | 'outcomes')} />
-                                <input
-                                    type="month"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    className="ml-4 border rounded px-2 py-1 text-sm dark:bg-zinc-800 dark:text-grayWhite"
-                                />
+            <div className="flex" style={{ paddingTop: '96px' }}>
+                <MenuAside activePage="relatorios" />
+                
+                <div style={{ 
+                    flex: 1, 
+                    marginLeft: '240px',
+                    padding: '2rem',
+                    maxWidth: '1200px',
+                    margin: '0 auto',
+                    marginLeft: '260px'
+                }}>
+                    {/* Header Section */}
+                    <div style={{
+                        marginBottom: '2rem'
+                    }}>
+                        <h1 style={{
+                            fontSize: '2.25rem',
+                            fontWeight: 700,
+                            color: '#424242',
+                            marginBottom: '0.5rem',
+                            lineHeight: 1.2
+                        }}>
+                            Relatórios por Categoria
+                        </h1>
+                        <p style={{
+                            color: '#616161',
+                            fontSize: '1rem',
+                            fontWeight: 400
+                        }}>
+                            Analise seus gastos e receitas por categoria
+                        </p>
+                    </div>
+
+                    {/* Controls Section */}
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '2rem',
+                        backgroundColor: 'white',
+                        padding: '1.5rem',
+                        borderRadius: '1rem',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)'
+                    }}>
+                        <Tabs tabs={TABS} selected={tab} onChange={(v) => setTab(v as 'incomes' | 'outcomes')} />
+                        <input
+                            type="month"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            style={{
+                                border: '1px solid #E0E0E0',
+                                borderRadius: '0.5rem',
+                                padding: '0.75rem 1rem',
+                                fontSize: '0.875rem',
+                                color: '#424242',
+                                backgroundColor: 'white',
+                                outline: 'none',
+                                transition: 'all 0.2s ease'
+                            }}
+                            onFocus={(e) => {
+                                e.target.style.outline = '2px solid #009688';
+                                e.target.style.outlineOffset = '2px';
+                            }}
+                            onBlur={(e) => {
+                                e.target.style.outline = 'none';
+                            }}
+                        />
+                    </div>
+
+                    {/* Chart Section */}
+                    <div style={{
+                        backgroundColor: 'white',
+                        borderRadius: '1rem',
+                        padding: '1.5rem',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        marginBottom: '2rem',
+                        minHeight: '400px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        {loading ? (
+                            <div style={{
+                                textAlign: 'center',
+                                padding: '2rem',
+                                color: '#616161'
+                            }}>
+                                <div style={{
+                                    width: '40px',
+                                    height: '40px',
+                                    border: '3px solid #E0E0E0',
+                                    borderTop: '3px solid #009688',
+                                    borderRadius: '50%',
+                                    animation: 'spin 1s linear infinite',
+                                    margin: '0 auto 1rem'
+                                }}></div>
+                                Carregando dados...
                             </div>
-                            <div className="bg-white dark:bg-black-bg rounded-xl p-6 shadow mb-6">
-                                {loading ? (
-                                    <div className="text-center py-8">Carregando...</div>
-                                ) : (
-                                    (() => {
-                                        const chartData = tab === 'incomes' ? chartCategories.income.chartConfig : chartCategories.notIncome.chartConfig;
-                                        if (!chartData.labels || chartData.labels.length === 0 || !chartData.datasets[0].data.some((v: number) => v > 0)) {
-                                            return (
-                                                <div className="flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-500">
-                                                    <MessageCircleQuestion size={48} className="mb-2" />
-                                                    <span className="text-lg">Nenhum dado para exibir neste período.</span>
-                                                </div>
-                                            );
-                                        }
-                                        return <ChartComponent categories={chartData} />;
-                                    })()
-                                )}
-                            </div>
-                            <div className="space-y-4">
-                                {categories.map((cat) => (
-                                    <div key={cat.id} className="bg-white dark:bg-black-bg rounded-lg shadow p-4">
-                                        <button
-                                            className="flex items-center w-full justify-between focus:outline-none"
-                                            onClick={() => setExpanded((prev) => ({ ...prev, [cat.id]: !prev[cat.id] }))}
+                        ) : (
+                            (() => {
+                                const chartData = tab === 'incomes' ? chartCategories.income.chartConfig : chartCategories.notIncome.chartConfig;
+                                if (!chartData.labels || chartData.labels.length === 0 || !chartData.datasets[0].data.some((v: number) => v > 0)) {
+                                    return (
+                                        <div style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            padding: '2rem',
+                                            color: '#616161'
+                                        }}>
+                                            <MessageCircleQuestion size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
+                                            <span style={{ fontSize: '1.125rem', fontWeight: 500 }}>
+                                                Nenhum dado para exibir neste período
+                                            </span>
+                                            <span style={{ fontSize: '0.875rem', marginTop: '0.5rem', opacity: 0.7 }}>
+                                                Tente selecionar um período diferente
+                                            </span>
+                                        </div>
+                                    );
+                                }
+                                return (
+                                    <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                                        <EnhancedChartComponent categories={chartData} size={300} />
+                                    </div>
+                                );
+                            })()
+                        )}
+                    </div>
+                    {/* Categories List */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {categories.map((cat) => (
+                            <div key={cat.id} style={{
+                                backgroundColor: 'white',
+                                borderRadius: '1rem',
+                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                                border: '1px solid rgba(255, 255, 255, 0.2)',
+                                overflow: 'hidden',
+                                transition: 'all 0.2s ease'
+                            }}>
+                                <button
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        width: '100%',
+                                        justifyContent: 'space-between',
+                                        padding: '1.5rem',
+                                        border: 'none',
+                                        backgroundColor: 'transparent',
+                                        cursor: 'pointer',
+                                        outline: 'none',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                    onClick={() => setExpanded((prev) => ({ ...prev, [cat.id]: !prev[cat.id] }))}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = '#F5F5F5';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
+                                    onFocus={(e) => {
+                                        e.currentTarget.style.outline = '2px solid #009688';
+                                        e.currentTarget.style.outlineOffset = '2px';
+                                    }}
+                                    onBlur={(e) => {
+                                        e.currentTarget.style.outline = 'none';
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <CategoryIcon category={{
+                                            iconName: cat.icon_name,
+                                            color: cat.color,
+                                            icon_name: cat.icon_name,
+                                            id: cat.id,
+                                            name: cat.name,
+                                            type: cat.type,
+                                        }} size="large" />
+                                        <span style={{
+                                            fontWeight: 500,
+                                            color: '#424242',
+                                            fontSize: '1rem'
+                                        }}>
+                                            {cat.name}
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <span style={{
+                                            color: tab === 'incomes' ? '#4CAF50' : '#F44336',
+                                            fontWeight: 600,
+                                            fontSize: '1rem'
+                                        }}>
+                                            {tab === 'incomes' ? '+' : '-'}
+                                            {cat.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                        </span>
+                                        <svg 
+                                            style={{
+                                                width: '20px',
+                                                height: '20px',
+                                                color: '#616161',
+                                                transition: 'transform 0.2s ease',
+                                                transform: expanded[cat.id] ? 'rotate(180deg)' : 'rotate(0deg)'
+                                            }}
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            strokeWidth="2" 
+                                            viewBox="0 0 24 24"
                                         >
-                                            <div className="flex items-center gap-3">
-                                                <CategoryIcon category={{
-                                                    iconName: cat.icon_name,
-                                                    color: cat.color,
-                                                    icon_name: cat.icon_name,
-                                                    id: cat.id,
-                                                    name: cat.name,
-                                                    type: cat.type,
-                                                }} size="large" />
-                                                <span className="font-medium text-gray-800 dark:text-grayWhite">{cat.name}</span>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                </button>
+                                {expanded[cat.id] && (
+                                    <div style={{
+                                        padding: '0 1.5rem 1.5rem',
+                                        borderTop: '1px solid #E0E0E0'
+                                    }}>
+                                        {cat.transactions.length === 0 ? (
+                                            <div style={{
+                                                color: '#616161',
+                                                fontSize: '0.875rem',
+                                                textAlign: 'center',
+                                                padding: '1rem',
+                                                fontStyle: 'italic'
+                                            }}>
+                                                Nenhuma transação nesta categoria
                                             </div>
-                                            <div className="flex items-center gap-4">
-                                                <span className={tab === 'incomes' ? 'text-green-600' : 'text-red-600'}>
-                                                    {tab === 'incomes' ? '+' : '-'}
-                                                    {cat.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                                </span>
-                                                <svg className={`w-5 h-5 transition-transform ${expanded[cat.id] ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                                            </div>
-                                        </button>
-                                        {expanded[cat.id] && (
-                                            <div className="mt-4 border-t pt-4">
-                                                {cat.transactions.length === 0 ? (
-                                                    <div className="text-gray-500 text-sm">Nenhuma transação nesta categoria.</div>
-                                                ) : (
-                                                    (() => {
-                                                        // Ordenar transações por data decrescente
-                                                        const sortedTx = [...cat.transactions].sort((a, b) => DateTime.fromISO(b.transaction_day).toMillis() - DateTime.fromISO(a.transaction_day).toMillis());
-                                                        // Agrupar por dia
-                                                        const grouped = sortedTx.reduce((acc: Record<string, Transaction[]>, tx) => {
-                                                            const day = DateTime.fromISO(tx.transaction_day).toFormat('dd/MM/yyyy');
-                                                            if (!acc[day]) acc[day] = [];
-                                                            acc[day].push(tx);
-                                                            return acc;
-                                                        }, {});
-                                                        return (
-                                                            <ul>
-                                                                {Object.entries(grouped).map(([day, txs], idx) => (
-                                                                    <React.Fragment key={day}>
-                                                                        <li
-                                                                            className={`py-1 text-xs font-semibold rounded px-2 ${idx !== 0 ? 'mt-4' : ''}`}
-                                                                            style={{ background: 'var(--gray-100, #f3f4f6)', color: '#374151' }}
-                                                                        >
-                                                                            {day}
-                                                                        </li>
-                                                                        {txs.map((tx) => (
-                                                                            <li key={tx.id} className="py-2 flex justify-between items-center pl-4">
-                                                                                <div>
-                                                                                    <div className="text-sm text-gray-800 dark:text-grayWhite">{tx.description}</div>
-                                                                                </div>
-                                                                                <div className={tab === 'incomes' ? 'text-green-600' : 'text-red-600'}>
-                                                                                    {tab === 'incomes' ? '+' : '-'}
-                                                                                    {tx.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                                                                </div>
-                                                                            </li>
-                                                                        ))}
-                                                                    </React.Fragment>
+                                        ) : (
+                                            (() => {
+                                                // Ordenar transações por data decrescente
+                                                const sortedTx = [...cat.transactions].sort((a, b) => DateTime.fromISO(b.transaction_day).toMillis() - DateTime.fromISO(a.transaction_day).toMillis());
+                                                // Agrupar por dia
+                                                const grouped = sortedTx.reduce((acc: Record<string, Transaction[]>, tx) => {
+                                                    const day = DateTime.fromISO(tx.transaction_day).toFormat('dd/MM/yyyy');
+                                                    if (!acc[day]) acc[day] = [];
+                                                    acc[day].push(tx);
+                                                    return acc;
+                                                }, {});
+                                                return (
+                                                    <div style={{ marginTop: '1rem' }}>
+                                                        {Object.entries(grouped).map(([day, txs], idx) => (
+                                                            <React.Fragment key={day}>
+                                                                <div
+                                                                    style={{
+                                                                        padding: '0.5rem 0.75rem',
+                                                                        fontSize: '0.75rem',
+                                                                        fontWeight: 600,
+                                                                        borderRadius: '0.5rem',
+                                                                        backgroundColor: '#F5F5F5',
+                                                                        color: '#424242',
+                                                                        marginTop: idx !== 0 ? '1rem' : '0',
+                                                                        marginBottom: '0.5rem'
+                                                                    }}
+                                                                >
+                                                                    {day}
+                                                                </div>
+                                                                {txs.map((tx) => (
+                                                                    <div key={tx.id} style={{
+                                                                        display: 'flex',
+                                                                        justifyContent: 'space-between',
+                                                                        alignItems: 'center',
+                                                                        padding: '0.75rem 1rem',
+                                                                        borderBottom: '1px solid #F5F5F5',
+                                                                        transition: 'all 0.2s ease'
+                                                                    }}
+                                                                    onMouseEnter={(e) => {
+                                                                        e.currentTarget.style.backgroundColor = '#FAFAFA';
+                                                                    }}
+                                                                    onMouseLeave={(e) => {
+                                                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                                                    }}
+                                                                    >
+                                                                        <div>
+                                                                            <div style={{
+                                                                                fontSize: '0.875rem',
+                                                                                color: '#424242',
+                                                                                fontWeight: 500
+                                                                            }}>
+                                                                                {tx.description}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div style={{
+                                                                            color: tab === 'incomes' ? '#4CAF50' : '#F44336',
+                                                                            fontWeight: 600,
+                                                                            fontSize: '0.875rem'
+                                                                        }}>
+                                                                            {tab === 'incomes' ? '+' : '-'}
+                                                                            {tx.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                                                        </div>
+                                                                    </div>
                                                                 ))}
-                                                            </ul>
-                                                        );
-                                                    })()
-                                                )}
-                                            </div>
+                                                            </React.Fragment>
+                                                        ))}
+                                                    </div>
+                                                );
+                                            })()
                                         )}
                                     </div>
-                                ))}
+                                )}
                             </div>
-                            {/* Total geral de entradas ou saídas */}
-                            <div className="flex justify-end mt-8">
-                                <span className={tab === 'incomes' ? 'text-green-600' : 'text-red-600'}>
-                                <span className="ml-2 text-base font-medium text-gray-500">Total: </span>
-                                    <span className="font-semibold text-lg">
-                                        {tab === 'incomes' ? '+' : '-'}
-                                        {categories.reduce((acc, cat) => acc + (cat.total || 0), 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                                    </span>
-                                </span>
+                        ))}
+                    </div>
+                    {/* Total Section */}
+                    <div style={{
+                        backgroundColor: 'white',
+                        borderRadius: '1rem',
+                        padding: '1.5rem',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        marginTop: '2rem',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}>
+                        <div>
+                            <h3 style={{
+                                fontSize: '1.125rem',
+                                fontWeight: 600,
+                                color: '#424242',
+                                marginBottom: '0.25rem'
+                            }}>
+                                Total {tab === 'incomes' ? 'de Entradas' : 'de Saídas'}
+                            </h3>
+                            <p style={{
+                                fontSize: '0.875rem',
+                                color: '#616161'
+                            }}>
+                                Soma de todas as categorias do período
+                            </p>
+                        </div>
+                        <div style={{
+                            textAlign: 'right'
+                        }}>
+                            <div style={{
+                                fontSize: '1.875rem',
+                                fontWeight: 700,
+                                color: tab === 'incomes' ? '#4CAF50' : '#F44336'
+                            }}>
+                                {tab === 'incomes' ? '+' : '-'}
+                                {categories.reduce((acc, cat) => acc + (cat.total || 0), 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            </div>
+        </>
     );
 };
 

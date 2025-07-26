@@ -139,7 +139,10 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
         })()
         return (
           <tr key={recentTransaction.id} className="relative">
-            <td className="border-b-[1px] p-3 border-lineGray text-sm font-medium h-[56px] text-center">
+            <td 
+              className="p-3 text-sm font-medium h-[56px] text-center hover:bg-gray-50 transition-colors"
+              style={{ borderBottom: '1px solid #E0E0E0' }}
+            >
               <label className="checkbox-orange">
                 <input
                   type="checkbox"
@@ -153,7 +156,10 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                 </span>
               </label>
             </td>
-            <td className="border-b-[1px] p-3 border-lineGray text-sm font-medium h-[56px]">
+            <td 
+              className="p-3 text-sm font-medium h-[56px] hover:bg-gray-50 transition-colors"
+              style={{ borderBottom: '1px solid #E0E0E0' }}
+            >
               <div className="flex justify-center items-center">
                 {recentTransaction.category ? (
                   <CategoryIcon
@@ -168,37 +174,58 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                     size="large"
                   />
                 ) : (
-                  <span className="text-xs text-gray-400">Sem categoria</span>
+                  <span className="text-xs" style={{ color: '#A0A0A0' }}>Sem categoria</span>
                 )}
               </div>
             </td>
             <td
-              className={`w-60 p-3 text-center border-lineGray border-b-[1px] text-sm dark:text-softGray sm:relative h-[56px]`}
+              className="w-60 p-3 text-center text-sm h-[56px] hover:bg-gray-50 transition-colors"
+              style={{ 
+                borderBottom: '1px solid #E0E0E0',
+                color: '#424242'
+              }}
             >
               {recentTransaction.description}
             </td>
             <td
-              className={`border-b-[1px] p-3 text-center border-lineGray text-sm dark:text-softGray sm:relative h-[56px]`}
+              className="p-3 text-center text-sm h-[56px] hover:bg-gray-50 transition-colors"
+              style={{ 
+                borderBottom: '1px solid #E0E0E0',
+                color: '#424242'
+              }}
             >
               {formattedPrice}
             </td>
             <td
-              className={`border-b-[1px] p-3 text-center border-lineGray text-sm dark:text-softGray sm:relative h-[56px]`}
+              className="p-3 text-center text-sm h-[56px] hover:bg-gray-50 transition-colors"
+              style={{ 
+                borderBottom: '1px solid #E0E0E0',
+                color: '#424242'
+              }}
             >
               {formattedDate}
             </td>
             <td
-              className={`border-b-[1px] p-3 text-center border-lineGray text-sm dark:text-softGray sm:relative h-[56px]`}
+              className="p-3 text-center text-sm h-[56px] hover:bg-gray-50 transition-colors"
+              style={{ 
+                borderBottom: '1px solid #E0E0E0',
+                color: '#424242'
+              }}
             >
               {formattedUpdatedDate}
             </td>
             <td
-              className={`border-b-[1px] p-3 text-center border-lineGray text-sm dark:text-softGray sm:relative h-[56px]`}
+              className="p-3 text-center text-sm h-[56px] hover:bg-gray-50 transition-colors"
+              style={{ 
+                borderBottom: '1px solid #E0E0E0',
+                color: '#424242'
+              }}
             >
               {getTag(recentTransaction.type || '')}
             </td>
             <td
-              className={`border-b-[1px] p-3 text-center border-lineGray text-sm h-[56px]`}
+              className="p-3 text-center text-sm h-[56px] hover:bg-gray-50 transition-colors"
+              style={{ borderBottom: '1px solid #E0E0E0' }}
             >
               <div className="relative">
                 <div className="button-config justify-center items-center px-2">
@@ -272,7 +299,14 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
           <table className="min-w-640 sm:w-full h-full text-left">
             <thead>
               <tr>
-                <th className="sticky top-0 z-10 text-center bg-background dark:bg-orangeDark rounded-tl-lg p-4 text-gray dark:text-softGray border-b-1 border-lineGray text-sm w-12">
+                <th 
+                  className="sticky top-0 z-10 text-center rounded-tl-lg p-4 text-sm font-medium w-12"
+                  style={{ 
+                    backgroundColor: '#F5F5F5',
+                    color: '#616161',
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
+                >
                   <label className="checkbox-orange">
                     <input
                       type="checkbox"
@@ -286,14 +320,33 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                     </span>
                   </label>
                 </th>
-                <th className="sticky top-0 z-10 text-center bg-background dark:bg-orangeDark rounded-tl-lg p-4 text-gray dark:text-softGray border-b-1 border-lineGray text-sm">
+                <th 
+                  className="sticky top-0 z-10 text-center p-4 text-sm font-medium"
+                  style={{ 
+                    backgroundColor: '#F5F5F5',
+                    color: '#616161',
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
+                >
                   Categoria
                 </th>
-                <th className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
+                <th 
+                  className="sticky top-0 z-10 text-center text-sm font-medium"
+                  style={{ 
+                    backgroundColor: '#F5F5F5',
+                    color: '#616161',
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
+                >
                   Descrição
                 </th>
                 <th
-                  className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm cursor-pointer select-none"
+                  className="sticky top-0 z-10 text-center text-sm font-medium cursor-pointer select-none hover:bg-gray-200 transition-colors"
+                  style={{ 
+                    backgroundColor: '#F5F5F5',
+                    color: '#616161',
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
                   onClick={() => onSort && onSort('price', sortBy === 'price' ? (sortOrder === 'desc' ? 'asc' : 'desc') : 'desc')}
                 >
                   Valor
@@ -302,7 +355,12 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                   )}
                 </th>
                 <th
-                  className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm cursor-pointer select-none"
+                  className="sticky top-0 z-10 text-center text-sm font-medium cursor-pointer select-none hover:bg-gray-200 transition-colors"
+                  style={{ 
+                    backgroundColor: '#F5F5F5',
+                    color: '#616161',
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
                   onClick={() => onSort && onSort('transaction_day', sortBy === 'transaction_day' ? (sortOrder === 'desc' ? 'asc' : 'desc') : 'desc')}
                 >
                   Dia
@@ -311,7 +369,12 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                   )}
                 </th>
                 <th
-                  className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm cursor-pointer select-none"
+                  className="sticky top-0 z-10 text-center text-sm font-medium cursor-pointer select-none hover:bg-gray-200 transition-colors"
+                  style={{ 
+                    backgroundColor: '#F5F5F5',
+                    color: '#616161',
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
                   onClick={() => onSort && onSort('updated_at', sortBy === 'updated_at' ? (sortOrder === 'desc' ? 'asc' : 'desc') : 'desc')}
                 >
                   Última modificação
@@ -319,10 +382,24 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                     <span>{sortOrder === 'asc' ? ' ▲' : ' ▼'}</span>
                   )}
                 </th>
-                <th className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
+                <th 
+                  className="sticky top-0 z-10 text-center text-sm font-medium"
+                  style={{ 
+                    backgroundColor: '#F5F5F5',
+                    color: '#616161',
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
+                >
                   Tipo
                 </th>
-                <th className="sticky top-0 z-10 text-center rounded-tr-lg text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
+                <th 
+                  className="sticky top-0 z-10 text-center rounded-tr-lg text-sm font-medium"
+                  style={{ 
+                    backgroundColor: '#F5F5F5',
+                    color: '#616161',
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
+                >
                   Ações
                 </th>
               </tr>

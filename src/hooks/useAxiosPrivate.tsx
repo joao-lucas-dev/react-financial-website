@@ -1,12 +1,23 @@
 import api, { axiosPrivate } from '../api/axiosInstance'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import useAuthContext from './useAuthContext'
 
 const useAxiosPrivate = () => {
   const { accessToken, setAccessToken } = useAuthContext()
+  const interceptorsRef = useRef<{
+    request?: number;
+    response?: number;
+  }>({})
 
   useEffect(() => {
-    const requestInterceptor = axiosPrivate.interceptors.request.use(
+    // Clear existing interceptors
+    if (interceptorsRef.current.request !== undefined) {
+      axiosPrivate.interceptors.request.eject(interceptorsRef.current.request)
+    }
+    if (interceptorsRef.current.response !== undefined) {
+      axiosPrivate.interceptors.response.eject(interceptorsRef.current.response)
+    }
+    interceptorsRef.current.request = axiosPrivate.interceptors.request.use(
       (config: any) => {
         if (accessToken) {
           config.headers.Authorization = `Bearer ${accessToken}`
@@ -22,7 +33,7 @@ const useAxiosPrivate = () => {
       onFailure: (error: any) => void
     }> = []
 
-    const responseInterceptor = axiosPrivate.interceptors.response.use(
+    interceptorsRef.current.response = axiosPrivate.interceptors.response.use(
       (response) => response,
       async (error) => {
         const originalRequest = error.config
@@ -75,8 +86,12 @@ const useAxiosPrivate = () => {
     )
 
     return () => {
-      axiosPrivate.interceptors.request.eject(requestInterceptor)
-      axiosPrivate.interceptors.response.eject(responseInterceptor)
+      if (interceptorsRef.current.request !== undefined) {
+        axiosPrivate.interceptors.request.eject(interceptorsRef.current.request)
+      }
+      if (interceptorsRef.current.response !== undefined) {
+        axiosPrivate.interceptors.response.eject(interceptorsRef.current.response)
+      }
     }
   }, [accessToken, setAccessToken])
 

@@ -1,0 +1,447 @@
+
+{
+  "designSystem": {
+    "name": "Modern Financial Dashboard",
+    "version": "1.0.0",
+    "description": "Clean, modern fintech interface with glassmorphism elements and vibrant gradients",
+    
+    "colorPalette": {
+      "primary": {
+        "teal": "#009688",
+        "darkTeal": "#00695C",
+        "lightTeal": "#4DB6AC"
+      },
+      "accent": {
+        "orange": "#FF9800",
+        "yellow": "#FFC107",
+        "gold": "#FFB300"
+      },
+      "neutrals": {
+        "white": "#FFFFFF",
+        "lightGray": "#F5F5F5",
+        "mediumGray": "#E0E0E0",
+        "darkGray": "#616161",
+        "charcoal": "#424242"
+      },
+      "gradients": {
+        "primaryCard": "linear-gradient(135deg, #00695C, #009688, #4DB6AC)",
+        "backgroundOrb": "radial-gradient(circle, rgba(255,184,0,0.3), rgba(0,150,136,0.2))",
+        "glassMorphism": "rgba(255, 255, 255, 0.1)"
+      }
+    },
+
+    "typography": {
+      "fontFamily": {
+        "primary": "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+        "secondary": "SF Pro Display, system-ui, sans-serif"
+      },
+      "fontSizes": {
+        "xs": "0.75rem",
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.25rem",
+        "2xl": "1.5rem",
+        "3xl": "1.875rem",
+        "4xl": "2.25rem"
+      },
+      "fontWeights": {
+        "light": 300,
+        "normal": 400,
+        "medium": 500,
+        "semibold": 600,
+        "bold": 700
+      },
+      "lineHeights": {
+        "tight": 1.2,
+        "normal": 1.4,
+        "relaxed": 1.6
+      }
+    },
+
+    "spacing": {
+      "xs": "0.25rem",
+      "sm": "0.5rem",
+      "md": "1rem",
+      "lg": "1.5rem",
+      "xl": "2rem",
+      "2xl": "3rem",
+      "3xl": "4rem"
+    },
+
+    "borderRadius": {
+      "none": "0",
+      "sm": "0.25rem",
+      "md": "0.5rem",
+      "lg": "0.75rem",
+      "xl": "1rem",
+      "2xl": "1.5rem",
+      "full": "9999px"
+    },
+
+    "shadows": {
+      "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+      "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+      "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+      "xl": "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+      "card": "0 8px 32px rgba(0, 0, 0, 0.1)",
+      "glass": "0 8px 32px rgba(255, 255, 255, 0.1)"
+    },
+
+    "components": {
+      "layout": {
+        "container": {
+          "maxWidth": "1200px",
+          "padding": "2rem",
+          "backgroundColor": "#F5F5F5",
+          "borderRadius": "2xl"
+        },
+        "sidebar": {
+          "width": "240px",
+          "backgroundColor": "white",
+          "borderRadius": "xl",
+          "padding": "1.5rem",
+          "shadow": "card"
+        },
+        "mainContent": {
+          "flex": 1,
+          "marginLeft": "2rem",
+          "display": "grid",
+          "gridTemplateColumns": "1fr 1fr",
+          "gap": "2rem"
+        }
+      },
+
+      "navigationItem": {
+        "base": {
+          "display": "flex",
+          "alignItems": "center",
+          "padding": "0.75rem 1rem",
+          "borderRadius": "lg",
+          "fontSize": "sm",
+          "fontWeight": "medium",
+          "marginBottom": "0.5rem",
+          "cursor": "pointer",
+          "transition": "all 0.2s ease"
+        },
+        "active": {
+          "backgroundColor": "#009688",
+          "color": "white"
+        },
+        "inactive": {
+          "color": "#616161",
+          "hover": {
+            "backgroundColor": "#F5F5F5"
+          }
+        }
+      },
+
+      "card": {
+        "base": {
+          "backgroundColor": "white",
+          "borderRadius": "xl",
+          "padding": "1.5rem",
+          "shadow": "card",
+          "border": "1px solid rgba(255, 255, 255, 0.2)"
+        },
+        "primaryCard": {
+          "background": "linear-gradient(135deg, #00695C, #009688, #4DB6AC)",
+          "color": "white",
+          "position": "relative",
+          "overflow": "hidden"
+        },
+        "glassMorphism": {
+          "background": "rgba(255, 255, 255, 0.1)",
+          "backdropFilter": "blur(10px)",
+          "border": "1px solid rgba(255, 255, 255, 0.2)"
+        }
+      },
+
+      "creditCard": {
+        "container": {
+          "width": "300px",
+          "height": "180px",
+          "borderRadius": "xl",
+          "background": "linear-gradient(135deg, #00695C, #009688, #4DB6AC)",
+          "color": "white",
+          "padding": "1.5rem",
+          "position": "relative",
+          "overflow": "hidden"
+        },
+        "cardNumber": {
+          "fontSize": "lg",
+          "fontWeight": "medium",
+          "letterSpacing": "0.1em",
+          "marginBottom": "1rem"
+        },
+        "balance": {
+          "fontSize": "2xl",
+          "fontWeight": "bold",
+          "marginBottom": "0.5rem"
+        },
+        "cardType": {
+          "position": "absolute",
+          "bottom": "1.5rem",
+          "right": "1.5rem",
+          "fontSize": "lg",
+          "fontWeight": "bold",
+          "opacity": 0.8
+        }
+      },
+
+      "transactionItem": {
+        "container": {
+          "display": "flex",
+          "alignItems": "center",
+          "padding": "1rem 0",
+          "borderBottom": "1px solid #E0E0E0"
+        },
+        "icon": {
+          "width": "40px",
+          "height": "40px",
+          "borderRadius": "lg",
+          "backgroundColor": "#F5F5F5",
+          "display": "flex",
+          "alignItems": "center",
+          "justifyContent": "center",
+          "marginRight": "1rem"
+        },
+        "content": {
+          "flex": 1
+        },
+        "title": {
+          "fontSize": "sm",
+          "fontWeight": "medium",
+          "color": "#424242",
+          "marginBottom": "0.25rem"
+        },
+        "subtitle": {
+          "fontSize": "xs",
+          "color": "#616161"
+        },
+        "amount": {
+          "fontSize": "sm",
+          "fontWeight": "semibold",
+          "color": "#424242"
+        }
+      },
+
+      "chartContainer": {
+        "backgroundColor": "white",
+        "borderRadius": "xl",
+        "padding": "1.5rem",
+        "shadow": "card",
+        "height": "200px"
+      },
+
+      "statCard": {
+        "container": {
+          "backgroundColor": "white",
+          "borderRadius": "lg",
+          "padding": "1rem",
+          "shadow": "sm",
+          "textAlign": "center"
+        },
+        "icon": {
+          "width": "24px",
+          "height": "24px",
+          "marginBottom": "0.5rem",
+          "color": "#009688"
+        },
+        "label": {
+          "fontSize": "xs",
+          "color": "#616161",
+          "marginBottom": "0.25rem"
+        },
+        "value": {
+          "fontSize": "lg",
+          "fontWeight": "bold",
+          "color": "#424242"
+        }
+      },
+
+      "categorySpendItem": {
+        "container": {
+          "display": "flex",
+          "alignItems": "center",
+          "justifyContent": "space-between",
+          "padding": "0.75rem 0",
+          "borderBottom": "1px solid #F5F5F5"
+        },
+        "left": {
+          "display": "flex",
+          "alignItems": "center"
+        },
+        "icon": {
+          "width": "20px",
+          "height": "20px",
+          "marginRight": "0.75rem",
+          "color": "#009688"
+        },
+        "label": {
+          "fontSize": "sm",
+          "color": "#424242"
+        },
+        "amount": {
+          "fontSize": "sm",
+          "fontWeight": "medium",
+          "color": "#424242"
+        }
+      },
+
+      "button": {
+        "primary": {
+          "backgroundColor": "#009688",
+          "color": "white",
+          "padding": "0.75rem 1.5rem",
+          "borderRadius": "lg",
+          "fontSize": "sm",
+          "fontWeight": "medium",
+          "border": "none",
+          "cursor": "pointer",
+          "transition": "all 0.2s ease",
+          "hover": {
+            "backgroundColor": "#00695C"
+          }
+        },
+        "secondary": {
+          "backgroundColor": "transparent",
+          "color": "#009688",
+          "padding": "0.75rem 1.5rem",
+          "borderRadius": "lg",
+          "fontSize": "sm",
+          "fontWeight": "medium",
+          "border": "1px solid #009688",
+          "cursor": "pointer",
+          "transition": "all 0.2s ease",
+          "hover": {
+            "backgroundColor": "#009688",
+            "color": "white"
+          }
+        }
+      },
+
+      "badge": {
+        "success": {
+          "backgroundColor": "#4CAF50",
+          "color": "white",
+          "padding": "0.25rem 0.75rem",
+          "borderRadius": "full",
+          "fontSize": "xs",
+          "fontWeight": "medium"
+        },
+        "warning": {
+          "backgroundColor": "#FF9800",
+          "color": "white",
+          "padding": "0.25rem 0.75rem",
+          "borderRadius": "full",
+          "fontSize": "xs",
+          "fontWeight": "medium"
+        }
+      }
+    },
+
+    "patterns": {
+      "decorativeElements": {
+        "backgroundOrbs": {
+          "description": "Large circular gradient elements for visual interest",
+          "implementation": {
+            "position": "absolute",
+            "width": "300-500px",
+            "height": "300-500px",
+            "borderRadius": "50%",
+            "background": "radial-gradient(circle, rgba(255,184,0,0.2), rgba(0,150,136,0.1))",
+            "filter": "blur(100px)",
+            "zIndex": "-1"
+          }
+        },
+        "glassMorphismOverlay": {
+          "description": "Semi-transparent overlay with backdrop blur",
+          "implementation": {
+            "background": "rgba(255, 255, 255, 0.1)",
+            "backdropFilter": "blur(10px)",
+            "border": "1px solid rgba(255, 255, 255, 0.2)"
+          }
+        }
+      },
+
+      "dataVisualization": {
+        "lineChart": {
+          "strokeWidth": 2,
+          "strokeColor": "#009688",
+          "fillGradient": "linear-gradient(to bottom, rgba(0,150,136,0.2), transparent)",
+          "gridLines": "#E0E0E0",
+          "dataPoints": {
+            "radius": 4,
+            "color": "#009688",
+            "hoverColor": "#00695C"
+          }
+        },
+        "progressBar": {
+          "height": "4px",
+          "backgroundColor": "#E0E0E0",
+          "borderRadius": "full",
+          "fillColor": "#009688"
+        }
+      },
+
+      "interactions": {
+        "hover": {
+          "transition": "all 0.2s ease",
+          "transform": "translateY(-2px)",
+          "shadow": "lg"
+        },
+        "focus": {
+          "outline": "2px solid #009688",
+          "outlineOffset": "2px"
+        },
+        "active": {
+          "transform": "translateY(0px)",
+          "shadow": "md"
+        }
+      }
+    },
+
+    "responsiveBreakpoints": {
+      "mobile": "320px",
+      "tablet": "768px",
+      "desktop": "1024px",
+      "wide": "1200px"
+    },
+
+    "accessibility": {
+      "colorContrast": {
+        "minimum": "4.5:1",
+        "enhanced": "7:1"
+      },
+      "focusIndicator": {
+        "outline": "2px solid #009688",
+        "outlineOffset": "2px"
+      },
+      "semanticColors": {
+        "error": "#F44336",
+        "warning": "#FF9800",
+        "success": "#4CAF50",
+        "info": "#2196F3"
+      }
+    },
+
+    "implementation": {
+      "cssVariables": {
+        "--primary-teal": "#009688",
+        "--accent-orange": "#FF9800",
+        "--neutral-white": "#FFFFFF",
+        "--neutral-gray": "#F5F5F5",
+        "--border-radius-xl": "1rem",
+        "--shadow-card": "0 8px 32px rgba(0, 0, 0, 0.1)",
+        "--transition-default": "all 0.2s ease"
+      },
+      "keyFrameworks": [
+        "React/Next.js for component architecture",
+        "Tailwind CSS for utility-first styling",
+        "Framer Motion for animations",
+        "Chart.js or Recharts for data visualization"
+      ]
+    }
+  }
+}

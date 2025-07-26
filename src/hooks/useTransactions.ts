@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useCallback, useState } from 'react'
+import React, { Dispatch, SetStateAction, useCallback, useState, useRef } from 'react'
 import { IOverview, IRow, ITransaction } from '../types/transactions.ts'
 import { DateTime } from 'luxon'
 import useAxiosPrivate from './useAxiosPrivate.tsx'
@@ -26,7 +26,9 @@ export default function useTransactions(
   })
   const [balance, setBalance] = useState(0)
   const [recentTransactions, setRecentTransactions] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
   const axiosPrivate = useAxiosPrivate()
+  const loadingRef = useRef<Record<string, boolean>>({})
 
   const handleGetRecentTransactions = useCallback(
     async (
@@ -35,6 +37,10 @@ export default function useTransactions(
       direction: 'asc' | 'desc' = 'desc',
       type: 'income' | 'outcome' | 'all' = 'all',
     ) => {
+      const key = `recent-${filter}-${sort}-${direction}-${type}`;
+      if (loadingRef.current[key]) return;
+      
+      loadingRef.current[key] = true;
       try {
         const response = await axiosPrivate.get(
           `/transactions/recent?filter=${filter}&sort=${sort}&direction=${direction.toUpperCase()}&type=${type}`,
@@ -43,6 +49,8 @@ export default function useTransactions(
         setRecentTransactions(response.data)
       } catch (err) {
         console.log(err)
+      } finally {
+        loadingRef.current[key] = false;
       }
     },
     [axiosPrivate],
@@ -160,16 +168,16 @@ export default function useTransactions(
         const promises = []
 
         if (from === 'dashboard') {
-          promises.push(await handleGetPreviewTransactions(newDate))
+          promises.push(handleGetPreviewTransactions(newDate))
         } else {
-          promises.push(await handleGetTransactionsMonth(newDate))
+          promises.push(handleGetTransactionsMonth(newDate))
         }
 
         if (newDate.month === currentMonth) {
-          promises.push(await handleGetChartCategories(newDate))
-          promises.push(await handleGetBalance())
-          promises.push(await handleGetOverviewTransactions(newDate))
-          promises.push(await handleGetRecentTransactions())
+          promises.push(handleGetChartCategories(newDate))
+          promises.push(handleGetBalance())
+          promises.push(handleGetOverviewTransactions(newDate))
+          promises.push(handleGetRecentTransactions())
           // @ts-expect-error TS2345
           setCurrentMonth(newDate.month)
         }
@@ -216,11 +224,11 @@ export default function useTransactions(
         const promises = []
 
         if (newDate.month === currentMonth) {
-          promises.push(await handleGetTransactionsMonth(newDate))
-          promises.push(await handleGetChartCategories(newDate))
-          promises.push(await handleGetBalance())
-          promises.push(await handleGetOverviewTransactions(newDate))
-          promises.push(await handleGetRecentTransactions())
+          promises.push(handleGetTransactionsMonth(newDate))
+          promises.push(handleGetChartCategories(newDate))
+          promises.push(handleGetBalance())
+          promises.push(handleGetOverviewTransactions(newDate))
+          promises.push(handleGetRecentTransactions())
 
           await Promise.all(promises)
         }
@@ -256,16 +264,16 @@ export default function useTransactions(
         const promises = []
 
         if (from === 'dashboard') {
-          promises.push(await handleGetPreviewTransactions(newDate))
+          promises.push(handleGetPreviewTransactions(newDate))
         } else {
-          promises.push(await handleGetTransactionsMonth(newDate))
+          promises.push(handleGetTransactionsMonth(newDate))
         }
 
         if (newDate.month === currentMonth) {
-          promises.push(await handleGetChartCategories(newDate))
-          promises.push(await handleGetOverviewTransactions(newDate))
-          promises.push(await handleGetBalance())
-          promises.push(await handleGetRecentTransactions())
+          promises.push(handleGetChartCategories(newDate))
+          promises.push(handleGetOverviewTransactions(newDate))
+          promises.push(handleGetBalance())
+          promises.push(handleGetRecentTransactions())
           // @ts-expect-error TS2345
           setCurrentMonth(newDate.month)
         }
@@ -307,16 +315,16 @@ export default function useTransactions(
         const promises = []
 
         if (from === 'dashboard') {
-          promises.push(await handleGetPreviewTransactions(newDate))
+          promises.push(handleGetPreviewTransactions(newDate))
         } else {
-          promises.push(await handleGetTransactionsMonth(newDate))
+          promises.push(handleGetTransactionsMonth(newDate))
         }
 
         if (newDate.month === currentMonth) {
-          promises.push(await handleGetChartCategories(newDate))
-          promises.push(await handleGetBalance())
-          promises.push(await handleGetOverviewTransactions(newDate))
-          promises.push(await handleGetRecentTransactions())
+          promises.push(handleGetChartCategories(newDate))
+          promises.push(handleGetBalance())
+          promises.push(handleGetOverviewTransactions(newDate))
+          promises.push(handleGetRecentTransactions())
           // @ts-expect-error TS2345
           setCurrentMonth(newDate.month)
         }
@@ -355,16 +363,16 @@ export default function useTransactions(
         const promises = []
 
         if (from === 'dashboard') {
-          promises.push(await handleGetPreviewTransactions(newDate))
+          promises.push(handleGetPreviewTransactions(newDate))
         } else {
-          promises.push(await handleGetTransactionsMonth(newDate))
+          promises.push(handleGetTransactionsMonth(newDate))
         }
 
         if (newDate.month === currentMonth) {
-          promises.push(await handleGetChartCategories(newDate))
-          promises.push(await handleGetOverviewTransactions(newDate))
-          promises.push(await handleGetBalance())
-          promises.push(await handleGetRecentTransactions())
+          promises.push(handleGetChartCategories(newDate))
+          promises.push(handleGetOverviewTransactions(newDate))
+          promises.push(handleGetBalance())
+          promises.push(handleGetRecentTransactions())
           // @ts-expect-error TS2345
           setCurrentMonth(newDate.month)
         }
@@ -402,5 +410,6 @@ export default function useTransactions(
     handleGetRecentTransactions,
     recentTransactions,
     handleDeleteMultipleTransactions,
+    isLoading,
   }
 }

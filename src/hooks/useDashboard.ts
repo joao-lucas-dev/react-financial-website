@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import { monthRemap } from '../common/constants'
 import { IRow } from '../types/transactions'
 import { DateTime } from 'luxon'
@@ -12,6 +12,8 @@ export default function useDashboard(
   handleGetRecentTransactions: () => Promise<void>,
 ) {
   const [currentMonth, setCurrentMonth] = useState(DateTime.now().month)
+  const [isLoading, setIsLoading] = useState(false)
+  const initializedRef = useRef(false)
 
   const getMonth = useCallback(() => {
     if (rows.length > 0) {
@@ -22,28 +24,52 @@ export default function useDashboard(
   }, [rows])
 
   const getNextMonth = useCallback(async () => {
-    const newDate = DateTime.now().set({ month: currentMonth }).plus({ months: 1 });
-    await handleGetPreviewTransactions(newDate);
-    await handleGetChartCategories(newDate);
-    await handleGetOverviewTransactions(newDate);
-    setCurrentMonth(newDate.month);
-  }, [currentMonth, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const newDate = DateTime.now().set({ month: currentMonth }).plus({ months: 1 });
+      await Promise.all([
+        handleGetPreviewTransactions(newDate),
+        handleGetChartCategories(newDate),
+        handleGetOverviewTransactions(newDate),
+      ]);
+      setCurrentMonth(newDate.month);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentMonth, isLoading, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
 
   const getPreviousMonth = useCallback(async () => {
-    const newDate = DateTime.now().set({ month: currentMonth }).minus({ months: 1 });
-    await handleGetPreviewTransactions(newDate);
-    await handleGetChartCategories(newDate);
-    await handleGetOverviewTransactions(newDate);
-    setCurrentMonth(newDate.month);
-  }, [currentMonth, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const newDate = DateTime.now().set({ month: currentMonth }).minus({ months: 1 });
+      await Promise.all([
+        handleGetPreviewTransactions(newDate),
+        handleGetChartCategories(newDate),
+        handleGetOverviewTransactions(newDate),
+      ]);
+      setCurrentMonth(newDate.month);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentMonth, isLoading, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
 
   const getToday = useCallback(async () => {
-    const newDate = DateTime.now();
-    await handleGetPreviewTransactions(newDate);
-    await handleGetChartCategories(newDate);
-    await handleGetOverviewTransactions(newDate);
-    setCurrentMonth(newDate.month);
-  }, [handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const newDate = DateTime.now();
+      await Promise.all([
+        handleGetPreviewTransactions(newDate),
+        handleGetChartCategories(newDate),
+        handleGetOverviewTransactions(newDate),
+      ]);
+      setCurrentMonth(newDate.month);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
 
   const getGreeting = useCallback(() => {
     const now = new Date()
@@ -69,12 +95,26 @@ export default function useDashboard(
   }, [rows])
 
   useEffect(() => {
-    handleGetPreviewTransactions()
-    handleGetChartCategories()
-    handleGetOverviewTransactions()
-    handleGetBalance()
-    handleGetRecentTransactions()
-  }, [])
+    if (initializedRef.current) return;
+    
+    const initializeDashboard = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([
+          handleGetPreviewTransactions(),
+          handleGetChartCategories(),
+          handleGetOverviewTransactions(),
+          handleGetBalance(),
+          handleGetRecentTransactions(),
+        ]);
+        initializedRef.current = true;
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeDashboard();
+  }, [handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions, handleGetBalance, handleGetRecentTransactions])
 
   return {
     getMonth,
@@ -85,5 +125,6 @@ export default function useDashboard(
     hasToday,
     currentMonth,
     setCurrentMonth,
+    isLoading,
   }
 }

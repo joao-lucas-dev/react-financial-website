@@ -6,11 +6,18 @@ import {
   ChevronLeft,
   Calendar,
   Search,
+  CreditCard,
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  PiggyBank,
+  Plus
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import TablePreview from '../../components/TablePreview'
 import ChartComponent from '../../components/ChartComponent.tsx'
+import EnhancedChartComponent from '../../components/EnhancedChartComponent.tsx'
 import FloatingButton from '../../components/FloatingButton.tsx'
 
 import './styles.css'
@@ -83,10 +90,6 @@ export default function Dashboard() {
     handleGetRecentTransactions(filter, field, order, typeFilter);
   };
 
-  useEffect(() => {
-    handleGetRecentTransactions('both', 'updated_at', 'desc', 'all');
-  }, []);
-
   const handleFilterChange = (newFilter: 'before' | 'after' | 'both', newType: 'income' | 'outcome' | 'all') => {
     setFilter(newFilter);
     setTypeFilter(newType);
@@ -96,333 +99,502 @@ export default function Dashboard() {
   };
 
   return (
-    <div>
-      <div className="w-full h-full bg-background dark:bg-orangeDark">
-        <Header title="Dashboard" activePage="dashboard" />
+    <div style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif' }}>
+      <div className="w-full h-full" style={{ backgroundColor: '#F5F5F5' }}>
+        {/* <Header title="Dashboard" activePage="dashboard" /> */}
 
         <div className="flex h-full">
           <MenuAside activePage="dashboard" />
 
-          <main className="flex w-full h-full justify-center items-center mt-24 pl-0 xl-lg:pl-[210px]">
-            <div className="w-full px-2 md:px-10 pt-6 pb-2">
-              <div className="flex justify-center">
-                <div className="w-full mx-2 md:mx-0 bg-white dark:bg-black-bg h-20 rounded-2xl flex justify-between px-4 sm:px-10">
-                  <div className="flex items-center">
-                    <h1 className="text-lg font-semibold text-gray dark:text-softGray">
-                      <span>{getGreeting()}</span>
-                    </h1>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="border-l-2 border-primary h-12 px-2 flex flex-col justify-center">
-                      <span className="text-xs md:text-sm text-gray dark:text-grayWhite">
-                        Saldo hoje
-                      </span>
-                      <div>
-                        <strong className="text-lg dark:text-softGray">
-                          <CountUp valueNumber={balance} />
-                        </strong>
-                      </div>
-                    </div>
+          <main 
+            className="flex-1 mt-4 pl-0 xl-lg:pl-64" 
+            style={{ 
+              maxWidth: '1200px', 
+              margin: '0 auto',
+              padding: '2rem'
+            }}
+          >
+            {/* Welcome Section */}
+            <div 
+              className="bg-white rounded-2xl p-6 mb-8" 
+              style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)' }}
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 
+                    className="text-2xl font-semibold mb-2" 
+                    style={{ color: '#424242' }}
+                  >
+                    {getGreeting()}
+                  </h1>
+                  <p style={{ color: '#616161', fontSize: '0.875rem' }}>
+                    Bem-vindo de volta ao seu painel financeiro
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p style={{ color: '#616161', fontSize: '0.875rem' }}>Saldo Total</p>
+                  <div 
+                    className="text-2xl font-bold" 
+                    style={{ color: '#009688' }}
+                  >
+                    <CountUp valueNumber={balance} />
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div className="flex items-center mt-6 average-spending-area px-2 sm:px-0">
-                <div className="w-full h-full bg-white dark:bg-black-bg rounded-xl p-6 mr-6 average-info">
-                  <div className="flex justify-center">
-                    <div className="bg-green-600 w-12 h-12 flex justify-center items-center rounded-xl">
-                      <MoveDownLeft size={24} className="text-white" />
-                    </div>
-                    <div className="ml-4">
-                      <h3 className="text-xs text-gray dark:text-softGray">
-                        Total de entradas
-                      </h3>
-                      <span className="text-lg font-semibold text-green-600 mt-4">
-                        <CountUp valueNumber={overview?.income?.total} />
-                      </span>
-                    </div>
-                    <div className="ml-8 flex items-end">
-                      <span className="flex justify-center items-center bg-green-200 text-green-600 dark:text-green-400 dark:bg-green-700 rounded-full w-16 h-6 text-xs px-4 py-2">
-                        <CountUp
-                          valueNumber={overview?.income?.percentage}
-                          isPercentage={true}
-                        />
-                        %
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full h-full bg-white dark:bg-black-bg rounded-xl p-6 mr-6 average-info">
-                  <div className="flex justify-center">
-                    <div className="bg-red-600 w-12 h-12 flex justify-center items-center rounded-xl">
-                      <MoveUpRight size={24} className="text-white" />
-                    </div>
-                    <div className="ml-4">
-                      <h3 className="text-xs text-gray dark:text-softGray">
-                        Total de saídas
-                      </h3>
-                      <span className="text-lg font-semibold text-red-600 mt-4">
-                        <CountUp valueNumber={overview?.outcome?.total} />
-                      </span>
-                    </div>
-                    <div className="ml-8 flex items-end">
-                      <span className="flex justify-center items-center bg-red-200 text-red-600 dark:text-red-400 dark:bg-red-700 da rounded-full w-16 h-6 text-xs px-4 py-2">
-                        <CountUp
-                          valueNumber={overview?.outcome?.percentage}
-                          isPercentage={true}
-                        />
-                        %
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full h-full bg-white dark:bg-black-bg rounded-xl p-6 average-info">
-                  <div className="flex justify-center">
-                    <div className="bg-purple-600 w-12 h-12 flex justify-center items-center rounded-xl">
-                      <ChartColumnDecreasing size={24} className="text-white" />
-                    </div>
-                    <div className="ml-4">
-                      <h3 className="text-xs text-gray dark:text-softGray">
-                        Limite Restante
-                      </h3>
-                      <span className="text-lg font-semibold text-purple-600 mt-4">
-                        <CountUp valueNumber={overview?.remaining?.total} />
-                      </span>
-                    </div>
-                    <div className="ml-8 flex items-end ">
-                      <span className="flex justify-center items-center bg-purple-200 text-purple-600 dark:text-purple-400 dark:bg-purple-700 rounded-full w-16 h-6 text-xs px-4 py-2">
-                        <CountUp
-                          valueNumber={overview?.remaining?.percentage}
-                          isPercentage={true}
-                        />
-                        %
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6">
-                <div className="h-[600px] flex flex-col bg-white dark:bg-black-bg rounded-xl px-6 py-6 sm:p-6  lg:col-span-2 lg:row-span-2">
-                  <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center mb-4">
-                    <h2 className="text-base mb-2 sm:mb-0 font-medium text-gray dark:text-softGray">
-                      {getMonth ? (
-                        `${getMonth()}`
-                      ) : (
-                        <Skeleton height={20} width={100} />
-                      )}
-                    </h2>
-                    <div className="flex flex-1 items-center justify-center">
-                      <button
-                        className="text-base font-semibold text-gray dark:text-softGray active:opacity-50 rounded-2xl hover:bg-zinc-100 p-2"
-                        onClick={() => getPreviousMonth()}
-                      >
-                        <ChevronLeft size={18} />
-                      </button>
-                      <span className="text-base font-medium text-gray dark:text-softGray mx-2">
-                        {rows.length > 0 ? (
-                          `${rows[0].formatted_date} à ${rows[rows.length - 1].formatted_date}`
-                        ) : (
-                          <Skeleton height={20} width={100} />
-                        )}
-                      </span>
-                      <button
-                        className="text-sm font-semibold text-gray dark:text-softGray active:opacity-50 rounded-2xl hover:bg-zinc-100 p-2"
-                        onClick={() => getNextMonth()}
-                      >
-                        <ChevronRight size={18} />
-                      </button>
-                    </div>
-                    <div className="hidden sm:block">
-                      <button
-                        disabled={hasToday()}
-                        className="bg-primary px-4 py-1 text-white rounded-lg disabled:bg-orange-300 dark:disabled:bg-auto flex justify-center items-center active:opacity-50"
-                        onClick={() => getToday()}
-                      >
-                        <Calendar size={16} className="mr-2" />
-                        Hoje
-                      </button>
-                    </div>
-                  </div>
-
-                  <TablePreview
-                    rows={rows}
-                    handleCreateTransaction={handleCreateTransaction}
-                    handleCreateCompleteTransaction={
-                      handleCreateCompleteTransaction
-                    }
-                    handleDeleteTransaction={handleDeleteTransaction}
-                    handleUpdateTransaction={handleUpdateTransaction}
-                    currentMonth={currentMonth}
-                    setCurrentMonth={setCurrentMonth}
-                    openModal={openModal}
-                    setOpenModal={setOpenModal}
-                    categories={categories}
-                    from="dashboard"
+            {/* Credit Card Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+              <div className="lg:col-span-2">
+                <div className="relative group" style={{ maxWidth: '450px' }}>
+                  {/* Second Card (Background) */}
+                  <div 
+                    className="absolute cursor-pointer transition-all duration-300"
+                    style={{
+                      top: '10px',
+                      right: '-20px',
+                      width: '350px',
+                      height: '220px',
+                      borderRadius: '1rem',
+                      background: 'linear-gradient(135deg, rgba(66, 66, 66, 0.3), rgba(97, 97, 97, 0.3), rgba(117, 117, 117, 0.3))',
+                      transform: 'rotate(5deg)',
+                      zIndex: 1,
+                      opacity: 0.4,
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)'
+                    }}
+                    onMouseEnter={(e) => {
+                      const container = e.currentTarget.parentElement
+                      const button = container?.querySelector('.add-card-button') as HTMLElement
+                      
+                      e.currentTarget.style.opacity = '0.8'
+                      e.currentTarget.style.transform = 'rotate(3deg) translateX(-5px)'
+                      
+                      if (button) {
+                        button.style.background = 'linear-gradient(135deg, #4CAF50, #388E3C)'
+                        button.style.boxShadow = '0 12px 40px rgba(76, 175, 80, 0.3)'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      const container = e.currentTarget.parentElement
+                      const button = container?.querySelector('.add-card-button') as HTMLElement
+                      
+                      e.currentTarget.style.opacity = '0.4'
+                      e.currentTarget.style.transform = 'rotate(5deg) translateX(0px)'
+                      
+                      if (button) {
+                        button.style.background = 'linear-gradient(135deg, #616161, #424242)'
+                        button.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)'
+                      }
+                    }}
                   />
-                  <div className="w-full flex justify-end items-center mt-6">
-                    <Link
-                      to={{ pathname: '/transacoes' }}
-                      className="text-sm text-gray flex justify-center items-center hover:opacity-40"
-                    >
-                      Ver transações por mês
-                      <ChevronRight size={16} className="text-gray" />
-                    </Link>
+                  
+                  {/* Main Card */}
+                  <div 
+                    className="relative overflow-hidden"
+                    style={{
+                      width: '100%',
+                      maxWidth: '400px',
+                      height: '240px',
+                      borderRadius: '1rem',
+                      background: 'linear-gradient(135deg, #00695C, #009688, #4DB6AC)',
+                      color: 'white',
+                      padding: '2rem',
+                      position: 'relative',
+                      zIndex: 2,
+                      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+                    }}
+                  >
+                    {/* Decorative background orb */}
+                    <div 
+                      style={{
+                        position: 'absolute',
+                        top: '-50px',
+                        right: '-50px',
+                        width: '200px',
+                        height: '200px',
+                        borderRadius: '50%',
+                        background: 'radial-gradient(circle, rgba(255,184,0,0.3), rgba(0,150,136,0.2))',
+                        filter: 'blur(60px)'
+                      }}
+                    />
+                    
+                    <div className="relative z-10">
+                      <div className="flex justify-between items-start mb-8">
+                        <div>
+                          <p className="text-sm opacity-80 mb-1">Cartão Principal</p>
+                          <p className="text-lg font-medium tracking-wider">•••• •••• •••• 4532</p>
+                        </div>
+                        <CreditCard className="w-8 h-8 opacity-80" />
+                      </div>
+                      
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <p className="text-sm opacity-80">Saldo Disponível</p>
+                          <p className="text-2xl font-bold">
+                            <CountUp valueNumber={balance} />
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm opacity-80">Vencimento</p>
+                          <p className="text-lg font-medium">12/28</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-
-                <div className="h-[600px]">
-                  <div className="h-[288px] w-full bg-white dark:bg-black-bg rounded-xl p-6">
-                    {chartCategories.income.config.length === 0 ? (
-                      <div className="h-full w-full">
-                        <h3 className="font-base font-medium">
-                          Maiores entradas do mês atual
-                        </h3>
-                        <div className="h-full flex justify-center items-center">
-                          <h3 className="flex justify-center items-center text-[#A0A0A0] h-full dark:text-softGray">
-                            Sem valores registrados
-                          </h3>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex justify-center items-center w-full h-full">
-                        <div className="h-full w-[70%] pr-8">
-                          <h3 className="font-base font-medium">
-                            Maiores entradas do mês atual
-                          </h3>
-                          <ul className="h-full flex flex-col justify-center">
-                            {chartCategories.income.config.map((item) => {
-                              return (
-                                <li
-                                  key={item.id}
-                                  className="flex py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 justify-center items-center border-b-[1px] border-b-zinc-100"
-                                >
-                                  <div className="flex h-full">
-                                    <CategoryIcon
-                                      size="large"
-                                      category={item}
-                                    />
-                                  </div>
-                                  <div className="flex flex-1">
-                                    <p className="px-4 max-w-32 text-sm">
-                                      {item.name}
-                                    </p>
-                                  </div>
-                                  <div>
-                                    <span className="text-sm">
-                                      {item.percentage}%
-                                    </span>
-                                  </div>
-                                </li>
-                              )
-                            })}
-                          </ul>
-                        </div>
-                        <div className="flex flex-col w-[30%] pt-6">
-                          <div>
-                            <ChartComponent
-                              categories={chartCategories.income.chartConfig}
-                            />
-                          </div>
-                          <div className="flex justify-center items-center">
-                            <Link to={{ pathname: '/relatorios', search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }} className="border border-zinc-300 px-4 py-1 rounded text-[#A0A0A0] text-sm hover:bg-primary hover:text-white transition-all duration-200 hover:border-primary">
-                              Ver relatório
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="h-[288px] w-full bg-white dark:bg-black-bg rounded-xl p-6 mt-6">
-                    {chartCategories.notIncome.config.length === 0 ? (
-                      <div className="h-full w-full">
-                        <h3 className="font-base font-medium">
-                          Maiores saídas do mês atual
-                        </h3>
-                        <div className="h-full flex justify-center items-center">
-                          <h3 className="flex justify-center items-center text-[#A0A0A0] h-full dark:text-softGray">
-                            Sem valores registrados
-                          </h3>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex justify-center items-center w-full h-full">
-                        <div className="h-full w-[70%] pr-8">
-                          <h3 className="font-base font-medium">
-                            Maiores saídas do mês atual
-                          </h3>
-                          <ul className="h-full flex flex-col justify-center">
-                            {chartCategories.notIncome.config.map((item) => {
-                              return (
-                                <li
-                                  key={item.id}
-                                  className="flex py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 justify-center items-center border-b-[1px] border-b-zinc-100"
-                                >
-                                  <div className="flex h-full">
-                                    <CategoryIcon
-                                      size="large"
-                                      category={item}
-                                    />
-                                  </div>
-                                  <div className="flex flex-1">
-                                    <p className="px-4 max-w-32 text-sm">
-                                      {item.name}
-                                    </p>
-                                  </div>
-                                  <div>
-                                    <span className="text-sm">
-                                      {item.percentage}%
-                                    </span>
-                                  </div>
-                                </li>
-                              )
-                            })}
-                          </ul>
-                        </div>
-                        <div className="flex flex-col w-[30%] pt-6">
-                          <div>
-                            <ChartComponent
-                              categories={chartCategories.notIncome.chartConfig}
-                            />
-                          </div>
-                          <div className="flex justify-center items-center">
-                          <Link to={{ pathname: '/relatorios', search: `?type=outcomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }} className="border border-zinc-300 px-4 py-1 rounded text-[#A0A0A0] text-sm hover:bg-primary hover:text-white transition-all duration-200 hover:border-primary">
-                              Ver relatório
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  
+                  {/* Add Card Button */}
+                  <button
+                    className="add-card-button absolute transition-all duration-300 hover:scale-110 active:scale-95"
+                    style={{
+                      top: '50%',
+                      right: '-10px',
+                      transform: 'translateY(-50%)',
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #616161, #424242)',
+                      color: 'white',
+                      border: 'none',
+                      cursor: 'pointer',
+                      zIndex: 3,
+                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    onMouseEnter={(e) => {
+                      const container = e.currentTarget.parentElement
+                      const card = container?.querySelector('.absolute.cursor-pointer') as HTMLElement
+                      
+                      e.currentTarget.style.background = 'linear-gradient(135deg, #4CAF50, #388E3C)'
+                      e.currentTarget.style.boxShadow = '0 12px 40px rgba(76, 175, 80, 0.3)'
+                      
+                      if (card) {
+                        card.style.opacity = '0.8'
+                        card.style.transform = 'rotate(3deg) translateX(-5px)'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      const container = e.currentTarget.parentElement
+                      const card = container?.querySelector('.absolute.cursor-pointer') as HTMLElement
+                      
+                      e.currentTarget.style.background = 'linear-gradient(135deg, #616161, #424242)'
+                      e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)'
+                      
+                      if (card) {
+                        card.style.opacity = '0.4'
+                        card.style.transform = 'rotate(5deg) translateX(0px)'
+                      }
+                    }}
+                    onClick={() => {
+                      // Aqui você pode adicionar a lógica para criar um novo cartão
+                      console.log('Adicionar novo cartão')
+                    }}
+                  >
+                    <Plus size={24} />
+                  </button>
                 </div>
               </div>
+              
+              {/* Quick Stats */}
+              <div className="space-y-4">
+                <div 
+                  className="bg-white rounded-lg p-4 text-center"
+                  style={{ boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}
+                >
+                  <TrendingUp className="w-6 h-6 mx-auto mb-2" style={{ color: '#009688' }} />
+                  <p style={{ fontSize: '0.75rem', color: '#616161' }}>Total de Entradas</p>
+                  <p className="text-lg font-bold" style={{ color: '#424242' }}>
+                    <CountUp valueNumber={overview?.income?.total} />
+                  </p>
+                </div>
+                
+                <div 
+                  className="bg-white rounded-lg p-4 text-center"
+                  style={{ boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}
+                >
+                  <TrendingDown className="w-6 h-6 mx-auto mb-2" style={{ color: '#FF9800' }} />
+                  <p style={{ fontSize: '0.75rem', color: '#616161' }}>Total de Saídas</p>
+                  <p className="text-lg font-bold" style={{ color: '#424242' }}>
+                    <CountUp valueNumber={overview?.outcome?.total} />
+                  </p>
+                </div>
+                
+                <div 
+                  className="bg-white rounded-lg p-4 text-center"
+                  style={{ boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}
+                >
+                  <PiggyBank className="w-6 h-6 mx-auto mb-2" style={{ color: '#4CAF50' }} />
+                  <p style={{ fontSize: '0.75rem', color: '#616161' }}>Economias</p>
+                  <p className="text-lg font-bold" style={{ color: '#424242' }}>
+                    <CountUp valueNumber={overview?.remaining?.total} />
+                  </p>
+                </div>
+              </div>
+            </div>
 
-              <div className="flex flex-col bg-white dark:bg-black-bg rounded-xl sm:p-6 lg:col-span-2 lg:row-span-2 mb-6">
-                <div className="px-2 mb-4">
-                  <h3 className="font-base font-medium mb-4">
-                    Transações cadastradas
-                  </h3>
-                  <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
-                    <div className="relative w-full max-w-[250px]">
-                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400">
-                        <Search size={16} />
-                      </span>
-                      <input
-                        type="text"
-                        placeholder="Buscar transação"
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
-                        className="pl-8 pr-2 py-1 border border-zinc-300 rounded-md bg-white shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition w-full"
-                      />
+            {/* Monthly Overview Table - Full Width */}
+            <div 
+              className="bg-white rounded-xl p-6 mb-8"
+              style={{ 
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+              }}
+            >
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center space-x-2">
+                  <button
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    onClick={() => getPreviousMonth()}
+                    style={{ color: '#616161' }}
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                  <h2 
+                    className="text-lg font-medium" 
+                    style={{ color: '#424242' }}
+                  >
+                    {getMonth ? `${getMonth()}` : <Skeleton height={20} width={100} />}
+                  </h2>
+                  <button
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    onClick={() => getNextMonth()}
+                    style={{ color: '#616161' }}
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+
+                <button
+                  disabled={hasToday()}
+                  className="px-4 py-2 rounded-lg text-white text-sm font-medium disabled:opacity-50 transition-all"
+                  style={{ 
+                    backgroundColor: hasToday() ? '#E0E0E0' : '#009688'
+                  }}
+                  onClick={() => getToday()}
+                >
+                  <Calendar size={16} className="mr-2 inline" />
+                  Hoje
+                </button>
+              </div>
+              
+              <div style={{ height: '350px', overflow: 'auto', border: '1px solid #E0E0E0', borderRadius: '0.75rem' }}>
+                <TablePreview
+                  rows={rows}
+                  handleCreateTransaction={handleCreateTransaction}
+                  handleCreateCompleteTransaction={handleCreateCompleteTransaction}
+                  handleDeleteTransaction={handleDeleteTransaction}
+                  handleUpdateTransaction={handleUpdateTransaction}
+                  currentMonth={currentMonth}
+                  setCurrentMonth={setCurrentMonth}
+                  openModal={openModal}
+                  setOpenModal={setOpenModal}
+                  categories={categories}
+                  from="dashboard"
+                />
+              </div>
+            </div>
+              
+            {/* Category Spending - Side by Side */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              {/* Income Categories */}
+              <div 
+                className="bg-white rounded-xl p-6"
+                style={{ 
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                  height: '320px'
+                }}
+              >
+                <h3 
+                  className="text-base font-medium mb-4" 
+                  style={{ color: '#424242' }}
+                >
+                  Maiores Entradas
+                </h3>
+                {chartCategories.income.config.length === 0 ? (
+                  <div className="h-56 flex items-center justify-center">
+                    <p style={{ color: '#A0A0A0' }}>Sem valores registrados</p>
+                  </div>
+                ) : (
+                  <div className="flex h-56">
+                    {/* Lista de categorias - metade esquerda */}
+                    <div className="w-1/2 pr-4 overflow-y-auto">
+                      {chartCategories.income.config.slice(0, 5).map((item) => (
+                        <div 
+                          key={item.id} 
+                          className="flex items-center justify-between py-2 border-b last:border-b-0"
+                          style={{ borderBottomColor: '#F5F5F5' }}
+                        >
+                          <div className="flex items-center min-w-0">
+                            <CategoryIcon size="small" category={item} />
+                            <span 
+                              className="ml-2 text-sm truncate" 
+                              style={{ color: '#424242' }}
+                            >
+                              {item.name}
+                            </span>
+                          </div>
+                          <span 
+                            className="text-sm font-medium ml-2 flex-shrink-0" 
+                            style={{ color: '#424242' }}
+                          >
+                            {item.percentage}%
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                    <Filter 
-                      currentFilter={filter}
-                      currentType={typeFilter}
-                      onFilterChange={handleFilterChange}
+                    
+                    {/* Chart e botão - metade direita */}
+                    <div className="w-1/2 flex flex-col items-center">
+                      <div className="flex-1 flex items-center justify-center">
+                        <EnhancedChartComponent 
+                          categories={chartCategories.income.chartConfig} 
+                          size={200}
+                        />
+                      </div>
+                      <Link 
+                        to={{ pathname: '/relatorios', search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
+                        className="text-xs px-3 py-2 rounded border transition-all mt-2"
+                        style={{
+                          borderColor: '#009688',
+                          color: '#009688'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#009688'
+                          e.currentTarget.style.color = 'white'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent'
+                          e.currentTarget.style.color = '#009688'
+                        }}
+                      >
+                        Ver relatório completo
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* Outcome Categories */}
+              <div 
+                className="bg-white rounded-xl p-6"
+                style={{ 
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                  height: '320px'
+                }}
+              >
+                <h3 
+                  className="text-base font-medium mb-4" 
+                  style={{ color: '#424242' }}
+                >
+                  Maiores Saídas
+                </h3>
+                {chartCategories.notIncome.config.length === 0 ? (
+                  <div className="h-56 flex items-center justify-center">
+                    <p style={{ color: '#A0A0A0' }}>Sem valores registrados</p>
+                  </div>
+                ) : (
+                  <div className="flex h-56">
+                    {/* Lista de categorias - metade esquerda */}
+                    <div className="w-1/2 pr-4 overflow-y-auto">
+                      {chartCategories.notIncome.config.slice(0, 5).map((item) => (
+                        <div 
+                          key={item.id} 
+                          className="flex items-center justify-between py-2 border-b last:border-b-0"
+                          style={{ borderBottomColor: '#F5F5F5' }}
+                        >
+                          <div className="flex items-center min-w-0">
+                            <CategoryIcon size="small" category={item} />
+                            <span 
+                              className="ml-2 text-sm truncate" 
+                              style={{ color: '#424242' }}
+                            >
+                              {item.name}
+                            </span>
+                          </div>
+                          <span 
+                            className="text-sm font-medium ml-2 flex-shrink-0" 
+                            style={{ color: '#424242' }}
+                          >
+                            {item.percentage}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Chart e botão - metade direita */}
+                    <div className="w-1/2 flex flex-col items-center">
+                      <div className="flex-1 flex items-center justify-center">
+                        <EnhancedChartComponent 
+                          categories={chartCategories.notIncome.chartConfig} 
+                          size={200}
+                        />
+                      </div>
+                      <Link 
+                        to={{ pathname: '/relatorios', search: `?type=outcomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
+                        className="text-xs px-3 py-2 rounded border transition-all mt-2"
+                        style={{
+                          borderColor: '#009688',
+                          color: '#009688'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#009688'
+                          e.currentTarget.style.color = 'white'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent'
+                          e.currentTarget.style.color = '#009688'
+                        }}
+                      >
+                        Ver relatório completo
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Recent Transactions */}
+            <div 
+              className="bg-white rounded-xl p-6 mt-8"
+              style={{ boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)' }}
+            >
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                <h3 
+                  className="text-lg font-medium mb-4 sm:mb-0" 
+                  style={{ color: '#424242' }}
+                >
+                  Transações Recentes
+                </h3>
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                  <div className="relative">
+                    <Search 
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2" 
+                      size={16} 
+                      style={{ color: '#616161' }} 
+                    />
+                    <input
+                      type="text"
+                      placeholder="Buscar transação..."
+                      value={searchTerm}
+                      onChange={e => setSearchTerm(e.target.value)}
+                      className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 text-sm"
+                      style={{
+                        borderColor: '#E0E0E0',
+                        focusRingColor: '#009688',
+                        width: '250px'
+                      }}
                     />
                   </div>
+                  <Filter 
+                    currentFilter={filter}
+                    currentType={typeFilter}
+                    onFilterChange={handleFilterChange}
+                  />
                 </div>
-
+              </div>
+              
+              <div style={{ maxHeight: '500px', overflow: 'auto' }}>
                 <TableTransactions
                   recentTransactions={recentTransactions}
                   onSort={handleSort}
@@ -440,7 +612,30 @@ export default function Dashboard() {
                   searchTerm={searchTerm}
                 />
               </div>
+              
+              <div className="flex justify-center mt-6">
+                <Link
+                  to={{ pathname: '/transacoes' }}
+                  className="flex items-center px-6 py-2 rounded-lg border transition-all text-sm font-medium"
+                  style={{
+                    borderColor: '#009688',
+                    color: '#009688'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#009688'
+                    e.currentTarget.style.color = 'white'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.color = '#009688'
+                  }}
+                >
+                  Ver todas as transações
+                  <ChevronRight size={16} className="ml-2" />
+                </Link>
+              </div>
             </div>
+
           </main>
         </div>
       </div>

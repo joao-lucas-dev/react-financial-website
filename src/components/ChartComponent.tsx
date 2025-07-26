@@ -37,9 +37,11 @@ const DonutChart = ({ categories }: IParams) => {
   }
 
   return (
-    <div className="h-full py-3">
+    <div className="w-full h-full flex items-center justify-center">
       {categories && categories.labels.length > 0 && (
-        <Doughnut data={categories} options={options} />
+        <div className="w-full h-full max-w-20 max-h-20">
+          <Doughnut data={categories} options={options} />
+        </div>
       )}
     </div>
   )

@@ -111,12 +111,20 @@ const TablePreview = ({
           className="relative"
         >
           <td
-            className={`sticky left-0 ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : 'bg-white'} dark:bg-black-bg dark:text-softGray sm:relative border-b-1 p-2 border-lineGray text-sm text-center font-medium h-[56px]`}
+            className={`sticky left-0 ${row.isToday ? 'bg-blue-50' : 'bg-white'} text-sm text-center font-medium h-[56px] p-2`}
+            style={{
+              borderBottom: '1px solid #E0E0E0',
+              color: '#424242'
+            }}
           >
             {row.formatted_date}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} dark:text-softGray sm:relative hover:cursor-pointer group hover:border h-[56px]`}
+            className={`text-sm text-center ${row.isToday ? 'bg-blue-50' : ''} hover:cursor-pointer group hover:border border-zinc-200 h-[56px] p-2 transition-colors`}
+            style={{
+              borderBottom: '1px solid #E0E0E0',
+              color: '#424242'
+            }}
             onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 1)}
             onMouseLeave={handleMouseLeave}
           >
@@ -143,7 +151,11 @@ const TablePreview = ({
               )}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray text-sm text-center ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} dark:text-softGray sm:relative hover:cursor-pointer group hover:border h-[56px]`}
+            className={`text-sm text-center ${row.isToday ? 'bg-blue-50' : ''} hover:cursor-pointer group hover:border border-zinc-200 h-[56px] p-2 transition-colors`}
+            style={{
+              borderBottom: '1px solid #E0E0E0',
+              color: '#424242'
+            }}
             onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 2)}
             onMouseLeave={handleMouseLeave}
           >
@@ -170,7 +182,10 @@ const TablePreview = ({
               )}
           </td>
           <td
-            className={`border-b-1 p-2 border-lineGray ${color} ${row.isToday ? 'bg-grayWhite dark:bg-zinc-800' : ''} font-semibold text-sm text-center h-[56px]`}
+            className={`${color} ${row.isToday ? 'bg-blue-50' : ''} font-semibold text-sm text-center h-[56px] p-2`}
+            style={{
+              borderBottom: '1px solid #E0E0E0'
+            }}
           >
             {row.total.valueFormatted}
           </td>
@@ -193,21 +208,49 @@ const TablePreview = ({
       {rows.length > 0 ? (
         <div
           ref={tableContainerRef}
-          className="w-full overflow-y-scroll flex flex-auto relative"
+          className="w-full flex flex-auto relative"
         >
           <table className="min-w-640 sm:w-full h-full text-left">
             <thead>
               <tr>
-                <th className="sticky top-0 left-0 z-20 sm:z-10 bg-background dark:bg-orangeDark rounded-tl-lg text-center p-4 text-gray dark:text-softGray border-b-1 border-lineGray text-sm">
+                <th 
+                  className="sticky top-0 left-0 z-20 sm:z-10 rounded-tl-lg text-center p-4 text-sm font-medium"
+                  style={{ 
+                    backgroundColor: '#F5F5F5',
+                    color: '#616161',
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
+                >
                   Data
                 </th>
-                <th className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
+                <th 
+                  className="sticky top-0 z-10 text-center text-sm font-medium"
+                  style={{ 
+                    backgroundColor: '#F5F5F5',
+                    color: '#616161',
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
+                >
                   Entradas
                 </th>
-                <th className="sticky top-0 z-10 text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
+                <th 
+                  className="sticky top-0 z-10 text-center text-sm font-medium"
+                  style={{ 
+                    backgroundColor: '#F5F5F5',
+                    color: '#616161',
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
+                >
                   Saídas
                 </th>
-                <th className="sticky top-0 z-10 rounded-tr-lg text-center text-gray dark:text-softGray border-b-1 border-lineGray bg-background dark:bg-orangeDark text-sm">
+                <th 
+                  className="sticky top-0 z-10 rounded-tr-lg text-center text-sm font-medium"
+                  style={{ 
+                    backgroundColor: '#F5F5F5',
+                    color: '#616161',
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
+                >
                   Saldo
                 </th>
               </tr>
