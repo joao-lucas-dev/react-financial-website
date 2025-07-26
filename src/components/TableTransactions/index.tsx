@@ -35,7 +35,7 @@ interface TableRecentTransactionsProps {
   searchTerm?: string
 }
 
-const ITEMS_PER_PAGE = 7;
+const ITEMS_PER_PAGE = 10;
 
 const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder, openModal, setOpenModal, handleUpdateTransaction, handleDeleteTransaction, handleDeleteMultipleTransactions, currentMonth, setCurrentMonth, categories, from, searchTerm = '' }: TableRecentTransactionsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -138,11 +138,8 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
           }
         })()
         return (
-          <tr key={recentTransaction.id} className="relative">
-            <td 
-              className="p-3 text-sm font-medium h-[56px] text-center hover:bg-gray-50 transition-colors"
-              style={{ borderBottom: '1px solid #E0E0E0' }}
-            >
+          <tr key={recentTransaction.id} className="relative bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all duration-200 hover:shadow-sm group">
+            <td className="p-4 text-sm font-medium h-16 text-center border-b border-zinc-100 dark:border-zinc-700">
               <label className="checkbox-orange">
                 <input
                   type="checkbox"
@@ -156,95 +153,75 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                 </span>
               </label>
             </td>
-            <td 
-              className="p-3 text-sm font-medium h-[56px] hover:bg-gray-50 transition-colors"
-              style={{ borderBottom: '1px solid #E0E0E0' }}
-            >
+            <td className="p-4 text-sm font-medium h-16 border-b border-zinc-100 dark:border-zinc-700">
               <div className="flex justify-center items-center">
                 {recentTransaction.category ? (
-                  <CategoryIcon
-                    category={{
-                      iconName: recentTransaction.category.iconName,
-                      color: recentTransaction.category.color,
-                      icon_name: recentTransaction.category.icon_name,
-                      id: recentTransaction.category.id,
-                      name: recentTransaction.category.name,
-                      type: recentTransaction.category.type,
-                    }}
-                    size="large"
-                  />
+                  <div className="w-10 h-10 rounded-lg bg-zinc-50 dark:bg-zinc-600 flex items-center justify-center transition-all duration-200 group-hover:bg-teal-50 dark:group-hover:bg-teal-900">
+                    <CategoryIcon
+                      category={{
+                        iconName: recentTransaction.category.iconName,
+                        color: recentTransaction.category.color,
+                        icon_name: recentTransaction.category.icon_name,
+                        id: recentTransaction.category.id,
+                        name: recentTransaction.category.name,
+                        type: recentTransaction.category.type,
+                      }}
+                      size="large"
+                    />
+                  </div>
                 ) : (
-                  <span className="text-xs" style={{ color: '#A0A0A0' }}>Sem categoria</span>
+                  <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-600 flex items-center justify-center">
+                    <span className="text-xs text-zinc-400 dark:text-zinc-500">N/A</span>
+                  </div>
                 )}
               </div>
             </td>
-            <td
-              className="w-60 p-3 text-center text-sm h-[56px] hover:bg-gray-50 transition-colors"
-              style={{ 
-                borderBottom: '1px solid #E0E0E0',
-                color: '#424242'
-              }}
-            >
-              {recentTransaction.description}
+            <td className="w-60 p-4 text-center text-sm h-16 border-b border-zinc-100 dark:border-zinc-700">
+              <div className="text-zinc-700 dark:text-zinc-200 font-medium truncate">
+                {recentTransaction.description}
+              </div>
             </td>
-            <td
-              className="p-3 text-center text-sm h-[56px] hover:bg-gray-50 transition-colors"
-              style={{ 
-                borderBottom: '1px solid #E0E0E0',
-                color: '#424242'
-              }}
-            >
-              {formattedPrice}
+            <td className="p-4 text-center text-sm h-16 border-b border-zinc-100 dark:border-zinc-700">
+              <div className={`font-semibold ${
+                Number(recentTransaction.price) >= 0 
+                  ? 'text-emerald-600 dark:text-emerald-400' 
+                  : 'text-red-600 dark:text-red-400'
+              }`}>
+                {formattedPrice}
+              </div>
             </td>
-            <td
-              className="p-3 text-center text-sm h-[56px] hover:bg-gray-50 transition-colors"
-              style={{ 
-                borderBottom: '1px solid #E0E0E0',
-                color: '#424242'
-              }}
-            >
-              {formattedDate}
+            <td className="p-4 text-center text-sm h-16 border-b border-zinc-100 dark:border-zinc-700">
+              <div className="text-zinc-600 dark:text-zinc-400">
+                {formattedDate}
+              </div>
             </td>
-            <td
-              className="p-3 text-center text-sm h-[56px] hover:bg-gray-50 transition-colors"
-              style={{ 
-                borderBottom: '1px solid #E0E0E0',
-                color: '#424242'
-              }}
-            >
-              {formattedUpdatedDate}
+            <td className="p-4 text-center text-sm h-16 border-b border-zinc-100 dark:border-zinc-700">
+              <div className="text-zinc-600 dark:text-zinc-400">
+                {formattedUpdatedDate}
+              </div>
             </td>
-            <td
-              className="p-3 text-center text-sm h-[56px] hover:bg-gray-50 transition-colors"
-              style={{ 
-                borderBottom: '1px solid #E0E0E0',
-                color: '#424242'
-              }}
-            >
+            <td className="p-4 text-center text-sm h-16 border-b border-zinc-100 dark:border-zinc-700">
               {getTag(recentTransaction.type || '')}
             </td>
-            <td
-              className="p-3 text-center text-sm h-[56px] hover:bg-gray-50 transition-colors"
-              style={{ borderBottom: '1px solid #E0E0E0' }}
-            >
+            <td className="p-4 text-center text-sm h-16 border-b border-zinc-100 dark:border-zinc-700">
               <div className="relative">
                 <div className="button-config justify-center items-center px-2">
-                  <button>
+                  <button className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors">
                     <EllipsisVertical
                       size={18}
-                      className="text-zinc-600 dark:text-softGray"
+                      className="text-zinc-600 dark:text-zinc-400"
                     />
                   </button>
 
-                  <div className="absolute z-20 bottom-5 right-0 mt-2 w-28 bg-white dark:bg-black-bg shadow-md rounded-lg">
+                  <div className="absolute z-20 bottom-5 right-0 mt-2 w-32 bg-white dark:bg-zinc-800 shadow-lg rounded-xl border border-zinc-200 dark:border-zinc-600 overflow-hidden">
                     <button
-                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                      className="w-full px-4 py-3 text-left text-sm text-zinc-700 dark:text-zinc-200 hover:bg-teal-50 dark:hover:bg-teal-900 hover:text-teal-600 dark:hover:text-teal-400 transition-all duration-200 flex items-center gap-2"
                       onClick={() => setOpenModal({ isOpen: true, transaction: recentTransaction, type: 'edit' })}
                     >
                       Editar
                     </button>
                     <button
-                      className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                      className="w-full px-4 py-3 text-left text-sm text-zinc-700 dark:text-zinc-200 hover:bg-red-50 dark:hover:bg-red-900 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200 flex items-center gap-2"
                       onClick={() => setOpenModal({ isOpen: true, transaction: recentTransaction, type: 'delete' })}
                     >
                       Excluir
@@ -262,51 +239,44 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
   return (
     <>
       {selectedIds.length > 0 && (
-        <div className="flex justify-end mb-2">
+        <div className="flex justify-end mb-4">
           <button
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow text-sm font-medium transition-colors"
+            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg shadow-md text-sm font-medium transition-all duration-200 hover:shadow-lg active:scale-95 flex items-center gap-2"
             onClick={() => setShowBulkDeleteModal(true)}
           >
-            Excluir selecionados
+            Excluir {selectedIds.length} selecionado{selectedIds.length > 1 ? 's' : ''}
           </button>
         </div>
       )}
       {showBulkDeleteModal && (
-        <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white dark:bg-black-bg w-96 rounded-lg shadow-lg p-6 relative">
-            <h2 className="text-lg font-semibold mb-6 text-center dark:text-softGray">
-              Deseja realmente excluir os itens selecionados?
+        <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm z-50">
+          <div className="bg-white dark:bg-zinc-800 w-96 rounded-xl shadow-2xl p-6 relative border border-zinc-200 dark:border-zinc-700">
+            <h2 className="text-lg font-semibold mb-6 text-center text-zinc-700 dark:text-zinc-200">
+              Deseja realmente excluir {selectedIds.length} transaç{selectedIds.length > 1 ? 'ões' : 'ão'}?
             </h2>
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-3">
               <button
                 onClick={() => setShowBulkDeleteModal(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 dark:text-softGray"
+                className="px-6 py-2 bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-all duration-200 font-medium"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleBulkDelete}
-                className="px-4 py-2 bg-primary hover:bg-orange-400 rounded-lg text-center text-white font-semibold text-md"
+                className="px-6 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-medium transition-all duration-200 hover:shadow-lg active:scale-95"
               >
-                Sim, apagar!
+                Sim, excluir!
               </button>
             </div>
           </div>
         </div>
       )}
-      <div className="w-full flex flex-auto relative">
-        <div className="w-full min-h-[56px]">
+      <div className="w-full flex flex-auto relative overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
+        <div className="w-full min-h-16">
           <table className="min-w-640 sm:w-full h-full text-left">
             <thead>
-              <tr>
-                <th 
-                  className="sticky top-0 z-10 text-center rounded-tl-lg p-4 text-sm font-medium w-12"
-                  style={{ 
-                    backgroundColor: '#F5F5F5',
-                    color: '#616161',
-                    borderBottom: '1px solid #E0E0E0'
-                  }}
-                >
+              <tr className="bg-white dark:bg-zinc-800">
+                <th className="sticky top-0 z-10 text-center rounded-tl-xl p-4 text-sm font-medium w-12 bg-zinc-50 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-600">
                   <label className="checkbox-orange">
                     <input
                       type="checkbox"
@@ -320,86 +290,43 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                     </span>
                   </label>
                 </th>
-                <th 
-                  className="sticky top-0 z-10 text-center p-4 text-sm font-medium"
-                  style={{ 
-                    backgroundColor: '#F5F5F5',
-                    color: '#616161',
-                    borderBottom: '1px solid #E0E0E0'
-                  }}
-                >
+                <th className="sticky top-0 z-10 text-center p-4 text-sm font-medium bg-zinc-50 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-600">
                   Categoria
                 </th>
-                <th 
-                  className="sticky top-0 z-10 text-center text-sm font-medium"
-                  style={{ 
-                    backgroundColor: '#F5F5F5',
-                    color: '#616161',
-                    borderBottom: '1px solid #E0E0E0'
-                  }}
-                >
+                <th className="sticky top-0 z-10 text-center text-sm font-medium bg-zinc-50 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-600">
                   Descrição
                 </th>
                 <th
-                  className="sticky top-0 z-10 text-center text-sm font-medium cursor-pointer select-none hover:bg-gray-200 transition-colors"
-                  style={{ 
-                    backgroundColor: '#F5F5F5',
-                    color: '#616161',
-                    borderBottom: '1px solid #E0E0E0'
-                  }}
+                  className="sticky top-0 z-10 text-center text-sm font-medium cursor-pointer select-none bg-zinc-50 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-600 hover:bg-teal-50 dark:hover:bg-teal-900 hover:text-teal-600 dark:hover:text-teal-400 transition-all duration-200"
                   onClick={() => onSort && onSort('price', sortBy === 'price' ? (sortOrder === 'desc' ? 'asc' : 'desc') : 'desc')}
                 >
                   Valor
                   {sortBy === 'price' && (
-                    <span>{sortOrder === 'asc' ? ' ▲' : ' ▼'}</span>
+                    <span className="text-teal-600 dark:text-teal-400">{sortOrder === 'asc' ? ' ▲' : ' ▼'}</span>
                   )}
                 </th>
                 <th
-                  className="sticky top-0 z-10 text-center text-sm font-medium cursor-pointer select-none hover:bg-gray-200 transition-colors"
-                  style={{ 
-                    backgroundColor: '#F5F5F5',
-                    color: '#616161',
-                    borderBottom: '1px solid #E0E0E0'
-                  }}
+                  className="sticky top-0 z-10 text-center text-sm font-medium cursor-pointer select-none bg-zinc-50 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-600 hover:bg-teal-50 dark:hover:bg-teal-900 hover:text-teal-600 dark:hover:text-teal-400 transition-all duration-200"
                   onClick={() => onSort && onSort('transaction_day', sortBy === 'transaction_day' ? (sortOrder === 'desc' ? 'asc' : 'desc') : 'desc')}
                 >
                   Dia
                   {sortBy === 'transaction_day' && (
-                    <span>{sortOrder === 'asc' ? ' ▲' : ' ▼'}</span>
+                    <span className="text-teal-600 dark:text-teal-400">{sortOrder === 'asc' ? ' ▲' : ' ▼'}</span>
                   )}
                 </th>
                 <th
-                  className="sticky top-0 z-10 text-center text-sm font-medium cursor-pointer select-none hover:bg-gray-200 transition-colors"
-                  style={{ 
-                    backgroundColor: '#F5F5F5',
-                    color: '#616161',
-                    borderBottom: '1px solid #E0E0E0'
-                  }}
+                  className="sticky top-0 z-10 text-center text-sm font-medium cursor-pointer select-none bg-zinc-50 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-600 hover:bg-teal-50 dark:hover:bg-teal-900 hover:text-teal-600 dark:hover:text-teal-400 transition-all duration-200"
                   onClick={() => onSort && onSort('updated_at', sortBy === 'updated_at' ? (sortOrder === 'desc' ? 'asc' : 'desc') : 'desc')}
                 >
                   Última modificação
                   {sortBy === 'updated_at' && (
-                    <span>{sortOrder === 'asc' ? ' ▲' : ' ▼'}</span>
+                    <span className="text-teal-600 dark:text-teal-400">{sortOrder === 'asc' ? ' ▲' : ' ▼'}</span>
                   )}
                 </th>
-                <th 
-                  className="sticky top-0 z-10 text-center text-sm font-medium"
-                  style={{ 
-                    backgroundColor: '#F5F5F5',
-                    color: '#616161',
-                    borderBottom: '1px solid #E0E0E0'
-                  }}
-                >
+                <th className="sticky top-0 z-10 text-center text-sm font-medium bg-zinc-50 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-600">
                   Tipo
                 </th>
-                <th 
-                  className="sticky top-0 z-10 text-center rounded-tr-lg text-sm font-medium"
-                  style={{ 
-                    backgroundColor: '#F5F5F5',
-                    color: '#616161',
-                    borderBottom: '1px solid #E0E0E0'
-                  }}
-                >
+                <th className="sticky top-0 z-10 text-center rounded-tr-xl text-sm font-medium bg-zinc-50 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-600">
                   Ações
                 </th>
               </tr>
@@ -408,11 +335,17 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
               <tbody>{memoizedTransactions}</tbody>
             ) : (
               <tbody>
-                <tr>
-                  <td colSpan={8} className="text-center py-8">
-                    <span style={{ color: 'rgb(160 160 160)' }} className="text-lg font-medium">Nenhuma transação cadastrada ainda</span>
-                    <br />
-                    <span style={{ color: 'rgb(160 160 160)' }} className="text-sm mt-1">Adicione sua primeira transação para começar!</span>
+                <tr className="bg-white dark:bg-zinc-800">
+                  <td colSpan={8} className="text-center py-12">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center">
+                        <MessageCircleQuestion className="w-8 h-8 text-zinc-400 dark:text-zinc-500" />
+                      </div>
+                      <div>
+                        <p className="text-lg font-medium text-zinc-400 dark:text-zinc-500">Nenhuma transação encontrada</p>
+                        <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-1">Adicione sua primeira transação para começar!</p>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -422,9 +355,9 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
       </div>
       {/* Pagination Controls */}
       {filteredTransactions.length > 0 && (
-        <div className="flex justify-center items-center gap-2 mt-4">
+        <div className="flex justify-center items-center gap-2 mt-6 p-4">
           <button
-            className="px-2 py-1 rounded border text-sm disabled:opacity-50"
+            className="px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-600 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
           >
@@ -433,20 +366,24 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i + 1}
-              className={`px-2 py-1 rounded border text-sm ${currentPage === i + 1 ? 'bg-orange-500 text-white' : ''}`}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                currentPage === i + 1 
+                  ? 'bg-teal-600 text-white shadow-md hover:bg-teal-700' 
+                  : 'border border-zinc-200 dark:border-zinc-600 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700'
+              }`}
               onClick={() => setCurrentPage(i + 1)}
             >
               {i + 1}
             </button>
           ))}
           <button
-            className="px-2 py-1 rounded border text-sm disabled:opacity-50"
+            className="px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-600 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
           >
             Próxima
           </button>
-          <span className="ml-4 text-sm text-gray-500">Página {currentPage}</span>
+          <span className="ml-4 text-sm text-zinc-500 dark:text-zinc-400">Página {currentPage} de {totalPages}</span>
         </div>
       )}
       {/* Modais de Editar/Excluir */}

@@ -13,7 +13,8 @@ import {
   PiggyBank,
   Plus,
   Moon,
-  Sun
+  Sun,
+  BarChart3
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -41,6 +42,7 @@ import { Filter } from '../../components/Filter'
 
 export default function Dashboard() {
   const { theme, actualTheme } = useTheme()
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
   
   const [openModal, setOpenModal] = useState({
     isOpen: false,
@@ -106,7 +108,7 @@ export default function Dashboard() {
 
   return (
     <div style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif' }}>
-      <div className="w-full h-full bg-gray-100 dark:bg-gray-900 transition-colors">
+      <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
         {/* <Header title="Dashboard" activePage="dashboard" /> */}
 
         <div className="flex h-full">
@@ -121,18 +123,18 @@ export default function Dashboard() {
             }}
           >
             {/* Welcome Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 mb-8 shadow-2xl transition-colors">
+            <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 mb-8 shadow-2xl transition-colors">
               <div className="flex justify-between items-center">
                 <div>
-                  <h1 className="text-2xl font-semibold mb-2 text-gray-700 dark:text-gray-200">
+                  <h1 className="text-2xl font-semibold mb-2 text-zinc-700 dark:text-zinc-200">
                     {getGreeting()}
                   </h1>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm">
                     Bem-vindo de volta ao seu painel financeiro
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">Saldo Total</p>
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm">Saldo Total</p>
                   <div className="text-2xl font-bold text-teal-600 dark:text-teal-400">
                     <CountUp valueNumber={balance} />
                   </div>
@@ -296,26 +298,26 @@ export default function Dashboard() {
               
               {/* Quick Stats */}
               <div className="space-y-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm transition-colors">
+                <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 text-center shadow-md transition-colors">
                   <TrendingUp className="w-6 h-6 mx-auto mb-2 text-teal-600 dark:text-teal-400" />
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Total de Entradas</p>
-                  <p className="text-lg font-bold text-gray-700 dark:text-gray-200">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400">Total de Entradas</p>
+                  <p className="text-lg font-bold text-teal-600 dark:text-zinc-200">
                     <CountUp valueNumber={overview?.income?.total} />
                   </p>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm transition-colors">
-                  <TrendingDown className="w-6 h-6 mx-auto mb-2 text-orange-500 dark:text-orange-400" />
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Total de Saídas</p>
-                  <p className="text-lg font-bold text-gray-700 dark:text-gray-200">
+                <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 text-center shadow-md transition-colors">
+                  <TrendingDown className="w-6 h-6 mx-auto mb-2 text-red-600 dark:text-red-400" />
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400">Total de Saídas</p>
+                  <p className="text-lg font-bold text-red-600 dark:text-zinc-200">
                     <CountUp valueNumber={overview?.outcome?.total} />
                   </p>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 text-center shadow-sm transition-colors">
+                <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 text-center shadow-md transition-colors">
                   <PiggyBank className="w-6 h-6 mx-auto mb-2 text-green-500 dark:text-green-400" />
-                  <p className="text-xs text-gray-600 dark:text-gray-400">Economias</p>
-                  <p className="text-lg font-bold text-gray-700 dark:text-gray-200">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400">Economias</p>
+                  <p className="text-lg font-bold text-zinc-700 dark:text-zinc-200">
                     <CountUp valueNumber={overview?.remaining?.total} />
                   </p>
                 </div>
@@ -323,9 +325,9 @@ export default function Dashboard() {
             </div>
 
             {/* Enhanced Transactions Preview */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 mb-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700">
+            <div className="hidden bg-white dark:bg-zinc-800 rounded-xl p-6 mb-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">
+                <h2 className="text-xl font-semibold text-zinc-700 dark:text-zinc-200">
                   Transações Recentes
                 </h2>
                 <div className="flex items-center gap-3">
@@ -344,20 +346,20 @@ export default function Dashboard() {
               {/* Modern Transaction Cards */}
               <div className="space-y-3 mb-6">
                 {/* Transaction 1 - Income */}
-                <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 transition-all duration-200 hover:shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 hover:border-teal-500 cursor-pointer">
+                <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-700 transition-all duration-200 hover:shadow-md hover:bg-zinc-100 dark:hover:bg-zinc-600 hover:border-teal-500 cursor-pointer">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg bg-gradient-to-br from-green-500 to-green-700">
                       💰
                     </div>
                     <div>
-                      <h4 className="font-medium text-sm text-gray-700 dark:text-gray-200">
+                      <h4 className="font-medium text-sm text-zinc-700 dark:text-zinc-200">
                         Salário Janeiro
                       </h4>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xs px-2 py-1 rounded-full bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-300">
                           Receita
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
                           26 Jan, 09:15
                         </span>
                       </div>
@@ -367,27 +369,27 @@ export default function Dashboard() {
                     <div className="text-lg font-semibold text-green-500 dark:text-green-400">
                       +R$ 5.500,00
                     </div>
-                    <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">
+                    <div className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">
                       Conta Corrente
                     </div>
                   </div>
                 </div>
 
                 {/* Transaction 2 - Expense */}
-                <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 transition-all duration-200 hover:shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 hover:border-teal-500 cursor-pointer">
+                <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-700 transition-all duration-200 hover:shadow-md hover:bg-zinc-100 dark:hover:bg-zinc-600 hover:border-teal-500 cursor-pointer">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg bg-gradient-to-br from-orange-500 to-red-600">
                       🍽️
                     </div>
                     <div>
-                      <h4 className="font-medium text-sm text-gray-700 dark:text-gray-200">
+                      <h4 className="font-medium text-sm text-zinc-700 dark:text-zinc-200">
                         Almoço Restaurante
                       </h4>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xs px-2 py-1 rounded-full bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-300">
                           Alimentação
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
                           25 Jan, 13:45
                         </span>
                       </div>
@@ -397,27 +399,27 @@ export default function Dashboard() {
                     <div className="text-lg font-semibold text-red-500 dark:text-red-400">
                       -R$ 45,90
                     </div>
-                    <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">
+                    <div className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">
                       Cartão Débito
                     </div>
                   </div>
                 </div>
 
                 {/* Transaction 3 - Transfer */}
-                <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 transition-all duration-200 hover:shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 hover:border-teal-500 cursor-pointer">
+                <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-700 transition-all duration-200 hover:shadow-md hover:bg-zinc-100 dark:hover:bg-zinc-600 hover:border-teal-500 cursor-pointer">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg bg-gradient-to-br from-blue-500 to-blue-700">
                       🚗
                     </div>
                     <div>
-                      <h4 className="font-medium text-sm text-gray-700 dark:text-gray-200">
+                      <h4 className="font-medium text-sm text-zinc-700 dark:text-zinc-200">
                         Combustível Posto Shell
                       </h4>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xs px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-300">
                           Transporte
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
                           24 Jan, 18:30
                         </span>
                       </div>
@@ -427,14 +429,14 @@ export default function Dashboard() {
                     <div className="text-lg font-semibold text-red-500 dark:text-red-400">
                       -R$ 120,00
                     </div>
-                    <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">
+                    <div className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">
                       Cartão Crédito
                     </div>
                   </div>
                 </div>
 
                 {/* Transaction 4 - Recurring */}
-                <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 transition-all duration-200 hover:shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 hover:border-teal-500 cursor-pointer">
+                <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-700 transition-all duration-200 hover:shadow-md hover:bg-zinc-100 dark:hover:bg-zinc-600 hover:border-teal-500 cursor-pointer">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg relative bg-gradient-to-br from-purple-500 to-purple-700">
                       🎮
@@ -443,7 +445,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div>
-                      <h4 className="font-medium text-sm text-gray-700 dark:text-gray-200">
+                      <h4 className="font-medium text-sm text-zinc-700 dark:text-zinc-200">
                         Netflix Assinatura
                       </h4>
                       <div className="flex items-center gap-2 mt-1">
@@ -453,7 +455,7 @@ export default function Dashboard() {
                         <span className="text-xs px-2 py-1 rounded-full bg-orange-50 dark:bg-orange-900 text-orange-700 dark:text-orange-300">
                           Recorrente
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
                           23 Jan, 10:00
                         </span>
                       </div>
@@ -463,7 +465,7 @@ export default function Dashboard() {
                     <div className="text-lg font-semibold text-red-500 dark:text-red-400">
                       -R$ 39,90
                     </div>
-                    <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">
+                    <div className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">
                       Débito Automático
                     </div>
                   </div>
@@ -471,28 +473,28 @@ export default function Dashboard() {
               </div>
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-4 p-4 rounded-lg bg-gray-100 dark:bg-gray-700">
+              <div className="grid grid-cols-3 gap-4 p-4 rounded-lg bg-zinc-100 dark:bg-zinc-700">
                 <div className="text-center">
-                  <div className="text-xs font-medium mb-1 text-gray-500 dark:text-gray-400">
+                  <div className="text-xs font-medium mb-1 text-zinc-500 dark:text-zinc-400">
                     Hoje
                   </div>
-                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <div className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
                     +R$ 5.294,20
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xs font-medium mb-1 text-gray-500 dark:text-gray-400">
+                  <div className="text-xs font-medium mb-1 text-zinc-500 dark:text-zinc-400">
                     Esta Semana
                   </div>
-                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <div className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
                     +R$ 4.850,40
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xs font-medium mb-1 text-gray-500 dark:text-gray-400">
+                  <div className="text-xs font-medium mb-1 text-zinc-500 dark:text-zinc-400">
                     Este Mês
                   </div>
-                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  <div className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
                     +R$ 3.245,80
                   </div>
                 </div>
@@ -500,20 +502,20 @@ export default function Dashboard() {
             </div>
 
             {/* Monthly Overview Table - Full Width */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 mb-8 shadow-2xl transition-colors">
+            <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 mb-8 shadow-2xl transition-colors">
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center space-x-2">
                   <button
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-400"
+                    className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors text-zinc-600 dark:text-zinc-400"
                     onClick={() => getPreviousMonth()}
                   >
                     <ChevronLeft size={18} />
                   </button>
-                  <h2 className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                  <h2 className="text-lg font-medium text-zinc-700 dark:text-zinc-200">
                     {getMonth ? `${getMonth()}` : <Skeleton height={20} width={100} />}
                   </h2>
                   <button
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-400"
+                    className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors text-zinc-600 dark:text-zinc-400"
                     onClick={() => getNextMonth()}
                   >
                     <ChevronRight size={18} />
@@ -522,7 +524,7 @@ export default function Dashboard() {
 
                 <button
                   disabled={hasToday()}
-                  className="px-4 py-2 rounded-lg text-white text-sm font-medium disabled:opacity-50 transition-all bg-teal-600 hover:bg-teal-700 disabled:bg-gray-300 dark:disabled:bg-gray-600"
+                  className="px-4 py-2 rounded-lg text-white text-sm font-medium disabled:opacity-50 transition-all bg-teal-600 hover:bg-teal-700 disabled:bg-zinc-300 dark:disabled:bg-zinc-600"
                   onClick={() => getToday()}
                 >
                   <Calendar size={16} className="mr-2 inline" />
@@ -530,20 +532,74 @@ export default function Dashboard() {
                 </button>
               </div>
               
-              <div className="h-[600px] overflow-auto border border-gray-200 dark:border-gray-600 rounded-xl">
-                <TablePreview
-                  rows={rows}
-                  handleCreateTransaction={handleCreateTransaction}
-                  handleCreateCompleteTransaction={handleCreateCompleteTransaction}
-                  handleDeleteTransaction={handleDeleteTransaction}
-                  handleUpdateTransaction={handleUpdateTransaction}
-                  currentMonth={currentMonth}
-                  setCurrentMonth={setCurrentMonth}
-                  openModal={openModal}
-                  setOpenModal={setOpenModal}
-                  categories={categories}
-                  from="dashboard"
-                />
+              <div className="h-[600px] dark:border-zinc-600 rounded-xl">
+                {/* Header with View Toggle */}
+                <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg border border-zinc-400 dark:border-zinc-700">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
+                      <BarChart3 size={20} className="text-teal-600 dark:text-teal-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-zinc-700 dark:text-zinc-100">Visão Financeira</h3>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">Acompanhe suas transações diárias</p>
+                    </div>
+                  </div>
+                  
+                  {/* View Mode Toggle */}
+                  <div className="flex bg-white dark:bg-zinc-700 rounded-lg p-1 border border-zinc-200 dark:border-zinc-600">
+                    <button
+                      onClick={() => setViewMode('cards')}
+                      className={`px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 ${
+                        viewMode === 'cards'
+                          ? 'bg-teal-600 text-white shadow-md'
+                          : 'text-zinc-600 dark:text-zinc-400 hover:text-teal-600 dark:hover:text-teal-400'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-3 grid grid-cols-2 gap-0.5">
+                          <div className="bg-current rounded-sm"></div>
+                          <div className="bg-current rounded-sm"></div>
+                          <div className="bg-current rounded-sm"></div>
+                          <div className="bg-current rounded-sm"></div>
+                        </div>
+                        Cards
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => setViewMode('table')}
+                      className={`px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 ${
+                        viewMode === 'table'
+                          ? 'bg-teal-600 text-white shadow-md'
+                          : 'text-zinc-600 dark:text-zinc-400 hover:text-teal-600 dark:hover:text-teal-400'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1">
+                        <div className="flex flex-col gap-0.5">
+                          <div className="w-3 h-0.5 bg-current rounded"></div>
+                          <div className="w-3 h-0.5 bg-current rounded"></div>
+                          <div className="w-3 h-0.5 bg-current rounded"></div>
+                        </div>
+                        Tabela
+                      </div>
+                    </button>
+                  </div>
+                </div>
+                <div className="h-[500px] overflow-auto">
+                  <TablePreview
+                    rows={rows}
+                    handleCreateTransaction={handleCreateTransaction}
+                    handleCreateCompleteTransaction={handleCreateCompleteTransaction}
+                    handleDeleteTransaction={handleDeleteTransaction}
+                    handleUpdateTransaction={handleUpdateTransaction}
+                    currentMonth={currentMonth}
+                    setCurrentMonth={setCurrentMonth}
+                    openModal={openModal}
+                    setOpenModal={setOpenModal}
+                    categories={categories}
+                    from="dashboard"
+                    viewMode={viewMode}
+                  />
+                </div>
               </div>
             </div>
 
@@ -555,13 +611,13 @@ export default function Dashboard() {
             {/* Category Spending - Side by Side */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
               {/* Income Categories */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-2xl h-80 transition-colors">
-                <h3 className="text-base font-medium mb-4 text-gray-700 dark:text-gray-200">
+              <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl h-80 transition-colors">
+                <h3 className="text-base font-medium mb-4 text-zinc-700 dark:text-zinc-200">
                   Maiores Entradas
                 </h3>
                 {chartCategories.income.config.length === 0 ? (
                   <div className="h-56 flex items-center justify-center">
-                    <p className="text-gray-400 dark:text-gray-500">Sem valores registrados</p>
+                    <p className="text-zinc-400 dark:text-zinc-500">Sem valores registrados</p>
                   </div>
                 ) : (
                   <div className="flex h-56">
@@ -570,15 +626,15 @@ export default function Dashboard() {
                       {chartCategories.income.config.slice(0, 5).map((item) => (
                         <div 
                           key={item.id} 
-                          className="flex items-center justify-between py-2 border-b last:border-b-0 border-gray-100 dark:border-gray-700"
+                          className="flex items-center justify-between py-2 border-b last:border-b-0 border-zinc-100 dark:border-zinc-700"
                         >
                           <div className="flex items-center min-w-0">
                             <CategoryIcon size="small" category={item} />
-                            <span className="ml-2 text-sm truncate text-gray-700 dark:text-gray-200">
+                            <span className="ml-2 text-sm truncate text-zinc-700 dark:text-zinc-200">
                               {item.name}
                             </span>
                           </div>
-                          <span className="text-sm font-medium ml-2 flex-shrink-0 text-gray-700 dark:text-gray-200">
+                          <span className="text-sm font-medium ml-2 flex-shrink-0 text-zinc-700 dark:text-zinc-200">
                             {item.percentage}%
                           </span>
                         </div>
@@ -595,7 +651,7 @@ export default function Dashboard() {
                       </div>
                       <Link 
                         to={{ pathname: '/relatorios', search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
-                        className="text-xs px-3 py-2 rounded border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all mt-2 hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-gray-900"
+                        className="text-xs px-3 py-2 rounded border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all mt-2 hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
                       >
                         Ver relatório completo
                       </Link>
@@ -605,13 +661,13 @@ export default function Dashboard() {
               </div>
               
               {/* Outcome Categories */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-2xl h-80 transition-colors">
-                <h3 className="text-base font-medium mb-4 text-gray-700 dark:text-gray-200">
+              <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl h-80 transition-colors">
+                <h3 className="text-base font-medium mb-4 text-zinc-700 dark:text-zinc-200">
                   Maiores Saídas
                 </h3>
                 {chartCategories.notIncome.config.length === 0 ? (
                   <div className="h-56 flex items-center justify-center">
-                    <p className="text-gray-400 dark:text-gray-500">Sem valores registrados</p>
+                    <p className="text-zinc-400 dark:text-zinc-500">Sem valores registrados</p>
                   </div>
                 ) : (
                   <div className="flex h-56">
@@ -620,15 +676,15 @@ export default function Dashboard() {
                       {chartCategories.notIncome.config.slice(0, 5).map((item) => (
                         <div 
                           key={item.id} 
-                          className="flex items-center justify-between py-2 border-b last:border-b-0 border-gray-100 dark:border-gray-700"
+                          className="flex items-center justify-between py-2 border-b last:border-b-0 border-zinc-100 dark:border-zinc-700"
                         >
                           <div className="flex items-center min-w-0">
                             <CategoryIcon size="small" category={item} />
-                            <span className="ml-2 text-sm truncate text-gray-700 dark:text-gray-200">
+                            <span className="ml-2 text-sm truncate text-zinc-700 dark:text-zinc-200">
                               {item.name}
                             </span>
                           </div>
-                          <span className="text-sm font-medium ml-2 flex-shrink-0 text-gray-700 dark:text-gray-200">
+                          <span className="text-sm font-medium ml-2 flex-shrink-0 text-zinc-700 dark:text-zinc-200">
                             {item.percentage}%
                           </span>
                         </div>
@@ -645,7 +701,7 @@ export default function Dashboard() {
                       </div>
                       <Link 
                         to={{ pathname: '/relatorios', search: `?type=outcomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
-                        className="text-xs px-3 py-2 rounded border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all mt-2 hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-gray-900"
+                        className="text-xs px-3 py-2 rounded border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all mt-2 hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
                       >
                         Ver relatório completo
                       </Link>
@@ -656,15 +712,15 @@ export default function Dashboard() {
             </div>
 
             {/* Recent Transactions */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 mt-8 shadow-2xl transition-colors">
+            <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 mt-8 shadow-2xl transition-colors">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                <h3 className="text-lg font-medium mb-4 sm:mb-0 text-gray-700 dark:text-gray-200">
+                <h3 className="text-lg font-medium mb-4 sm:mb-0 text-zinc-700 dark:text-zinc-200">
                   Transações Recentes
                 </h3>
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                   <div className="relative">
                     <Search 
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400" 
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-600 dark:text-zinc-400" 
                       size={16} 
                     />
                     <input
@@ -672,7 +728,7 @@ export default function Dashboard() {
                       placeholder="Buscar transação..."
                       value={searchTerm}
                       onChange={e => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 w-64"
+                      className="pl-10 pr-4 py-2 border border-zinc-200 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400 text-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 w-64"
                     />
                   </div>
                   <Filter 
@@ -705,7 +761,7 @@ export default function Dashboard() {
               <div className="flex justify-center mt-6">
                 <Link
                   to={{ pathname: '/transacoes' }}
-                  className="flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-gray-900"
+                  className="flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
                 >
                   Ver todas as transações
                   <ChevronRight size={16} className="ml-2" />

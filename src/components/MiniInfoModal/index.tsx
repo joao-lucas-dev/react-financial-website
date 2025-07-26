@@ -147,7 +147,7 @@ const MiniInfoModal = ({
                             <p className="font-semibold text-sm">
                               Kátja Santos
                             </p>
-                            <p className="text-gray-500 text-xs font-light">
+                            <p className="text-zinc-500 text-xs font-light">
                               {transaction.createdAt}
                             </p>
                           </div>
@@ -204,7 +204,7 @@ const MiniInfoModal = ({
                                   type: 'edit',
                                 })
                               }}
-                              className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                              className="w-full px-4 py-2 text-left text-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
                             >
                               Editar
                             </button>
@@ -216,7 +216,7 @@ const MiniInfoModal = ({
                                   type: 'delete',
                                 })
                               }}
-                              className="w-full px-4 py-2 text-left text-gray-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                              className="w-full px-4 py-2 text-left text-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
                             >
                               Excluir
                             </button>

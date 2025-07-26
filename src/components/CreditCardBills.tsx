@@ -121,7 +121,7 @@ const CreditCardBills: React.FC = () => {
   const overdueBills = bills.filter(bill => bill.isOverdue && !bill.isPaid).length;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+    <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
@@ -129,10 +129,10 @@ const CreditCardBills: React.FC = () => {
             <CreditCard size={24} className="text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
               Faturas do Cartão
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
               {bills.length} cartões • {overdueBills > 0 ? `${overdueBills} em atraso` : 'Tudo em dia'}
             </p>
           </div>
@@ -140,43 +140,43 @@ const CreditCardBills: React.FC = () => {
         
         <div className="flex items-center gap-2">
           <div className="text-right">
-            <p className="text-xs text-gray-500 dark:text-gray-400">Total a pagar</p>
-            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Total a pagar</p>
+            <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
               {formatCurrency(totalToPay)}
             </p>
           </div>
-          <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-            <MoreHorizontal size={16} className="text-gray-600 dark:text-gray-400" />
+          <button className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-lg transition-colors">
+            <MoreHorizontal size={16} className="text-zinc-600 dark:text-zinc-400" />
           </button>
         </div>
       </div>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <div className="p-3 bg-zinc-50 dark:bg-zinc-700 rounded-lg">
           <div className="flex items-center gap-2 mb-1">
             <CheckCircle size={14} className="text-green-600 dark:text-green-400" />
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Pagas</span>
+            <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Pagas</span>
           </div>
-          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
             {bills.filter(b => b.isPaid).length}
           </p>
         </div>
-        <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <div className="p-3 bg-zinc-50 dark:bg-zinc-700 rounded-lg">
           <div className="flex items-center gap-2 mb-1">
             <Clock size={14} className="text-orange-600 dark:text-orange-400" />
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Pendentes</span>
+            <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Pendentes</span>
           </div>
-          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
             {bills.filter(b => !b.isPaid && !b.isOverdue).length}
           </p>
         </div>
-        <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+        <div className="p-3 bg-zinc-50 dark:bg-zinc-700 rounded-lg">
           <div className="flex items-center gap-2 mb-1">
             <AlertTriangle size={14} className="text-red-600 dark:text-red-400" />
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Atrasadas</span>
+            <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Atrasadas</span>
           </div>
-          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
             {overdueBills}
           </p>
         </div>
@@ -190,7 +190,7 @@ const CreditCardBills: React.FC = () => {
             className={`group relative p-4 border rounded-xl transition-all duration-200 cursor-pointer hover:shadow-md ${
               selectedBill === bill.id
                 ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20'
-                : 'border-gray-200 dark:border-gray-700 hover:border-teal-300 dark:hover:border-teal-600'
+                : 'border-zinc-200 dark:border-zinc-700 hover:border-teal-300 dark:hover:border-teal-600'
             }`}
             onClick={() => setSelectedBill(selectedBill === bill.id ? null : bill.id)}
           >
@@ -203,10 +203,10 @@ const CreditCardBills: React.FC = () => {
                 </div>
                 
                 <div>
-                  <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                  <h4 className="font-medium text-zinc-900 dark:text-zinc-100">
                     {bill.cardName}
                   </h4>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     {bill.cardNumber}
                   </p>
                 </div>
@@ -221,23 +221,23 @@ const CreditCardBills: React.FC = () => {
             {/* Bill Amount and Due Date */}
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Valor da fatura</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">Valor da fatura</p>
                 <p className={`text-lg font-bold ${
                   bill.isPaid 
                     ? 'text-green-600 dark:text-green-400' 
                     : bill.isOverdue 
                     ? 'text-red-600 dark:text-red-400'
-                    : 'text-gray-900 dark:text-gray-100'
+                    : 'text-zinc-900 dark:text-zinc-100'
                 }`}>
                   {formatCurrency(bill.amount)}
                 </p>
               </div>
               
               <div className="text-right">
-                <p className="text-xs text-gray-500 dark:text-gray-400">Vencimento</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">Vencimento</p>
                 <div className="flex items-center gap-1">
-                  <Calendar size={12} className="text-gray-600 dark:text-gray-400" />
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  <Calendar size={12} className="text-zinc-600 dark:text-zinc-400" />
+                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                     {formatDate(bill.dueDate)}
                   </p>
                 </div>
@@ -246,11 +246,11 @@ const CreditCardBills: React.FC = () => {
 
             {/* Progress Bar - Usage */}
             <div className="mb-3">
-              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+              <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-1">
                 <span>Limite utilizado</span>
                 <span>{((bill.remainingBalance / (bill.remainingBalance + bill.amount)) * 100).toFixed(0)}%</span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2">
                 <div
                   className={`h-full bg-gradient-to-r ${bill.color} rounded-full transition-all duration-500`}
                   style={{ width: `${(bill.remainingBalance / (bill.remainingBalance + bill.amount)) * 100}%` }}
@@ -261,11 +261,11 @@ const CreditCardBills: React.FC = () => {
             {/* Actions */}
             <div className="flex items-center justify-between">
               <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
-                  <Eye size={14} className="text-gray-600 dark:text-gray-400" />
+                <button className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-md transition-colors">
+                  <Eye size={14} className="text-zinc-600 dark:text-zinc-400" />
                 </button>
-                <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
-                  <Download size={14} className="text-gray-600 dark:text-gray-400" />
+                <button className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-md transition-colors">
+                  <Download size={14} className="text-zinc-600 dark:text-zinc-400" />
                 </button>
               </div>
 
@@ -280,24 +280,24 @@ const CreditCardBills: React.FC = () => {
 
             {/* Expanded Details */}
             {selectedBill === bill.id && (
-              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+              <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-700 space-y-3">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-gray-500 dark:text-gray-400">Pagamento mínimo</p>
-                    <p className="font-semibold text-gray-900 dark:text-gray-100">
+                    <p className="text-zinc-500 dark:text-zinc-400">Pagamento mínimo</p>
+                    <p className="font-semibold text-zinc-900 dark:text-zinc-100">
                       {formatCurrency(bill.minimumPayment)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-500 dark:text-gray-400">Limite disponível</p>
-                    <p className="font-semibold text-gray-900 dark:text-gray-100">
+                    <p className="text-zinc-500 dark:text-zinc-400">Limite disponível</p>
+                    <p className="font-semibold text-zinc-900 dark:text-zinc-100">
                       {formatCurrency(bill.remainingBalance)}
                     </p>
                   </div>
                 </div>
                 
                 <div className="flex gap-2">
-                  <button className="flex-1 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 text-sm font-medium rounded-lg transition-colors">
+                  <button className="flex-1 py-2 bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 text-zinc-900 dark:text-zinc-100 text-sm font-medium rounded-lg transition-colors">
                     Ver Fatura
                   </button>
                   <button className="flex-1 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg transition-colors">
@@ -311,7 +311,7 @@ const CreditCardBills: React.FC = () => {
       </div>
 
       {/* Footer Action */}
-      <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-700">
         <button className="w-full py-3 bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-200 hover:shadow-lg">
           <div className="flex items-center justify-center gap-2">
             <TrendingUp size={16} />

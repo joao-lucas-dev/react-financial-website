@@ -47,7 +47,7 @@ const ModalDelete = ({
                 type: '',
               })
             }
-            className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 dark:text-softGray"
+            className="px-4 py-2 bg-zinc-200 text-zinc-600 rounded-lg hover:bg-zinc-300 dark:hover:bg-zinc-500 dark:text-softGray"
           >
             Cancelar
           </button>

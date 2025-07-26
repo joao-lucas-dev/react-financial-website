@@ -33,6 +33,7 @@ interface IParams {
   categories: any[]
   from: string
   resetScroll?: boolean
+  viewMode?: 'cards' | 'table'
 }
 
 const TablePreview = ({
@@ -48,13 +49,13 @@ const TablePreview = ({
   categories,
   from = 'transacoes',
   resetScroll = false,
+  viewMode = 'cards',
 }: IParams) => {
   const targetRowRef = useRef<HTMLDivElement>(null)
   const tableContainerRef = useRef<HTMLDivElement>(null)
   const { actualTheme } = useTheme()
 
   const { findTotalColor } = useTablePreviewAux()
-  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
   const [hoveredCell, setHoveredCell] = useState<{
     rowIndex: number
     colIndex: number
@@ -117,7 +118,7 @@ const TablePreview = ({
         ? 'text-green-600 dark:text-green-400' 
         : isNegative 
         ? 'text-red-600 dark:text-red-400' 
-        : 'text-gray-600 dark:text-gray-400'
+        : 'text-zinc-600 dark:text-zinc-400'
       
       const balanceIcon = isPositive 
         ? <TrendingUp size={16} className="inline mr-1" /> 
@@ -130,10 +131,10 @@ const TablePreview = ({
           <div
             key={row.formatted_date}
             ref={row.isToday ? targetRowRef : null}
-            className={`group relative bg-white dark:bg-gray-800 rounded-xl p-4 border transition-all duration-300 hover:shadow-lg hover:shadow-teal-500/10 hover:-translate-y-1 ${
+            className={`group relative bg-white dark:bg-zinc-800 rounded-xl p-4 border transition-all duration-300 hover:shadow-lg hover:shadow-teal-500/10 hover:-translate-y-1 ${
               row.isToday 
                 ? 'border-teal-500 bg-gradient-to-r from-teal-50 to-blue-50 dark:from-teal-900/30 dark:to-blue-900/30 shadow-lg' 
-                : 'border-gray-200 dark:border-gray-700 hover:border-teal-300 dark:hover:border-teal-600'
+                : 'border-zinc-200 dark:border-zinc-700 hover:border-teal-300 dark:hover:border-teal-600'
             }`}
           >
             {/* Today Badge */}
@@ -146,14 +147,14 @@ const TablePreview = ({
             {/* Date Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                  <Calendar size={16} className="text-gray-600 dark:text-gray-400" />
+                <div className="p-2 bg-zinc-100 dark:bg-zinc-700 rounded-lg">
+                  <Calendar size={16} className="text-zinc-600 dark:text-zinc-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                  <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
                     {row.formatted_date}
                   </h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     {new Date(row.date).toLocaleDateString('pt-BR', { weekday: 'long' })}
                   </p>
                 </div>
@@ -162,16 +163,16 @@ const TablePreview = ({
               {/* Quick Actions */}
               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button 
-                  className="p-2 bg-gray-100 dark:bg-gray-700 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-lg transition-colors"
+                  className="p-2 bg-zinc-100 dark:bg-zinc-700 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-lg transition-colors"
                   title="Ver detalhes"
                 >
-                  <Eye size={14} className="text-gray-600 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400" />
+                  <Eye size={14} className="text-zinc-600 dark:text-zinc-400 hover:text-teal-600 dark:hover:text-teal-400" />
                 </button>
                 <button 
-                  className="p-2 bg-gray-100 dark:bg-gray-700 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-lg transition-colors"
+                  className="p-2 bg-zinc-100 dark:bg-zinc-700 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-lg transition-colors"
                   title="Adicionar transação"
                 >
-                  <Plus size={14} className="text-gray-600 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400" />
+                  <Plus size={14} className="text-zinc-600 dark:text-zinc-400 hover:text-teal-600 dark:hover:text-teal-400" />
                 </button>
               </div>
             </div>
@@ -253,10 +254,10 @@ const TablePreview = ({
               </div>
 
               {/* Balance */}
-              <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+              <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-600">
                 <div className="flex items-center gap-2 mb-1">
-                  <BarChart3 size={14} className="text-gray-600 dark:text-gray-400" />
-                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                  <BarChart3 size={14} className="text-zinc-600 dark:text-zinc-400" />
+                  <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">
                     Saldo
                   </span>
                 </div>
@@ -268,13 +269,13 @@ const TablePreview = ({
             </div>
 
             {/* Progress bar for visual balance */}
-            {(row.incomes?.value || row.outcomes?.value) && (
-              <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+            {/* {(row.incomes?.value || row.outcomes?.value) && (
+              <div className="mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-700">
+                <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-1">
                   <span>Entradas vs Saídas</span>
                   <span>{Math.abs(totalValue) > 0 ? (isPositive ? '+' : '') + totalValue.toFixed(2) : '0.00'}</span>
                 </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2 overflow-hidden">
                   <div 
                     className={`h-full transition-all duration-500 ${
                       isPositive ? 'bg-gradient-to-r from-green-400 to-green-600' : 'bg-gradient-to-r from-red-400 to-red-600'
@@ -283,7 +284,7 @@ const TablePreview = ({
                   />
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         )
       }
@@ -293,15 +294,15 @@ const TablePreview = ({
         <tr
           key={row.formatted_date}
           ref={row.isToday ? targetRowRef : null}
-          className={`relative transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 ${
+          className={`relative transition-all duration-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 ${
             row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : ''
           }`}
         >
-          <td className={`sticky left-0 ${row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : 'bg-white dark:bg-gray-900'} text-sm text-center font-medium h-14 p-3 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200`}>
+          <td className={`sticky left-0 ${row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : 'bg-white dark:bg-zinc-900'} text-sm text-center font-medium h-14 p-3 border-b border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200`}>
             {row.formatted_date}
           </td>
           <td
-            className={`text-sm text-center ${row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : ''} hover:cursor-pointer group hover:bg-green-50 dark:hover:bg-green-900/20 h-14 p-3 transition-colors border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200`}
+            className={`text-sm text-center ${row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : ''} hover:cursor-pointer group hover:bg-green-50 dark:hover:bg-green-900/20 h-14 p-3 transition-colors border-b border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200`}
             onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 1)}
             onMouseLeave={handleMouseLeave}
           >
@@ -327,7 +328,7 @@ const TablePreview = ({
             )}
           </td>
           <td
-            className={`text-sm text-center ${row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : ''} hover:cursor-pointer group hover:bg-red-50 dark:hover:bg-red-900/20 h-14 p-3 transition-colors border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200`}
+            className={`text-sm text-center ${row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : ''} hover:cursor-pointer group hover:bg-red-50 dark:hover:bg-red-900/20 h-14 p-3 transition-colors border-b border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200`}
             onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 2)}
             onMouseLeave={handleMouseLeave}
           >
@@ -352,7 +353,7 @@ const TablePreview = ({
               />
             )}
           </td>
-          <td className={`${balanceColor} ${row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : ''} font-semibold text-sm text-center h-14 p-3 border-b border-gray-200 dark:border-gray-700`}>
+          <td className={`${balanceColor} ${row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : ''} font-semibold text-sm text-center h-14 p-3 border-b border-zinc-200 dark:border-zinc-700`}>
             <div className="flex items-center justify-center">
               {balanceIcon}
               {row.total.valueFormatted}
@@ -376,59 +377,7 @@ const TablePreview = ({
   return (
     <>
       {rows.length > 0 ? (
-        <div className="w-full">
-          {/* Header with View Toggle */}
-          <div className="flex items-center justify-between mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
-                <BarChart3 size={20} className="text-teal-600 dark:text-teal-400" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">Visão Financeira</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Acompanhe suas transações diárias</p>
-              </div>
-            </div>
-            
-            {/* View Mode Toggle */}
-            <div className="flex bg-white dark:bg-gray-700 rounded-lg p-1 border border-gray-200 dark:border-gray-600">
-              <button
-                onClick={() => setViewMode('cards')}
-                className={`px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 ${
-                  viewMode === 'cards'
-                    ? 'bg-teal-600 text-white shadow-md'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400'
-                }`}
-              >
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 grid grid-cols-2 gap-0.5">
-                    <div className="bg-current rounded-sm"></div>
-                    <div className="bg-current rounded-sm"></div>
-                    <div className="bg-current rounded-sm"></div>
-                    <div className="bg-current rounded-sm"></div>
-                  </div>
-                  Cards
-                </div>
-              </button>
-              <button
-                onClick={() => setViewMode('table')}
-                className={`px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 ${
-                  viewMode === 'table'
-                    ? 'bg-teal-600 text-white shadow-md'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400'
-                }`}
-              >
-                <div className="flex items-center gap-1">
-                  <div className="flex flex-col gap-0.5">
-                    <div className="w-3 h-0.5 bg-current rounded"></div>
-                    <div className="w-3 h-0.5 bg-current rounded"></div>
-                    <div className="w-3 h-0.5 bg-current rounded"></div>
-                  </div>
-                  Tabela
-                </div>
-              </button>
-            </div>
-          </div>
-
+        <div className="w-full overflow-auto pt-2">
           {/* Content Container */}
           <div
             ref={tableContainerRef}
@@ -440,19 +389,19 @@ const TablePreview = ({
               </div>
             ) : (
               <div className="w-full overflow-auto">
-                <table className="min-w-640 sm:w-full h-full text-left bg-white dark:bg-gray-900 rounded-lg overflow-hidden shadow-sm">
+                <table className="min-w-640 sm:w-full h-full text-left bg-white dark:bg-zinc-900 rounded-lg overflow-hidden shadow-sm">
                   <thead>
-                    <tr className="bg-gray-100 dark:bg-gray-800">
-                      <th className="sticky top-0 left-0 z-20 sm:z-10 text-center p-4 text-sm font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700">
+                    <tr className="bg-zinc-100 dark:bg-zinc-800">
+                      <th className="sticky top-0 left-0 z-20 sm:z-10 text-center p-4 text-sm font-semibold text-zinc-700 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-700">
                         Data
                       </th>
-                      <th className="sticky top-0 z-10 text-center text-sm font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700">
+                      <th className="sticky top-0 z-10 text-center text-sm font-semibold text-zinc-700 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-700">
                         Entradas
                       </th>
-                      <th className="sticky top-0 z-10 text-center text-sm font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700">
+                      <th className="sticky top-0 z-10 text-center text-sm font-semibold text-zinc-700 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-700">
                         Saídas
                       </th>
-                      <th className="sticky top-0 z-10 text-center text-sm font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700">
+                      <th className="sticky top-0 z-10 text-center text-sm font-semibold text-zinc-700 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-700">
                         Saldo
                       </th>
                     </tr>
@@ -469,7 +418,7 @@ const TablePreview = ({
 
       {openModal.isOpen && (
         <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 z-50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 w-96 rounded-xl shadow-2xl p-6 relative border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-zinc-800 w-96 rounded-xl shadow-2xl p-6 relative border border-zinc-200 dark:border-zinc-700">
             {openModal.type === 'edit' ? (
               <ModalEdit
                 openModal={openModal}

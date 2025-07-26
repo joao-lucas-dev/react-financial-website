@@ -94,11 +94,11 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
           <div ref={modalRef} className="absolute right-0 top-full mt-2 z-30">
             <div className="relative w-96 bg-white rounded-lg shadow-xl border border-zinc-300 p-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[14px] font-medium text-gray-900">
+                <h3 className="text-[14px] font-medium text-zinc-900">
                   Filtros colunas
                 </h3>
                 <button
-                  className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+                  className="text-zinc-400 hover:text-zinc-600 text-xl leading-none"
                   onClick={() => setIsModalOpen(false)}
                 >
                   <X size={16} />
@@ -107,7 +107,7 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
 
               <div className="flex gap-6">
                 <div className="flex-1">
-                  <h4 className="text-xs font-medium text-gray-500 mb-2">Dia</h4>
+                  <h4 className="text-xs font-medium text-zinc-500 mb-2">Dia</h4>
                   {[
                     [DATE_FILTERS.BOTH, DATE_FILTER_LABELS[DATE_FILTERS.BOTH]],
                     [DATE_FILTERS.BEFORE, DATE_FILTER_LABELS[DATE_FILTERS.BEFORE]],
@@ -115,16 +115,16 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
                   ].map(([filterType, label]) => (
                     <label
                       key={filterType}
-                      className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors"
+                      className="flex items-center space-x-3 cursor-pointer hover:bg-zinc-50 p-2 rounded-md transition-colors"
                     >
                       <input
                         type="radio"
                         name="dateFilter"
-                        className="w-4 h-4 appearance-none border border-gray-300 rounded-full checked:bg-orange-500 checked:border-orange-500 checked:before:content-[''] checked:before:w-2 checked:before:h-2 checked:before:bg-white checked:before:rounded-full checked:before:absolute checked:before:top-1/2 checked:before:left-1/2 checked:before:-translate-x-1/2 checked:before:-translate-y-1/2 focus:ring-2 focus:ring-orange-500 relative"
+                        className="w-4 h-4 appearance-none border border-zinc-300 rounded-full checked:bg-orange-500 checked:border-orange-500 checked:before:content-[''] checked:before:w-2 checked:before:h-2 checked:before:bg-white checked:before:rounded-full checked:before:absolute checked:before:top-1/2 checked:before:left-1/2 checked:before:-translate-x-1/2 checked:before:-translate-y-1/2 focus:ring-2 focus:ring-orange-500 relative"
                         checked={pendingFilter === filterType}
                         onChange={() => handleRadioChange(filterType as 'before' | 'after' | 'both', pendingType)}
                       />
-                      <span className="text-sm text-gray-700 select-none">
+                      <span className="text-sm text-zinc-700 select-none">
                         {label}
                       </span>
                     </label>
@@ -132,20 +132,20 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
                 </div>
 
                 <div className="flex-1">
-                  <h4 className="text-xs font-medium text-gray-500 mb-2">Tipo</h4>
+                  <h4 className="text-xs font-medium text-zinc-500 mb-2">Tipo</h4>
                   {Object.entries(TYPE_FILTER_LABELS).map(([filterType, label]) => (
                     <label
                       key={filterType}
-                      className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors"
+                      className="flex items-center space-x-3 cursor-pointer hover:bg-zinc-50 p-2 rounded-md transition-colors"
                     >
                       <input
                         type="radio"
                         name="typeFilter"
-                        className="w-4 h-4 appearance-none border border-gray-300 rounded-full checked:bg-orange-500 checked:border-orange-500 checked:before:content-[''] checked:before:w-2 checked:before:h-2 checked:before:bg-white checked:before:rounded-full checked:before:absolute checked:before:top-1/2 checked:before:left-1/2 checked:before:-translate-x-1/2 checked:before:-translate-y-1/2 focus:ring-2 focus:ring-orange-500 relative"
+                        className="w-4 h-4 appearance-none border border-zinc-300 rounded-full checked:bg-orange-500 checked:border-orange-500 checked:before:content-[''] checked:before:w-2 checked:before:h-2 checked:before:bg-white checked:before:rounded-full checked:before:absolute checked:before:top-1/2 checked:before:left-1/2 checked:before:-translate-x-1/2 checked:before:-translate-y-1/2 focus:ring-2 focus:ring-orange-500 relative"
                         checked={pendingType === filterType}
                         onChange={() => handleRadioChange(pendingFilter, filterType as 'income' | 'outcome' | 'all')}
                       />
-                      <span className="text-sm text-gray-700 select-none">
+                      <span className="text-sm text-zinc-700 select-none">
                         {label}
                       </span>
                     </label>

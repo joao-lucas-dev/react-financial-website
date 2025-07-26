@@ -22,7 +22,7 @@ const CustomDonutChart: React.FC<CustomDonutChartProps> = ({
   if (!data || data.length === 0) {
     return (
       <div 
-        className="flex items-center justify-center rounded-full border-4 border-gray-100"
+        className="flex items-center justify-center rounded-full border-4 border-zinc-100"
         style={{ width: size, height: size }}
       >
         <p style={{ color: '#A0A0A0', fontSize: '0.875rem' }}>

@@ -82,7 +82,7 @@ const SelectInput = forwardRef(({ field, categories }, ref) => {
               key={category.id}
               // @ts-expect-error TS2322
               onClick={() => handleSelect(category)}
-              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer hover:bg-zinc-100 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
+              className="flex items-center px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-100 cursor-pointer hover:bg-zinc-100 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
             >
               <CategoryIcon category={category} />
               <span className="ml-2">{category.name}</span>

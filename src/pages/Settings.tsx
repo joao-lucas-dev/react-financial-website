@@ -206,7 +206,7 @@ const Settings: React.FC = () => {
     const renderProfileSection = () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {/* Profile Photo */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+            <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
                 <h3 style={{
                     fontSize: '1.125rem',
                     fontWeight: 600,
@@ -258,7 +258,7 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Personal Info */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+            <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
                 <h3 style={{
                     fontSize: '1.125rem',
                     fontWeight: 600,
@@ -371,7 +371,7 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Password Change */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+            <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
                 <h3 style={{
                     fontSize: '1.125rem',
                     fontWeight: 600,
@@ -545,8 +545,8 @@ const Settings: React.FC = () => {
     );
 
     const renderNotificationsSection = () => (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+        <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
+            <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-200 mb-4">
                 Preferências de Notificação
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -626,12 +626,12 @@ const Settings: React.FC = () => {
     const renderAppearanceSection = () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* Theme */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+            <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
+                <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-200 mb-4">
                     Tema
                 </h3>
-                <div className="mb-4 p-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
-                    <p className="text-sm text-gray-700 dark:text-gray-200">
+                <div className="mb-4 p-3 rounded-lg bg-zinc-100 dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600">
+                    <p className="text-sm text-zinc-700 dark:text-zinc-200">
                         <strong>Status:</strong> {actualTheme === 'dark' ? '🌙 Modo Escuro Ativo' : '☀️ Modo Claro Ativo'}
                     </p>
                 </div>
@@ -647,14 +647,14 @@ const Settings: React.FC = () => {
                             className={`flex flex-col items-center gap-2 p-4 border-2 rounded-xl cursor-pointer transition-all ${
                                 theme === themeOption.value 
                                     ? 'border-teal-600 bg-teal-50 dark:bg-teal-900' 
-                                    : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-teal-300 dark:hover:border-teal-500'
+                                    : 'border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 hover:border-teal-300 dark:hover:border-teal-500'
                             }`}
                         >
-                            <themeOption.icon size={24} className={theme === themeOption.value ? 'text-teal-600 dark:text-teal-400' : 'text-gray-600 dark:text-gray-400'} />
+                            <themeOption.icon size={24} className={theme === themeOption.value ? 'text-teal-600 dark:text-teal-400' : 'text-zinc-600 dark:text-zinc-400'} />
                             <span className={`text-sm font-medium ${
                                 theme === themeOption.value 
                                     ? 'text-teal-600 dark:text-teal-400' 
-                                    : 'text-gray-700 dark:text-gray-200'
+                                    : 'text-zinc-700 dark:text-zinc-200'
                             }`}>
                                 {themeOption.label}
                             </span>
@@ -664,19 +664,19 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Language & Currency */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+            <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
+                <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-200 mb-4">
                     Idioma e Moeda
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-2">
                             Idioma
                         </label>
                         <select
                             value={formData.language}
                             onChange={(e) => handleInputChange('language', e.target.value)}
-                            className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 outline-none cursor-pointer focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400"
+                            className="w-full p-3 border border-zinc-200 dark:border-zinc-600 rounded-lg text-sm text-zinc-700 dark:text-zinc-200 bg-white dark:bg-zinc-700 outline-none cursor-pointer focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400"
                         >
                             <option value="pt-BR">Português (Brasil)</option>
                             <option value="en-US">English (US)</option>
@@ -684,13 +684,13 @@ const Settings: React.FC = () => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-2">
                             Moeda
                         </label>
                         <select
                             value={formData.currency}
                             onChange={(e) => handleInputChange('currency', e.target.value)}
-                            className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 outline-none cursor-pointer focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400"
+                            className="w-full p-3 border border-zinc-200 dark:border-zinc-600 rounded-lg text-sm text-zinc-700 dark:text-zinc-200 bg-white dark:bg-zinc-700 outline-none cursor-pointer focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400"
                         >
                             <option value="BRL">Real Brasileiro (R$)</option>
                             <option value="USD">Dólar Americano ($)</option>
@@ -703,8 +703,8 @@ const Settings: React.FC = () => {
     );
 
     const renderPrivacySection = () => (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
-            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+        <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
+            <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-200 mb-4">
                 Configurações de Privacidade
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -830,7 +830,7 @@ const Settings: React.FC = () => {
     const renderBillingSection = () => (
         <div className="flex flex-col gap-6">
             {/* Current Plan */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+            <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
                 <h3 style={{
                     fontSize: '1.125rem',
                     fontWeight: 600,
@@ -878,7 +878,7 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Payment Method */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+            <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
                 <h3 style={{
                     fontSize: '1.125rem',
                     fontWeight: 600,
@@ -953,7 +953,7 @@ const Settings: React.FC = () => {
     const renderCategoriesSection = () => (
         <div className="flex flex-col gap-6">
             {/* Categories List */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+            <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -1326,7 +1326,7 @@ const Settings: React.FC = () => {
     );
 
     const renderAlertsSection = () => (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+        <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
             <h3 style={{
                 fontSize: '1.125rem',
                 fontWeight: 600,
@@ -1604,7 +1604,7 @@ const Settings: React.FC = () => {
 
     return (
         <>
-            <div className="bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors" style={{
+            <div className="bg-zinc-100 dark:bg-zinc-900 min-h-screen transition-colors" style={{
                 fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
             }}>
                 <Header title="Configurações" activePage="configuracoes" />
@@ -1622,17 +1622,17 @@ const Settings: React.FC = () => {
                     }}>
                         {/* Header Section */}
                         <div className="mb-8">
-                            <h1 className="text-4xl font-bold text-gray-700 dark:text-gray-200 mb-2 leading-tight">
+                            <h1 className="text-4xl font-bold text-zinc-700 dark:text-zinc-200 mb-2 leading-tight">
                                 Configurações
                             </h1>
-                            <p className="text-gray-600 dark:text-gray-400 text-base">
+                            <p className="text-zinc-600 dark:text-zinc-400 text-base">
                                 Gerencie suas preferências e configurações da conta
                             </p>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem' }}>
                             {/* Sidebar */}
-                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 h-fit transition-colors">
+                            <div className="bg-white dark:bg-zinc-800 rounded-2xl p-4 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 h-fit transition-colors">
                                 <nav>
                                     {sections.map((section) => (
                                         <button
@@ -1641,7 +1641,7 @@ const Settings: React.FC = () => {
                                             className={`flex items-center gap-3 w-full px-4 py-3 mb-2 border-none rounded-xl text-sm font-medium cursor-pointer transition-all text-left ${
                                                 activeSection === section.id 
                                                     ? 'bg-teal-600 text-white' 
-                                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700'
                                             }`}
                                         >
                                             <section.icon size={18} />

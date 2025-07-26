@@ -154,18 +154,18 @@ const CategoryReports: React.FC = () => {
                     </div>
 
                     {/* Controls Section */}
-                    <div className="flex items-center justify-between mb-8 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+                    <div className="flex items-center justify-between mb-8 bg-white dark:bg-zinc-800 p-6 rounded-2xl shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
                         <Tabs tabs={TABS} selected={tab} onChange={(v) => setTab(v as 'incomes' | 'outcomes')} />
                         <input
                             type="month"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            className="border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-3 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 outline-none transition-all focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400"
+                            className="border border-zinc-200 dark:border-zinc-600 rounded-lg px-4 py-3 text-sm text-zinc-700 dark:text-zinc-200 bg-white dark:bg-zinc-700 outline-none transition-all focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400"
                         />
                     </div>
 
                     {/* Chart Section */}
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 mb-8 min-h-96 flex items-center justify-center transition-colors">
+                    <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 mb-8 min-h-96 flex items-center justify-center transition-colors">
                         {loading ? (
                             <div style={{
                                 textAlign: 'center',
