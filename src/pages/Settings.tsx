@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import MenuAside from '../components/MenuAside';
 import Header from '../components/Header';
+import { useTheme } from '../context/ThemeProvider';
 
 interface Category {
     id: number;
@@ -47,7 +48,6 @@ interface SettingsFormData {
     monthlyReports: boolean;
     
     // Appearance
-    theme: 'light' | 'dark' | 'auto';
     language: string;
     currency: string;
     
@@ -63,6 +63,7 @@ interface SettingsFormData {
 }
 
 const Settings: React.FC = () => {
+    const { theme, setTheme, actualTheme } = useTheme();
     const [activeSection, setActiveSection] = useState('profile');
     const [showPassword, setShowPassword] = useState({
         current: false,
@@ -80,7 +81,6 @@ const Settings: React.FC = () => {
         pushNotifications: true,
         transactionAlerts: true,
         monthlyReports: false,
-        theme: 'light',
         language: 'pt-BR',
         currency: 'BRL',
         profileVisibility: 'private',
@@ -206,13 +206,7 @@ const Settings: React.FC = () => {
     const renderProfileSection = () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {/* Profile Photo */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '1rem',
-                padding: '1.5rem',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
                 <h3 style={{
                     fontSize: '1.125rem',
                     fontWeight: 600,
@@ -264,13 +258,7 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Personal Info */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '1rem',
-                padding: '1.5rem',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
                 <h3 style={{
                     fontSize: '1.125rem',
                     fontWeight: 600,
@@ -383,13 +371,7 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Password Change */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '1rem',
-                padding: '1.5rem',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
                 <h3 style={{
                     fontSize: '1.125rem',
                     fontWeight: 600,
@@ -563,19 +545,8 @@ const Settings: React.FC = () => {
     );
 
     const renderNotificationsSection = () => (
-        <div style={{
-            backgroundColor: 'white',
-            borderRadius: '1rem',
-            padding: '1.5rem',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
-        }}>
-            <h3 style={{
-                fontSize: '1.125rem',
-                fontWeight: 600,
-                color: '#424242',
-                marginBottom: '1rem'
-            }}>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
                 Preferências de Notificação
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -655,50 +626,37 @@ const Settings: React.FC = () => {
     const renderAppearanceSection = () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* Theme */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '1rem',
-                padding: '1.5rem',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-                <h3 style={{
-                    fontSize: '1.125rem',
-                    fontWeight: 600,
-                    color: '#424242',
-                    marginBottom: '1rem'
-                }}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
                     Tema
                 </h3>
+                <div className="mb-4 p-3 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+                    <p className="text-sm text-gray-700 dark:text-gray-200">
+                        <strong>Status:</strong> {actualTheme === 'dark' ? '🌙 Modo Escuro Ativo' : '☀️ Modo Claro Ativo'}
+                    </p>
+                </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
                     {[
                         { value: 'light', label: 'Claro', icon: Sun },
                         { value: 'dark', label: 'Escuro', icon: Moon },
                         { value: 'auto', label: 'Automático', icon: Smartphone }
-                    ].map((theme) => (
+                    ].map((themeOption) => (
                         <button
-                            key={theme.value}
-                            onClick={() => handleInputChange('theme', theme.value)}
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                                padding: '1rem',
-                                border: `2px solid ${formData.theme === theme.value ? '#009688' : '#E0E0E0'}`,
-                                borderRadius: '0.75rem',
-                                backgroundColor: formData.theme === theme.value ? '#F0F9FF' : 'white',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease'
-                            }}
+                            key={themeOption.value}
+                            onClick={() => setTheme(themeOption.value as 'light' | 'dark' | 'auto')}
+                            className={`flex flex-col items-center gap-2 p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                                theme === themeOption.value 
+                                    ? 'border-teal-600 bg-teal-50 dark:bg-teal-900' 
+                                    : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-teal-300 dark:hover:border-teal-500'
+                            }`}
                         >
-                            <theme.icon size={24} color={formData.theme === theme.value ? '#009688' : '#616161'} />
-                            <span style={{
-                                fontSize: '0.875rem',
-                                fontWeight: 500,
-                                color: formData.theme === theme.value ? '#009688' : '#424242'
-                            }}>
-                                {theme.label}
+                            <themeOption.icon size={24} className={theme === themeOption.value ? 'text-teal-600 dark:text-teal-400' : 'text-gray-600 dark:text-gray-400'} />
+                            <span className={`text-sm font-medium ${
+                                theme === themeOption.value 
+                                    ? 'text-teal-600 dark:text-teal-400' 
+                                    : 'text-gray-700 dark:text-gray-200'
+                            }`}>
+                                {themeOption.label}
                             </span>
                         </button>
                     ))}
@@ -706,46 +664,19 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Language & Currency */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '1rem',
-                padding: '1.5rem',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-                <h3 style={{
-                    fontSize: '1.125rem',
-                    fontWeight: 600,
-                    color: '#424242',
-                    marginBottom: '1rem'
-                }}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
                     Idioma e Moeda
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
-                        <label style={{
-                            display: 'block',
-                            fontSize: '0.875rem',
-                            fontWeight: 500,
-                            color: '#424242',
-                            marginBottom: '0.5rem'
-                        }}>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                             Idioma
                         </label>
                         <select
                             value={formData.language}
                             onChange={(e) => handleInputChange('language', e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '0.75rem',
-                                border: '1px solid #E0E0E0',
-                                borderRadius: '0.5rem',
-                                fontSize: '0.875rem',
-                                color: '#424242',
-                                backgroundColor: 'white',
-                                outline: 'none',
-                                cursor: 'pointer'
-                            }}
+                            className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 outline-none cursor-pointer focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400"
                         >
                             <option value="pt-BR">Português (Brasil)</option>
                             <option value="en-US">English (US)</option>
@@ -753,29 +684,13 @@ const Settings: React.FC = () => {
                         </select>
                     </div>
                     <div>
-                        <label style={{
-                            display: 'block',
-                            fontSize: '0.875rem',
-                            fontWeight: 500,
-                            color: '#424242',
-                            marginBottom: '0.5rem'
-                        }}>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                             Moeda
                         </label>
                         <select
                             value={formData.currency}
                             onChange={(e) => handleInputChange('currency', e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '0.75rem',
-                                border: '1px solid #E0E0E0',
-                                borderRadius: '0.5rem',
-                                fontSize: '0.875rem',
-                                color: '#424242',
-                                backgroundColor: 'white',
-                                outline: 'none',
-                                cursor: 'pointer'
-                            }}
+                            className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 outline-none cursor-pointer focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400"
                         >
                             <option value="BRL">Real Brasileiro (R$)</option>
                             <option value="USD">Dólar Americano ($)</option>
@@ -788,19 +703,8 @@ const Settings: React.FC = () => {
     );
 
     const renderPrivacySection = () => (
-        <div style={{
-            backgroundColor: 'white',
-            borderRadius: '1rem',
-            padding: '1.5rem',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
-        }}>
-            <h3 style={{
-                fontSize: '1.125rem',
-                fontWeight: 600,
-                color: '#424242',
-                marginBottom: '1rem'
-            }}>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
+            <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
                 Configurações de Privacidade
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -924,15 +828,9 @@ const Settings: React.FC = () => {
     );
 
     const renderBillingSection = () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div className="flex flex-col gap-6">
             {/* Current Plan */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '1rem',
-                padding: '1.5rem',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
                 <h3 style={{
                     fontSize: '1.125rem',
                     fontWeight: 600,
@@ -980,13 +878,7 @@ const Settings: React.FC = () => {
             </div>
 
             {/* Payment Method */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '1rem',
-                padding: '1.5rem',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
                 <h3 style={{
                     fontSize: '1.125rem',
                     fontWeight: 600,
@@ -1059,15 +951,9 @@ const Settings: React.FC = () => {
     );
 
     const renderCategoriesSection = () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div className="flex flex-col gap-6">
             {/* Categories List */}
-            <div style={{
-                backgroundColor: 'white',
-                borderRadius: '1rem',
-                padding: '1.5rem',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -1440,13 +1326,7 @@ const Settings: React.FC = () => {
     );
 
     const renderAlertsSection = () => (
-        <div style={{
-            backgroundColor: 'white',
-            borderRadius: '1rem',
-            padding: '1.5rem',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
-        }}>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
             <h3 style={{
                 fontSize: '1.125rem',
                 fontWeight: 600,
@@ -1724,9 +1604,7 @@ const Settings: React.FC = () => {
 
     return (
         <>
-            <div style={{ 
-                backgroundColor: '#F5F5F5', 
-                minHeight: '100vh',
+            <div className="bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors" style={{
                 fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
             }}>
                 <Header title="Configurações" activePage="configuracoes" />
@@ -1743,69 +1621,28 @@ const Settings: React.FC = () => {
                         marginLeft: '260px'
                     }}>
                         {/* Header Section */}
-                        <div style={{
-                            marginBottom: '2rem'
-                        }}>
-                            <h1 style={{
-                                fontSize: '2.25rem',
-                                fontWeight: 700,
-                                color: '#424242',
-                                marginBottom: '0.5rem',
-                                lineHeight: 1.2
-                            }}>
+                        <div className="mb-8">
+                            <h1 className="text-4xl font-bold text-gray-700 dark:text-gray-200 mb-2 leading-tight">
                                 Configurações
                             </h1>
-                            <p style={{
-                                color: '#616161',
-                                fontSize: '1rem',
-                                fontWeight: 400
-                            }}>
+                            <p className="text-gray-600 dark:text-gray-400 text-base">
                                 Gerencie suas preferências e configurações da conta
                             </p>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem' }}>
                             {/* Sidebar */}
-                            <div style={{
-                                backgroundColor: 'white',
-                                borderRadius: '1rem',
-                                padding: '1rem',
-                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                                border: '1px solid rgba(255, 255, 255, 0.2)',
-                                height: 'fit-content'
-                            }}>
+                            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 h-fit transition-colors">
                                 <nav>
                                     {sections.map((section) => (
                                         <button
                                             key={section.id}
                                             onClick={() => setActiveSection(section.id)}
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.75rem',
-                                                width: '100%',
-                                                padding: '0.75rem 1rem',
-                                                marginBottom: '0.5rem',
-                                                backgroundColor: activeSection === section.id ? '#009688' : 'transparent',
-                                                color: activeSection === section.id ? 'white' : '#616161',
-                                                border: 'none',
-                                                borderRadius: '0.75rem',
-                                                fontSize: '0.875rem',
-                                                fontWeight: 500,
-                                                cursor: 'pointer',
-                                                transition: 'all 0.2s ease',
-                                                textAlign: 'left'
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (activeSection !== section.id) {
-                                                    e.currentTarget.style.backgroundColor = '#F5F5F5';
-                                                }
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                if (activeSection !== section.id) {
-                                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                                }
-                                            }}
+                                            className={`flex items-center gap-3 w-full px-4 py-3 mb-2 border-none rounded-xl text-sm font-medium cursor-pointer transition-all text-left ${
+                                                activeSection === section.id 
+                                                    ? 'bg-teal-600 text-white' 
+                                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                            }`}
                                         >
                                             <section.icon size={18} />
                                             {section.label}
@@ -1819,38 +1656,10 @@ const Settings: React.FC = () => {
                                 {renderContent()}
                                 
                                 {/* Save Button */}
-                                <div style={{
-                                    marginTop: '2rem',
-                                    display: 'flex',
-                                    justifyContent: 'flex-end'
-                                }}>
+                                <div className="mt-8 flex justify-end">
                                     <button
                                         onClick={handleSave}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.5rem',
-                                            padding: '0.75rem 1.5rem',
-                                            backgroundColor: '#009688',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '0.75rem',
-                                            fontSize: '0.875rem',
-                                            fontWeight: 600,
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.backgroundColor = '#00695C';
-                                            e.currentTarget.style.transform = 'translateY(-2px)';
-                                            e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.backgroundColor = '#009688';
-                                            e.currentTarget.style.transform = 'translateY(0px)';
-                                            e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-                                        }}
+                                        className="flex items-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 text-white border-none rounded-xl text-sm font-semibold cursor-pointer transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                                     >
                                         <Save size={16} />
                                         Salvar Alterações

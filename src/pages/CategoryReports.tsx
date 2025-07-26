@@ -154,55 +154,18 @@ const CategoryReports: React.FC = () => {
                     </div>
 
                     {/* Controls Section */}
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        marginBottom: '2rem',
-                        backgroundColor: 'white',
-                        padding: '1.5rem',
-                        borderRadius: '1rem',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)'
-                    }}>
+                    <div className="flex items-center justify-between mb-8 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl border border-white border-opacity-20 dark:border-gray-700 transition-colors">
                         <Tabs tabs={TABS} selected={tab} onChange={(v) => setTab(v as 'incomes' | 'outcomes')} />
                         <input
                             type="month"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            style={{
-                                border: '1px solid #E0E0E0',
-                                borderRadius: '0.5rem',
-                                padding: '0.75rem 1rem',
-                                fontSize: '0.875rem',
-                                color: '#424242',
-                                backgroundColor: 'white',
-                                outline: 'none',
-                                transition: 'all 0.2s ease'
-                            }}
-                            onFocus={(e) => {
-                                e.target.style.outline = '2px solid #009688';
-                                e.target.style.outlineOffset = '2px';
-                            }}
-                            onBlur={(e) => {
-                                e.target.style.outline = 'none';
-                            }}
+                            className="border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-3 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 outline-none transition-all focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400"
                         />
                     </div>
 
                     {/* Chart Section */}
-                    <div style={{
-                        backgroundColor: 'white',
-                        borderRadius: '1rem',
-                        padding: '1.5rem',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        marginBottom: '2rem',
-                        minHeight: '400px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-gray-700 mb-8 min-h-96 flex items-center justify-center transition-colors">
                         {loading ? (
                             <div style={{
                                 textAlign: 'center',
