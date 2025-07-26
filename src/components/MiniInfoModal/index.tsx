@@ -51,18 +51,27 @@ const MiniInfoModal = ({
       if (tdRect) {
         const modalHeight = modalRef.current.offsetHeight
         const modalWidth = modalRef.current.offsetWidth
-        let newTop = tdRect.top
-        let newLeft = tdRect.right + 2
+        
+        // Posicionar ao lado direito do card, alinhado verticalmente ao centro
+        let newTop = tdRect.top + (tdRect.height / 2) - (modalHeight / 2)
+        let newLeft = tdRect.right + 10
 
-        if (tdRect.top + modalHeight > window.innerHeight) {
+        // Verificar se o modal sai da tela na parte inferior
+        if (newTop + modalHeight > window.innerHeight) {
           newTop = window.innerHeight - modalHeight - 10
-          if (newTop < 0) newTop = 0
+        }
+        
+        // Verificar se o modal sai da tela na parte superior
+        if (newTop < 10) {
+          newTop = 10
         }
 
+        // Se não cabe do lado direito, mostrar do lado esquerdo
         if (newLeft + modalWidth > window.innerWidth) {
-          newLeft = tdRect.left - modalWidth - 2
+          newLeft = tdRect.left - modalWidth - 10
+          // Se também não cabe do lado esquerdo, mostrar embaixo
           if (newLeft < 0) {
-            newLeft = window.innerWidth - modalWidth - 10
+            newLeft = Math.max(10, tdRect.left)
             newTop = Math.min(
               tdRect.bottom + 10,
               window.innerHeight - modalHeight - 10,

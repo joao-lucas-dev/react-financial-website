@@ -42,7 +42,6 @@ import { Filter } from '../../components/Filter'
 
 export default function Dashboard() {
   const { theme, actualTheme } = useTheme()
-  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
   
   const [openModal, setOpenModal] = useState({
     isOpen: false,
@@ -503,7 +502,7 @@ export default function Dashboard() {
 
             {/* Monthly Overview Table - Full Width */}
             <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 mb-8 shadow-2xl transition-colors">
-              <div className="flex justify-between items-center mb-6">
+              {/* <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center space-x-2">
                   <button
                     className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors text-zinc-600 dark:text-zinc-400"
@@ -530,11 +529,12 @@ export default function Dashboard() {
                   <Calendar size={16} className="mr-2 inline" />
                   Hoje
                 </button>
-              </div>
+              </div> */}
               
-              <div className="h-[600px] dark:border-zinc-600 rounded-xl">
+              <div className="dark:border-zinc-600 rounded-xl">
                 {/* Header with View Toggle */}
-                <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg border border-zinc-400 dark:border-zinc-700">
+                {/* <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg border border-zinc-400 dark:border-zinc-700"> */}
+                <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
                       <BarChart3 size={20} className="text-teal-600 dark:text-teal-400" />
@@ -544,47 +544,9 @@ export default function Dashboard() {
                       <p className="text-sm text-zinc-600 dark:text-zinc-400">Acompanhe suas transações diárias</p>
                     </div>
                   </div>
-                  
-                  {/* View Mode Toggle */}
-                  <div className="flex bg-white dark:bg-zinc-700 rounded-lg p-1 border border-zinc-200 dark:border-zinc-600">
-                    <button
-                      onClick={() => setViewMode('cards')}
-                      className={`px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 ${
-                        viewMode === 'cards'
-                          ? 'bg-teal-600 text-white shadow-md'
-                          : 'text-zinc-600 dark:text-zinc-400 hover:text-teal-600 dark:hover:text-teal-400'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1">
-                        <div className="w-3 h-3 grid grid-cols-2 gap-0.5">
-                          <div className="bg-current rounded-sm"></div>
-                          <div className="bg-current rounded-sm"></div>
-                          <div className="bg-current rounded-sm"></div>
-                          <div className="bg-current rounded-sm"></div>
-                        </div>
-                        Cards
-                      </div>
-                    </button>
-                    <button
-                      onClick={() => setViewMode('table')}
-                      className={`px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 ${
-                        viewMode === 'table'
-                          ? 'bg-teal-600 text-white shadow-md'
-                          : 'text-zinc-600 dark:text-zinc-400 hover:text-teal-600 dark:hover:text-teal-400'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1">
-                        <div className="flex flex-col gap-0.5">
-                          <div className="w-3 h-0.5 bg-current rounded"></div>
-                          <div className="w-3 h-0.5 bg-current rounded"></div>
-                          <div className="w-3 h-0.5 bg-current rounded"></div>
-                        </div>
-                        Tabela
-                      </div>
-                    </button>
-                  </div>
                 </div>
-                <div className="h-[500px] overflow-auto">
+
+                <div>
                   <TablePreview
                     rows={rows}
                     handleCreateTransaction={handleCreateTransaction}
@@ -597,7 +559,8 @@ export default function Dashboard() {
                     setOpenModal={setOpenModal}
                     categories={categories}
                     from="dashboard"
-                    viewMode={viewMode}
+                    maxDays={3}
+                    showViewAllButton={true}
                   />
                 </div>
               </div>

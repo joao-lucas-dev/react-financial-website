@@ -1,9 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
-import { TrendingUp, TrendingDown, Calendar, Plus, Eye, BarChart3 } from 'lucide-react'
+import { TrendingUp, TrendingDown, Calendar, Plus, Eye, BarChart3, ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import MiniInfoModal from '../MiniInfoModal'
 import 'react-loading-skeleton/dist/skeleton.css'
 import './styles.css'
-import TableSkeleton from '../TableSkeleton'
+import CardSkeleton from '../CardSkeleton'
 import ModalDelete from '../ModalDelete'
 import useTablePreviewAux from '../../hooks/useTablePreviewAux'
 import { useTheme } from '../../context/ThemeProvider'
@@ -33,7 +34,8 @@ interface IParams {
   categories: any[]
   from: string
   resetScroll?: boolean
-  viewMode?: 'cards' | 'table'
+  maxDays?: number
+  showViewAllButton?: boolean
 }
 
 const TablePreview = ({
@@ -49,7 +51,8 @@ const TablePreview = ({
   categories,
   from = 'transacoes',
   resetScroll = false,
-  viewMode = 'cards',
+  maxDays = undefined,
+  showViewAllButton = false,
 }: IParams) => {
   const targetRowRef = useRef<HTMLDivElement>(null)
   const tableContainerRef = useRef<HTMLDivElement>(null)
@@ -97,8 +100,12 @@ const TablePreview = ({
     setHoveredCell(null)
   }
 
+  const limitedRows = useMemo(() => {
+    return maxDays ? rows.slice(0, maxDays) : rows
+  }, [rows, maxDays])
+
   const memoizedTransactions = useMemo(() => {
-    return rows.map((row: IRow, rowIndex: number) => {
+    return limitedRows.map((row: IRow, rowIndex: number) => {
       const color = findTotalColor(row)
 
       const today = new Date()
@@ -126,8 +133,7 @@ const TablePreview = ({
         ? <TrendingDown size={16} className="inline mr-1" /> 
         : null
 
-      if (viewMode === 'cards') {
-        return (
+      return (
           <div
             key={row.formatted_date}
             ref={row.isToday ? targetRowRef : null}
@@ -208,7 +214,7 @@ const TablePreview = ({
                         from,
                       )
                     }
-                    transactions={row.incomes.transactions}
+                    transactions={row.incomes?.transactions || []}
                     type="income"
                     setOpenModal={setOpenModal}
                     tdRect={hoveredCell?.tdRect}
@@ -245,7 +251,7 @@ const TablePreview = ({
                         from,
                       )
                     }
-                    transactions={row.outcomes.transactions}
+                    transactions={row.outcomes?.transactions || []}
                     type="outcome"
                     setOpenModal={setOpenModal}
                     tdRect={hoveredCell?.tdRect}
@@ -287,83 +293,9 @@ const TablePreview = ({
             )} */}
           </div>
         )
-      }
-
-      // Table view (original layout but improved)
-      return (
-        <tr
-          key={row.formatted_date}
-          ref={row.isToday ? targetRowRef : null}
-          className={`relative transition-all duration-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 ${
-            row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : ''
-          }`}
-        >
-          <td className={`sticky left-0 ${row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : 'bg-white dark:bg-zinc-900'} text-sm text-center font-medium h-14 p-3 border-b border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200`}>
-            {row.formatted_date}
-          </td>
-          <td
-            className={`text-sm text-center ${row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : ''} hover:cursor-pointer group hover:bg-green-50 dark:hover:bg-green-900/20 h-14 p-3 transition-colors border-b border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200`}
-            onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 1)}
-            onMouseLeave={handleMouseLeave}
-          >
-            {row.incomes?.valueFormatted}
-            {hoveredCell?.rowIndex === rowIndex && hoveredCell?.colIndex === 1 && (
-              <MiniInfoModal
-                handleCreateTransaction={(value, setValue) =>
-                  handleCreateTransaction(
-                    'incomes',
-                    row,
-                    value,
-                    setValue,
-                    currentMonth,
-                    setCurrentMonth,
-                    from,
-                  )
-                }
-                transactions={row.incomes.transactions}
-                type="income"
-                setOpenModal={setOpenModal}
-                tdRect={hoveredCell?.tdRect}
-              />
-            )}
-          </td>
-          <td
-            className={`text-sm text-center ${row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : ''} hover:cursor-pointer group hover:bg-red-50 dark:hover:bg-red-900/20 h-14 p-3 transition-colors border-b border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200`}
-            onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 2)}
-            onMouseLeave={handleMouseLeave}
-          >
-            {row.outcomes?.valueFormatted}
-            {hoveredCell?.rowIndex === rowIndex && hoveredCell?.colIndex === 2 && (
-              <MiniInfoModal
-                handleCreateTransaction={(value, setValue) =>
-                  handleCreateTransaction(
-                    'outcomes',
-                    row,
-                    value,
-                    setValue,
-                    currentMonth,
-                    setCurrentMonth,
-                    from,
-                  )
-                }
-                transactions={row.outcomes.transactions}
-                type="outcome"
-                setOpenModal={setOpenModal}
-                tdRect={hoveredCell?.tdRect}
-              />
-            )}
-          </td>
-          <td className={`${balanceColor} ${row.isToday ? 'bg-teal-50 dark:bg-teal-900/20' : ''} font-semibold text-sm text-center h-14 p-3 border-b border-zinc-200 dark:border-zinc-700`}>
-            <div className="flex items-center justify-center">
-              {balanceIcon}
-              {row.total.valueFormatted}
-            </div>
-          </td>
-        </tr>
-      )
     })
   }, [
-    rows,
+    limitedRows,
     findTotalColor,
     setOpenModal,
     handleCreateTransaction,
@@ -371,49 +303,37 @@ const TablePreview = ({
     currentMonth,
     setCurrentMonth,
     from,
-    viewMode,
   ])
 
   return (
     <>
       {rows.length > 0 ? (
-        <div className="w-full overflow-auto pt-2">
+        <div className="w-full pt-2">
           {/* Content Container */}
           <div
             ref={tableContainerRef}
             className="w-full flex flex-auto relative"
           >
-            {viewMode === 'cards' ? (
-              <div className="w-full grid gap-4 auto-rows-min">
-                {memoizedTransactions}
-              </div>
-            ) : (
-              <div className="w-full overflow-auto">
-                <table className="min-w-640 sm:w-full h-full text-left bg-white dark:bg-zinc-900 rounded-lg overflow-hidden shadow-sm">
-                  <thead>
-                    <tr className="bg-zinc-100 dark:bg-zinc-800">
-                      <th className="sticky top-0 left-0 z-20 sm:z-10 text-center p-4 text-sm font-semibold text-zinc-700 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-700">
-                        Data
-                      </th>
-                      <th className="sticky top-0 z-10 text-center text-sm font-semibold text-zinc-700 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-700">
-                        Entradas
-                      </th>
-                      <th className="sticky top-0 z-10 text-center text-sm font-semibold text-zinc-700 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-700">
-                        Saídas
-                      </th>
-                      <th className="sticky top-0 z-10 text-center text-sm font-semibold text-zinc-700 dark:text-zinc-200 border-b border-zinc-200 dark:border-zinc-700">
-                        Saldo
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>{memoizedTransactions}</tbody>
-                </table>
-              </div>
-            )}
+            <div className="w-full grid gap-4 auto-rows-min">
+              {memoizedTransactions}
+            </div>
           </div>
+          
+          {/* View All Button */}
+          {showViewAllButton && (
+            <div className="flex justify-center mt-6">
+              <Link
+                to="/transacoes"
+                className="flex items-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium transition-all duration-200 hover:shadow-lg active:scale-95"
+              >
+                Ver todas transações
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+          )}
         </div>
       ) : (
-        <TableSkeleton />
+        <CardSkeleton count={maxDays || 3} />
       )}
 
       {openModal.isOpen && (

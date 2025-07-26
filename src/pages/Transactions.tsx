@@ -61,15 +61,21 @@ const Transactions = () => {
   }
 
   return (
-    <div className="w-full h-full bg-background dark:bg-orangeDark">
+    <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
       <Header title="Transações" activePage="transacoes" />
 
-      <div className="flex h-dvh">
+      <div className="flex h-full">
         <MenuAside activePage="transacoes" />
 
-        <main className="flex justify-center items-center w-full h-full pt-28 pb-4 xl-lg:pl-[210px]">
-          <div className="flex w-full h-full px-2 md:px-10">
-            <div className="w-full h-full flex flex-col bg-white dark:bg-black-bg rounded-xl px-6 py-6 sm:p-6">
+        <main 
+          className="flex-1 mt-4 pl-0 xl-lg:pl-64" 
+          style={{ 
+            maxWidth: '1200px', 
+            margin: '0 auto',
+            padding: '2rem'
+          }}
+        >
+          <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors">
               <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center mb-4">
                 <h2 className="text-base mb-2 font-medium text-gray dark:text-softGray">
                   {getMonth ? (
@@ -127,7 +133,6 @@ const Transactions = () => {
                 from="transacoes"
                 resetScroll={resetScroll}
               />
-            </div>
           </div>
         </main>
       </div>
