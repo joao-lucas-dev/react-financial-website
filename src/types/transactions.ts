@@ -18,6 +18,12 @@ interface IShared {
   profileImage: string
 }
 
+// Tipos para sistema de recorrência
+export type RecurrenceType = 'none' | 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'biannually' | 'yearly'
+
+// Tipos para sistema de pagamento
+export type PaymentStatus = 'paid' | 'unpaid' | 'pending'
+
 export type ITransaction = {
   id?: string | undefined
   category_id: string
@@ -30,6 +36,15 @@ export type ITransaction = {
   transaction_day: string
   type?: 'income' | 'outcome'
   is_recurring?: boolean
+  // Novos campos para sistema de pagamento
+  is_paid?: boolean
+  paid_date?: string
+  payment_status?: PaymentStatus
+  // Novos campos para sistema de recorrência avançado
+  recurrence_type?: RecurrenceType
+  recurrence_interval?: number
+  next_occurrence?: string
+  recurrence_end_date?: string
 }
 
 interface IColumn {

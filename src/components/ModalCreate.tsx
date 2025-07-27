@@ -5,14 +5,20 @@ import {
   ISetCurrentMonth,
   ISetOpenModal,
   ITransaction,
+  RecurrenceType,
+  PaymentStatus,
 } from '../types/transactions.ts'
 import Input from './Input.tsx'
 import Button from './Button.tsx'
-import { X } from 'lucide-react'
+import ModernDatePicker from './ModernDatePicker.tsx'
+import ModernSelect, { SelectOption } from './ModernSelect.tsx'
+import PaymentStatusComponent from './PaymentStatus.tsx'
+import RecurrenceSelector from './RecurrenceSelector.tsx'
+import CategoryIcon from './CategoryIcon/index.tsx'
+import { X, CreditCard, TrendingUp, TrendingDown } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import SelectInput from './SelectInput.tsx'
 import { ICategory } from '../types/categories.ts'
 import { DateTime } from 'luxon'
 
@@ -25,17 +31,18 @@ interface IParams {
   categories: ICategory[]
 }
 
-const modalEditSchema = z.object({
+const modalCreateSchema = z.object({
   description: z.string().min(1, 'Descrição é obrigatória'),
-  price: z.string().min(1, 'Preço é obrigatorio'),
+  price: z.string().min(1, 'Preço é obrigatório'),
   transaction_day: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Data é obrigatória e deve ser uma data válida',
   }),
   category: z.string().min(1, 'Categoria é obrigatória'),
-  recurrence: z.string().min(1, 'Recorrência é obrigatória'),
+  recurrence_type: z.string().optional(),
+  payment_status: z.string().optional(),
 })
 
-type ModalCreateData = z.infer<typeof modalEditSchema>
+type ModalCreateData = z.infer<typeof modalCreateSchema>
 
 const ModalCreate = ({
   openModal,
@@ -57,13 +64,15 @@ const ModalCreate = ({
     control,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<ModalCreateData>({
-    resolver: zodResolver(modalEditSchema),
+    resolver: zodResolver(modalCreateSchema),
   })
 
   useEffect(() => {
     setValue('transaction_day', DateTime.fromJSDate(new Date(), { zone: Intl.DateTimeFormat().resolvedOptions().timeZone }).toFormat('yyyy-MM-dd'))
-    setValue('recurrence', 'false')
+    setValue('recurrence_type', 'none')
+    setValue('payment_status', 'unpaid')
   }, [setValue])
 
   const handleChange = useCallback(
@@ -94,7 +103,10 @@ const ModalCreate = ({
           category_id: Number(data.category),
           transaction_day: new Date(`${data.transaction_day}T00:00:00`),
           shared_id: null,
-          is_recurring: data.recurrence === 'true',
+          is_recurring: data.recurrence_type !== 'none',
+          recurrence_type: data.recurrence_type as RecurrenceType,
+          payment_status: data.payment_status as PaymentStatus,
+          is_paid: data.payment_status === 'paid',
         } as unknown as ITransaction
 
         await handleCreateCompleteTransaction(
@@ -114,12 +126,26 @@ const ModalCreate = ({
     },
     [
       handleCreateCompleteTransaction,
-      openModal.transaction,
+      openModal.button,
       setOpenModal,
       currentMonth,
       setCurrentMonth,
     ],
   )
+
+  // Preparar opções de categoria para o ModernSelect
+  const categoryOptions: SelectOption[] = categories
+    .filter((cat) => {
+      if (openModal.button === 'income') {
+        return cat.type === 'income' || cat.type === 'both'
+      }
+      return cat.type !== 'income'
+    })
+    .map((cat) => ({
+      value: String(cat.id),
+      label: cat.name,
+      icon: <CategoryIcon size="small" category={cat} />,
+    }))
 
   return (
     <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={e => {
@@ -131,9 +157,30 @@ const ModalCreate = ({
         })
       }
     }}>
-      <div className="bg-white dark:bg-black-bg w-[490px] rounded-lg shadow-lg p-6 relative">
-        <div className="flex justify-between  dark:text-softGray">
-          <h2 className="text-lg font-semibold">Criar {getType()}</h2>
+      <div className="bg-white dark:bg-zinc-800 w-[600px] max-w-[90vw] max-h-[95vh] rounded-2xl shadow-2xl p-8 relative transition-colors overflow-hidden">
+        {/* Header moderno */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <div className={`p-3 rounded-xl ${
+              openModal.button === 'income' 
+                ? 'bg-green-100 dark:bg-green-900/30' 
+                : 'bg-red-100 dark:bg-red-900/30'
+            }`}>
+              {openModal.button === 'income' ? (
+                <TrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
+              ) : (
+                <TrendingDown className="w-6 h-6 text-red-600 dark:text-red-400" />
+              )}
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-zinc-700 dark:text-zinc-200">
+                Criar {getType()}
+              </h2>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+                Preencha os dados da {getType()?.toLowerCase()}
+              </p>
+            </div>
+          </div>
           <button
             onClick={() => {
               setOpenModal({
@@ -142,94 +189,141 @@ const ModalCreate = ({
                 type: '',
               })
             }}
+            className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
           >
-            <X />
+            <X className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
           </button>
         </div>
-        <div>
-          <form onSubmit={handleSubmit(handleCreate)}>
-            <Input
-              label="Descrição"
-              placeholder="Insira um descrição"
-              required={true}
-              {...register('description')}
-            />
-            <span className="text-red-500 my-4 text-sm">
-              {errors.description?.message}
+
+        {/* Form com layout moderno */}
+        <form onSubmit={handleSubmit(handleCreate)} className="flex flex-col h-full">
+          <div className="flex-1 overflow-y-auto space-y-6 pr-2" style={{ maxHeight: 'calc(95vh - 200px)' }}>
+          {/* Descrição */}
+          <Input
+            label="Descrição"
+            placeholder="Ex: Almoço no restaurante, Salário janeiro..."
+            required={true}
+            {...register('description')}
+          />
+          {errors.description && (
+            <span className="text-red-500 text-sm">
+              {errors.description.message}
             </span>
+          )}
 
-            <div className="flex justify-between items-center">
-              <div className="w-[200px]">
-                <Input
-                  label="Valor"
-                  placeholder="R$ 0,00"
-                  required={true}
-                  {...register('price')}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="w-[200px]">
-                <Input
-                  label="Data"
-                  type="date"
-                  required={true}
-                  {...register('transaction_day')}
-                />
-              </div>
-            </div>
-            <div className={`hidden row justify-between items-center ${errors.price || errors.transaction_day ? 'flex' : ''}`}>
-              <span className="text-red-500 my-4 text-sm">
-                {errors.price?.message}
-              </span>
-              <span className="text-red-500 my-4 text-sm">
-                {errors.transaction_day?.message}
-              </span>
+          {/* Valor e Data - Layout em grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <Input
+                label="Valor"
+                placeholder="R$ 0,00"
+                required={true}
+                {...register('price')}
+                onChange={handleChange}
+              />
+              {errors.price && (
+                <span className="text-red-500 text-sm mt-1 block">
+                  {errors.price.message}
+                </span>
+              )}
             </div>
 
-            {categories.length > 0 && (
+            <div>
               <Controller
-                render={(field) => (
-                  <SelectInput
-                    {...field}
-                    // @ts-expect-error TS2322
-                    categories={
-                      openModal.transaction.type === 'income'
-                        ? categories.filter(
-                            (cat) =>
-                              cat.type === 'income' || cat.type === 'both',
-                          )
-                        : categories.filter((cat) => cat.type !== 'income')
-                    }
+                name="transaction_day"
+                control={control}
+                render={({ field }) => (
+                  <ModernDatePicker
+                    label="Data da Transação"
+                    value={field.value}
+                    onChange={field.onChange}
+                    required={true}
+                    error={errors.transaction_day?.message}
                   />
                 )}
-                name="category"
-                control={control}
+              />
+            </div>
+          </div>
+
+          {/* Categoria */}
+          {categoryOptions.length > 0 && (
+            <Controller
+              name="category"
+              control={control}
+              render={({ field }) => (
+                <ModernSelect
+                  label="Categoria"
+                  options={categoryOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  required={true}
+                  error={
+                    errors.category?.message === 'Required'
+                      ? 'Selecione uma categoria'
+                      : errors.category?.message
+                  }
+                  placeholder="Selecione uma categoria..."
+                />
+              )}
+            />
+          )}
+
+          {/* Sistema de Recorrência */}
+          <Controller
+            name="recurrence_type"
+            control={control}
+            render={({ field }) => (
+              <RecurrenceSelector
+                value={field.value as RecurrenceType}
+                onChange={(recurrenceType) => field.onChange(recurrenceType)}
+                transactionDate={watch('transaction_day')}
+                showPreview={true}
               />
             )}
+          />
 
-            <span className="text-red-500 my-4 text-sm">
-              {errors.category?.message === 'Required'
-                ? 'Selecione uma categoria'
-                : errors.category?.message}
-            </span>
+          {/* Sistema de Pagamento */}
+          <Controller
+            name="payment_status"
+            control={control}
+            render={({ field }) => (
+              <PaymentStatusComponent
+                value={field.value as PaymentStatus}
+                onChange={field.onChange}
+                transactionDate={watch('transaction_day')}
+                showAutoLogic={true}
+              />
+            )}
+          />
+          </div>
 
-            <div className="flex flex-col mt-4">
-              <label className="text-md font-semibold text-gray dark:text-softGray">
-                Recorrência mensal?
-              </label>
-              <select
-                className="focus:outline-primary border border-softGray dark:bg-zinc-800 dark:border-zinc-700 dark:text-softGray h-12 rounded-lg mt-2 px-5"
-                {...register('recurrence')}
-              >
-                <option value="false">Não</option>
-                <option value="true">Sim</option>
-              </select>
-            </div>
-
-            <Button title="Criar" type="submit" />
-          </form>
-        </div>
+          {/* Botões fixos no final */}
+          <div className="flex gap-4 pt-6 border-t border-zinc-200 dark:border-zinc-700 mt-6">
+            <button
+              type="button"
+              onClick={() => {
+                setOpenModal({
+                  isOpen: false,
+                  transaction: {} as ITransaction,
+                  type: '',
+                })
+              }}
+              className="flex-1 px-6 py-3 border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors font-medium"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className={`flex-1 px-6 py-3 rounded-lg text-white font-medium transition-colors ${
+                openModal.button === 'income'
+                  ? 'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600'
+                  : 'bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600'
+              }`}
+            >
+              Criar {getType()}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   )
