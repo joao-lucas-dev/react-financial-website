@@ -17,6 +17,8 @@ import TablePreview from "../../components/TablePreview";
 import EmptyChartState from "../../components/EmptyChartState";
 import FloatingButton from "../../components/FloatingButton.tsx";
 import CreditCardBills from "../../components/CreditCardBills";
+import CreditCardCarousel from "../../components/CreditCardCarousel";
+import CreditCardEmptyState from "../../components/CreditCardEmptyState";
 
 import "./styles.css";
 import MenuAside from "../../components/MenuAside.tsx";
@@ -27,6 +29,7 @@ import CountUp from "../../components/CountUp.tsx";
 import useCategories from "../../hooks/useCategories.ts";
 import { useState } from "react";
 import { ITransaction } from "../../types/transactions.ts";
+import { mockCreditCards } from "../../types/creditCards";
 import TableTransactions from "../../components/TableTransactions";
 import { Filter } from "../../components/Filter";
 import ModernDonutChart from "../../components/ModernDonutChart.tsx";
@@ -38,6 +41,10 @@ export default function Dashboard() {
     transaction: {} as ITransaction,
     type: "",
   });
+
+  // Credit Cards State
+  const [creditCards, setCreditCards] = useState(mockCreditCards);
+  const [showCards, setShowCards] = useState(true); // Toggle for empty state demo
 
   const { chartCategories, handleGetChartCategories, categories } =
     useCategories();
@@ -93,6 +100,17 @@ export default function Dashboard() {
     handleGetRecentTransactions(newFilter, "updated_at", "desc", newType);
   };
 
+  // Credit Card Handlers
+  const handleAddCard = () => {
+    console.log("Adicionar novo cartão - modal/página de criação aqui");
+    // TODO: Implementar modal ou página de criação de cartão quando backend estiver pronto
+  };
+
+  const handleCardClick = (card: any) => {
+    console.log("Cartão clicado:", card);
+    // TODO: Implementar navegação para detalhes do cartão ou ações
+  };
+
   return (
     <div className="font-sans">
       <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
@@ -127,122 +145,15 @@ export default function Dashboard() {
             {/* Credit Card Section */}
             <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 mb-8">
               <div>
-                <div className="relative group max-w-md">
-                  {/* Second Card (Background) */}
-                  <div
-                    className="absolute cursor-pointer transition-all duration-300 top-2.5 -right-5 w-[350px] h-[220px] rounded-2xl bg-gradient-to-br from-zinc-500/30 via-zinc-600/30 to-zinc-700/30 rotate-[5deg] z-[1] opacity-40 backdrop-blur-[10px] border border-white/20"
-                    onMouseEnter={(e) => {
-                      const container = e.currentTarget.parentElement;
-                      const button = container?.querySelector(
-                        ".add-card-button",
-                      ) as HTMLElement;
-
-                      e.currentTarget.style.opacity = "0.8";
-                      e.currentTarget.style.transform =
-                        "rotate(3deg) translateX(-5px)";
-
-                      if (button) {
-                        button.style.background =
-                          "linear-gradient(135deg, #4CAF50, #388E3C)";
-                        button.style.boxShadow =
-                          "0 12px 40px rgba(76, 175, 80, 0.3)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      const container = e.currentTarget.parentElement;
-                      const button = container?.querySelector(
-                        ".add-card-button",
-                      ) as HTMLElement;
-
-                      e.currentTarget.style.opacity = "0.4";
-                      e.currentTarget.style.transform =
-                        "rotate(5deg) translateX(0px)";
-
-                      if (button) {
-                        button.style.background =
-                          "linear-gradient(135deg, #616161, #424242)";
-                        button.style.boxShadow =
-                          "0 8px 32px rgba(0, 0, 0, 0.1)";
-                      }
-                    }}
+                {showCards && creditCards.length > 0 ? (
+                  <CreditCardCarousel
+                    cards={creditCards}
+                    onAddCard={handleAddCard}
+                    onCardClick={handleCardClick}
                   />
-
-                  {/* Main Card */}
-                  <div className="relative overflow-hidden w-full max-w-sm h-60 rounded-2xl bg-gradient-to-br from-teal-700 via-teal-600 to-teal-400 text-white p-8 z-[2] shadow-2xl">
-                    {/* Decorative background orb */}
-                    <div className="absolute -top-12 -right-12 w-50 h-50 rounded-full bg-gradient-to-br from-amber-400/30 to-teal-600/20 blur-[60px]" />
-
-                    <div className="relative z-10">
-                      <div className="flex justify-between items-start mb-8">
-                        <div>
-                          <p className="text-sm opacity-80 mb-1">
-                            Cartão Principal
-                          </p>
-                          <p className="text-lg font-medium tracking-wider">
-                            •••• •••• •••• 4532
-                          </p>
-                        </div>
-                        <CreditCard className="w-8 h-8 opacity-80" />
-                      </div>
-
-                      <div className="flex justify-between items-end">
-                        <div>
-                          <p className="text-sm opacity-80">Saldo Disponível</p>
-                          <p className="text-2xl font-bold">
-                            <CountUp valueNumber={balance} />
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm opacity-80">Vencimento</p>
-                          <p className="text-lg font-medium">12/28</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Add Card Button */}
-                  <button
-                    className="add-card-button absolute top-1/2 -right-2.5 -translate-y-1/2 w-12 h-12 rounded-full bg-gradient-to-br from-zinc-500 to-zinc-800 text-white border-0 cursor-pointer z-[3] shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
-                    onMouseEnter={(e) => {
-                      const container = e.currentTarget.parentElement;
-                      const card = container?.querySelector(
-                        ".absolute.cursor-pointer",
-                      ) as HTMLElement;
-
-                      e.currentTarget.style.background =
-                        "linear-gradient(135deg, #4CAF50, #388E3C)";
-                      e.currentTarget.style.boxShadow =
-                        "0 12px 40px rgba(76, 175, 80, 0.3)";
-
-                      if (card) {
-                        card.style.opacity = "0.8";
-                        card.style.transform = "rotate(3deg) translateX(-5px)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      const container = e.currentTarget.parentElement;
-                      const card = container?.querySelector(
-                        ".absolute.cursor-pointer",
-                      ) as HTMLElement;
-
-                      e.currentTarget.style.background =
-                        "linear-gradient(135deg, #616161, #424242)";
-                      e.currentTarget.style.boxShadow =
-                        "0 8px 32px rgba(0, 0, 0, 0.1)";
-
-                      if (card) {
-                        card.style.opacity = "0.4";
-                        card.style.transform = "rotate(5deg) translateX(0px)";
-                      }
-                    }}
-                    onClick={() => {
-                      // Aqui você pode adicionar a lógica para criar um novo cartão
-                      console.log("Adicionar novo cartão");
-                    }}
-                  >
-                    <Plus size={24} />
-                  </button>
-                </div>
+                ) : (
+                  <CreditCardEmptyState onAddCard={handleAddCard} />
+                )}
               </div>
 
               {/* Quick Stats */}
