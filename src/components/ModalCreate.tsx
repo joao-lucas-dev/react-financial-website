@@ -46,9 +46,9 @@ const ModalCreate = ({
   categories,
 }: IParams) => {
   const getType = useCallback(() => {
-    if (openModal.button === 'income') return 'entrada'
+    if (openModal.button === 'income') return 'receita'
 
-    if (openModal.button === 'outcome') return 'saída'
+    if (openModal.button === 'outcome') return 'despesa'
   }, [openModal.button])
 
   const {

@@ -175,7 +175,7 @@ const TablePreview = ({
                         className="text-green-600 dark:text-green-400"
                       />
                       <span className="text-xs font-medium text-green-700 dark:text-green-300">
-                        Entradas
+                        Receitas
                       </span>
                     </div>
                     <p className="font-semibold text-green-700 dark:text-green-300 text-sm">
@@ -193,7 +193,7 @@ const TablePreview = ({
                         className="text-red-600 dark:text-red-400"
                       />
                       <span className="text-xs font-medium text-red-700 dark:text-red-300">
-                        Saídas
+                        Despesas
                       </span>
                     </div>
                     <p className="font-semibold text-red-700 dark:text-red-300 text-sm">
@@ -300,7 +300,7 @@ const TablePreview = ({
                   className="text-green-600 dark:text-green-400"
                 />
                 <span className="text-xs font-medium text-green-700 dark:text-green-300 uppercase tracking-wide">
-                  Entradas
+                  Receitas
                 </span>
               </div>
               <p className="font-semibold text-green-700 dark:text-green-300 text-sm">
@@ -316,7 +316,7 @@ const TablePreview = ({
                   className="text-red-600 dark:text-red-400"
                 />
                 <span className="text-xs font-medium text-red-700 dark:text-red-300 uppercase tracking-wide">
-                  Saídas
+                  Despesas
                 </span>
               </div>
               <p className="font-semibold text-red-700 dark:text-red-300 text-sm">
@@ -348,7 +348,7 @@ const TablePreview = ({
           {/* {(row.incomes?.value || row.outcomes?.value) && (
               <div className="mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-700">
                 <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-1">
-                  <span>Entradas vs Saídas</span>
+                  <span>Receitas vs Despesas</span>
                   <span>{Math.abs(totalValue) > 0 ? (isPositive ? '+' : '') + totalValue.toFixed(2) : '0.00'}</span>
                 </div>
                 <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2 overflow-hidden">

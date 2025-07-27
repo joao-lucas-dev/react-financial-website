@@ -240,8 +240,8 @@ const ModalEdit = ({
                 {...register('type')}
                 className="focus:outline-primary border border-softGray dark:bg-zinc-800 dark:border-zinc-700 dark:text-softGray h-12 rounded-lg mt-2 px-5"
               >
-                <option value="income">Entrada</option>
-                <option value="outcome">Saída</option>
+                <option value="income">Receita</option>
+                <option value="outcome">Despesa</option>
               </select>
               <span className="text-red-500 my-4 text-sm">
                 {errors.type?.message}

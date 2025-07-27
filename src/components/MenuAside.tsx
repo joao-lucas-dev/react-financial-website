@@ -1,29 +1,50 @@
-import { House, MessageCircleQuestion, Settings, Newspaper, ChartColumn } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import LogoutButton from './LoggoutButton.tsx'
-import { useTheme } from '../context/ThemeProvider'
+import {
+  House,
+  MessageCircleQuestion,
+  Settings,
+  Newspaper,
+  ChartColumn,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import LogoutButton from "./LoggoutButton.tsx";
+import { useTheme } from "../context/ThemeProvider";
 
 interface IParams {
-  activePage: string
+  activePage: string;
 }
 
 const MenuAside = ({ activePage }: IParams) => {
   const { actualTheme } = useTheme();
   const navigationItems = [
-    { id: 'dashboard', icon: House, label: 'Dashboard', path: '/dashboard' },
-    { id: 'transacoes', icon: Newspaper, label: 'Transações', path: '/transacoes' },
-    { id: 'relatorios', icon: ChartColumn, label: 'Relatórios', path: '/relatorios' },
-    { id: 'feedback', icon: MessageCircleQuestion, label: 'Feedback', path: '/feedback' },
-    { id: 'configuracoes', icon: Settings, label: 'Configurações', path: '/configuracoes' }
-  ]
+    { id: "dashboard", icon: House, label: "Dashboard", path: "/dashboard" },
+    {
+      id: "transacoes",
+      icon: Newspaper,
+      label: "Transações",
+      path: "/transacoes",
+    },
+    {
+      id: "relatorios",
+      icon: ChartColumn,
+      label: "Relatórios",
+      path: "/relatorios",
+    },
+    {
+      id: "feedback",
+      icon: MessageCircleQuestion,
+      label: "Feedback",
+      path: "/feedback",
+    },
+    {
+      id: "configuracoes",
+      icon: Settings,
+      label: "Configurações",
+      path: "/configuracoes",
+    },
+  ];
 
   return (
-    <aside 
-      className="fixed top-4 left-4 h-[calc(100vh-2rem)] hidden xl-lg:flex flex-col justify-between w-60 bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl transition-colors"
-      style={{
-        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
-      }}
-    >
+    <aside className="fixed top-4 left-4 h-[calc(100vh-2rem)] hidden xl-lg:flex flex-col justify-between w-60 bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl transition-colors font-sans">
       {/* Logo/Brand Section */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold text-teal-600 dark:text-teal-400">
@@ -38,31 +59,31 @@ const MenuAside = ({ activePage }: IParams) => {
       <nav className="flex-1">
         <ul className="space-y-2">
           {navigationItems.map((item) => {
-            const isActive = activePage === item.id
-            const IconComponent = item.icon
-            
+            const isActive = activePage === item.id;
+            const IconComponent = item.icon;
+
             return (
               <li key={item.id}>
-                <Link 
-                  to={{ pathname: item.path }} 
+                <Link
+                  to={{ pathname: item.path }}
                   className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200 text-sm ${
-                    isActive 
-                      ? 'bg-teal-600 text-white font-medium' 
-                      : 'text-zinc-600 dark:text-zinc-400 font-normal hover:bg-zinc-100 dark:hover:bg-zinc-700'
+                    isActive
+                      ? "bg-teal-600 text-white font-medium"
+                      : "text-zinc-600 dark:text-zinc-400 font-normal hover:bg-zinc-100 dark:hover:bg-zinc-700"
                   }`}
                 >
-                  <IconComponent 
-                    size={20} 
+                  <IconComponent
+                    size={20}
                     className={`mr-3 flex-shrink-0 ${
-                      isActive ? 'text-white' : 'text-zinc-600 dark:text-zinc-400'
+                      isActive
+                        ? "text-white"
+                        : "text-zinc-600 dark:text-zinc-400"
                     }`}
                   />
-                  <span className="font-medium">
-                    {item.label}
-                  </span>
+                  <span className="font-medium">{item.label}</span>
                 </Link>
               </li>
-            )
+            );
           })}
         </ul>
       </nav>
@@ -82,11 +103,11 @@ const MenuAside = ({ activePage }: IParams) => {
             </p>
           </div>
         </div>
-        
+
         <LogoutButton />
       </div>
     </aside>
-  )
-}
+  );
+};
 
-export default MenuAside
+export default MenuAside;

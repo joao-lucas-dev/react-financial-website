@@ -35,8 +35,8 @@ interface CategorySummaryResponse {
 }
 
 const TABS = [
-    { label: 'Entradas', value: 'incomes' },
-    { label: 'Saídas', value: 'outcomes' },
+    { label: 'Receitas', value: 'incomes' },
+    { label: 'Despesas', value: 'outcomes' },
 ];
 
 function formatChartData(categories: Category[]) {
@@ -405,7 +405,7 @@ const CategoryReports: React.FC = () => {
                                 color: '#424242',
                                 marginBottom: '0.25rem'
                             }}>
-                                Total {tab === 'incomes' ? 'de Entradas' : 'de Saídas'}
+                                Total {tab === 'incomes' ? 'de Receitas' : 'de Despesas'}
                             </h3>
                             <p style={{
                                 fontSize: '0.875rem',

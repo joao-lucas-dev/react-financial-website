@@ -11,10 +11,10 @@ const TableSkeleton = ({ rows = 7 }) => {
               Data
             </th>
             <th className="text-center text-gray border-b-1 border-lineGray bg-background text-sm max-w-8">
-              Entradas
+              Receitas
             </th>
             <th className="text-center text-gray border-b-1 border-lineGray bg-background text-sm max-w-8">
-              Saídas
+              Despesas
             </th>
             <th className="rounded-tr-lg text-center text-gray border-b-1 border-lineGray bg-background text-sm max-w-8">
               Saldo

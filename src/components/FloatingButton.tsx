@@ -4,6 +4,8 @@ import {
   ChartColumnDecreasing,
   MoveDownLeft,
   MoveUpRight,
+  TrendingUp,
+  TrendingDown,
 } from 'lucide-react'
 import { ITransaction } from '../types/transactions.ts'
 
@@ -48,11 +50,11 @@ const FloatingButton = ({ setOpenModal }: IParams) => {
                   button: 'income',
                 })
               }}
-              className="relative flex items-center bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition duration-300 transform opacity-0 scale-95 animate-fade-in-up"
+              className="relative flex items-center bg-teal-500 text-white p-3 rounded-full shadow-lg hover:bg-teal-600 transition duration-300 transform opacity-0 scale-95 animate-fade-in-up"
             >
-              <MoveDownLeft />
+              <TrendingUp className="text-white" />
               <span className="absolute -left-16 bg-zinc-800 opacity-90 p-1 rounded-md text-xs">
-                Entrada
+                Receita
               </span>
             </button>
 
@@ -66,11 +68,11 @@ const FloatingButton = ({ setOpenModal }: IParams) => {
                   button: 'outcome',
                 })
               }}
-              className="relative flex items-center bg-red-500 text-white p-3 rounded-full shadow-lg hover:bg-red-600 transition duration-300 transform opacity-0 scale-95 animate-fade-in-up delay-100"
+              className="relative flex items-center bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700 transition duration-300 transform opacity-0 scale-95 animate-fade-in-up delay-100"
             >
-              <MoveUpRight />
-              <span className="absolute -left-14 bg-zinc-800 opacity-90 p-1 rounded-md text-xs">
-                Saída
+              <TrendingDown className="text-white" />
+              <span className="absolute -left-16 bg-zinc-800 opacity-90 p-1 rounded-md text-xs">
+                Despesa
               </span>
             </button>
           </div>

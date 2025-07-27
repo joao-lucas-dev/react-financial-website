@@ -11,6 +11,7 @@ import RedirectIfAuthenticated from './pages/RedirectIfAuthenticated.tsx'
 import CategoryReports from './pages/CategoryReports'
 import Settings from './pages/Settings'
 import ThemeProvider from './context/ThemeProvider.tsx'
+import ScrollToTop from './components/ScrollToTop'
 
 const rootElement = document.getElementById('root')
 if (rootElement) {
@@ -18,6 +19,7 @@ if (rootElement) {
     <StrictMode>
       <ThemeProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <AuthProvider>
             <Routes>
               <Route element={<RedirectIfAuthenticated />}>

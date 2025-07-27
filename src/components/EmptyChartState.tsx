@@ -1,12 +1,12 @@
 import { TrendingUp, TrendingDown, Plus } from 'lucide-react'
 
 interface EmptyChartStateProps {
-  type: 'entradas' | 'saidas'
+  type: 'receitas' | 'despesas'
   onAddTransaction?: () => void
 }
 
 const EmptyChartState = ({ type, onAddTransaction }: EmptyChartStateProps) => {
-  const isIncome = type === 'entradas'
+  const isIncome = type === 'receitas'
   const Icon = isIncome ? TrendingUp : TrendingDown
   const colorClasses = isIncome 
     ? 'from-green-100 to-green-200 dark:from-green-800 dark:to-green-900 text-green-600 dark:text-green-400'

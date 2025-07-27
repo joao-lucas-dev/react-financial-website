@@ -95,14 +95,14 @@ export const typeMap = new Map<string, { title: string; bgColor: string }>([
   [
     'income',
     {
-      title: 'Entrada',
+      title: 'Receita',
       bgColor: 'bg-green-400',
     },
   ],
   [
     'outcome',
     {
-      title: 'Saída',
+      title: 'Despesa',
       bgColor: 'bg-red-400',
     },
   ],

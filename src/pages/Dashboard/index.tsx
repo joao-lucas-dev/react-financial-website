@@ -55,11 +55,7 @@ export default function Dashboard() {
     recentTransactions,
     handleDeleteMultipleTransactions,
   } = useTransactions(handleGetChartCategories);
-  const {
-    getGreeting,
-    currentMonth,
-    setCurrentMonth,
-  } = useDashboard(
+  const { getGreeting, currentMonth, setCurrentMonth } = useDashboard(
     rows,
     handleGetChartCategories,
     handleGetOverviewTransactions,
@@ -96,25 +92,14 @@ export default function Dashboard() {
   };
 
   return (
-    <div
-      style={{
-        fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
-      }}
-    >
+    <div className="font-sans">
       <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
         {/* <Header title="Dashboard" activePage="dashboard" /> */}
 
         <div className="flex h-full">
           <MenuAside activePage="dashboard" />
 
-          <main
-            className="flex-1 mt-4 pl-0 xl-lg:pl-64"
-            style={{
-              maxWidth: "1200px",
-              margin: "0 auto",
-              padding: "2rem",
-            }}
-          >
+          <main className="flex-1 mt-4 pl-0 xl-lg:pl-64 max-w-7xl mx-auto p-8">
             {/* Welcome Section */}
             <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 mb-8 shadow-2xl transition-colors">
               <div className="flex justify-between items-center">
@@ -140,24 +125,10 @@ export default function Dashboard() {
             {/* Credit Card Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               <div className="lg:col-span-2">
-                <div className="relative group" style={{ maxWidth: "450px" }}>
+                <div className="relative group max-w-md">
                   {/* Second Card (Background) */}
                   <div
-                    className="absolute cursor-pointer transition-all duration-300"
-                    style={{
-                      top: "10px",
-                      right: "-20px",
-                      width: "350px",
-                      height: "220px",
-                      borderRadius: "1rem",
-                      background:
-                        "linear-gradient(135deg, rgba(66, 66, 66, 0.3), rgba(97, 97, 97, 0.3), rgba(117, 117, 117, 0.3))",
-                      transform: "rotate(5deg)",
-                      zIndex: 1,
-                      opacity: 0.4,
-                      backdropFilter: "blur(10px)",
-                      border: "1px solid rgba(255, 255, 255, 0.2)",
-                    }}
+                    className="absolute cursor-pointer transition-all duration-300 top-2.5 -right-5 w-[350px] h-[220px] rounded-2xl bg-gradient-to-br from-zinc-500/30 via-zinc-600/30 to-zinc-700/30 rotate-[5deg] z-[1] opacity-40 backdrop-blur-[10px] border border-white/20"
                     onMouseEnter={(e) => {
                       const container = e.currentTarget.parentElement;
                       const button = container?.querySelector(
@@ -195,36 +166,9 @@ export default function Dashboard() {
                   />
 
                   {/* Main Card */}
-                  <div
-                    className="relative overflow-hidden"
-                    style={{
-                      width: "100%",
-                      maxWidth: "400px",
-                      height: "240px",
-                      borderRadius: "1rem",
-                      background:
-                        "linear-gradient(135deg, #00695C, #009688, #4DB6AC)",
-                      color: "white",
-                      padding: "2rem",
-                      position: "relative",
-                      zIndex: 2,
-                      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-                    }}
-                  >
+                  <div className="relative overflow-hidden w-full max-w-sm h-60 rounded-2xl bg-gradient-to-br from-teal-700 via-teal-600 to-teal-400 text-white p-8 z-[2] shadow-2xl">
                     {/* Decorative background orb */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "-50px",
-                        right: "-50px",
-                        width: "200px",
-                        height: "200px",
-                        borderRadius: "50%",
-                        background:
-                          "radial-gradient(circle, rgba(255,184,0,0.3), rgba(0,150,136,0.2))",
-                        filter: "blur(60px)",
-                      }}
-                    />
+                    <div className="absolute -top-12 -right-12 w-50 h-50 rounded-full bg-gradient-to-br from-amber-400/30 to-teal-600/20 blur-[60px]" />
 
                     <div className="relative z-10">
                       <div className="flex justify-between items-start mb-8">
@@ -256,24 +200,7 @@ export default function Dashboard() {
 
                   {/* Add Card Button */}
                   <button
-                    className="add-card-button absolute transition-all duration-300 hover:scale-110 active:scale-95"
-                    style={{
-                      top: "50%",
-                      right: "-10px",
-                      transform: "translateY(-50%)",
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "50%",
-                      background: "linear-gradient(135deg, #616161, #424242)",
-                      color: "white",
-                      border: "none",
-                      cursor: "pointer",
-                      zIndex: 3,
-                      boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
+                    className="add-card-button absolute top-1/2 -right-2.5 -translate-y-1/2 w-12 h-12 rounded-full bg-gradient-to-br from-zinc-500 to-zinc-800 text-white border-0 cursor-pointer z-[3] shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
                     onMouseEnter={(e) => {
                       const container = e.currentTarget.parentElement;
                       const card = container?.querySelector(
@@ -321,7 +248,7 @@ export default function Dashboard() {
                 <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 text-center shadow-md transition-colors">
                   <TrendingUp className="w-6 h-6 mx-auto mb-2 text-teal-600 dark:text-teal-400" />
                   <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                    Total de Entradas
+                    Receitas <span className="text-zinc-400">do mês atual</span>
                   </p>
                   <p className="text-lg font-bold text-teal-600 dark:text-zinc-200">
                     <CountUp valueNumber={overview?.income?.total} />
@@ -331,7 +258,7 @@ export default function Dashboard() {
                 <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 text-center shadow-md transition-colors">
                   <TrendingDown className="w-6 h-6 mx-auto mb-2 text-red-600 dark:text-red-400" />
                   <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                    Total de Saídas
+                    Despesas <span className="text-zinc-400">do mês atual</span>
                   </p>
                   <p className="text-lg font-bold text-red-600 dark:text-zinc-200">
                     <CountUp valueNumber={overview?.outcome?.total} />
@@ -341,7 +268,8 @@ export default function Dashboard() {
                 <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 text-center shadow-md transition-colors">
                   <PiggyBank className="w-6 h-6 mx-auto mb-2 text-green-500 dark:text-green-400" />
                   <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                    Economias
+                    Economias{" "}
+                    <span className="text-zinc-400">do mês atual</span>
                   </p>
                   <p className="text-lg font-bold text-zinc-700 dark:text-zinc-200">
                     <CountUp valueNumber={overview?.remaining?.total} />
@@ -577,11 +505,11 @@ export default function Dashboard() {
                 {/* Outcome Categories - Now on Top */}
                 <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl flex-1 transition-colors">
                   <h3 className="text-base font-medium mb-4 text-zinc-700 dark:text-zinc-200">
-                    Maiores Saídas
+                    Maiores Despesas
                   </h3>
                   {chartCategories.notIncome.config.length === 0 ? (
                     <EmptyChartState
-                      type="saidas"
+                      type="despesas"
                       onAddTransaction={() =>
                         setOpenModal({
                           isOpen: true,
@@ -594,37 +522,42 @@ export default function Dashboard() {
                     <div className="flex">
                       {/* Lista de categorias centralizadas - metade esquerda */}
                       <div className="w-1/2 pr-4 flex flex-col justify-center">
-                        {chartCategories.notIncome.config.slice(0, 5).map((item, index) => (
-                          <div
-                            key={item.id}
-                            className={`flex items-center justify-start py-3 ${index !== chartCategories.notIncome.config.slice(0, 5).length - 1 ? 'border-b border-zinc-100 dark:border-zinc-700' : ''}`}
-                          >
-                            <div className="flex justify-between items-center gap-3 w-full">
-                              <div className="flex items-center gap-3">
-                                <CategoryIcon size="small" category={item} />
-                                <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
-                                  {item.name}
+                        {chartCategories.notIncome.config
+                          .slice(0, 5)
+                          .map((item, index) => (
+                            <div
+                              key={item.id}
+                              className={`flex items-center justify-start py-3 ${index !== chartCategories.notIncome.config.slice(0, 5).length - 1 ? "border-b border-zinc-100 dark:border-zinc-700" : ""}`}
+                            >
+                              <div className="flex justify-between items-center gap-3 w-full">
+                                <div className="flex items-center gap-3">
+                                  <CategoryIcon size="small" category={item} />
+                                  <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
+                                    {item.name}
+                                  </span>
+                                </div>
+                                <span className="text-base font-bold text-zinc-600 dark:text-zinc-400">
+                                  {item.percentage}%
                                 </span>
                               </div>
-                              <span className="text-base font-bold text-zinc-600 dark:text-zinc-400">
-                                {item.percentage}%
-                              </span>
                             </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
-                      
+
                       {/* Chart e botão - metade direita */}
                       <div className="w-1/2 flex flex-col items-center">
                         <div className="w-full">
                           <ModernDonutChart />
                         </div>
-                        <Link 
-                          to={{ pathname: '/relatorios', search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
-                          className="mt-4 flex items-center px-4 py-2 rounded-lg border bg-teal-600 text-white dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-700 dark:hover:bg-teal-400 dark:hover:text-zinc-900"
+                        <Link
+                          to={{
+                            pathname: "/relatorios",
+                            search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ""}`,
+                          }}
+                          className="mt-4 flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
                         >
                           Ver relatório
-                          <ArrowRight size={16} className="ml-2"/>
+                          <ArrowRight size={16} className="ml-2" />
                         </Link>
                       </div>
                     </div>
@@ -634,11 +567,11 @@ export default function Dashboard() {
                 {/* Income Categories - Now on Bottom */}
                 <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl flex-1 transition-colors">
                   <h3 className="text-base font-medium mb-4 text-zinc-700 dark:text-zinc-200">
-                    Maiores Entradas
+                    Maiores Receitas
                   </h3>
                   {chartCategories.income.config.length === 0 ? (
                     <EmptyChartState
-                      type="entradas"
+                      type="receitas"
                       onAddTransaction={() =>
                         setOpenModal({
                           isOpen: true,
@@ -651,37 +584,42 @@ export default function Dashboard() {
                     <div className="flex">
                       {/* Lista de categorias centralizadas - metade esquerda */}
                       <div className="w-1/2 pr-4 flex flex-col justify-center">
-                        {chartCategories.income.config.slice(0, 5).map((item, index) => (
-                          <div 
-                            key={item.id} 
-                            className={`flex items-center justify-start py-3 ${index !== chartCategories.income.config.slice(0, 5).length - 1 ? 'border-b border-zinc-100 dark:border-zinc-700' : ''}`}
-                          >
-                            <div className="flex justify-between items-center gap-3 w-full">
-                              <div className="flex items-center gap-3">
-                                <CategoryIcon size="small" category={item} />
-                                <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
-                                  {item.name}
+                        {chartCategories.income.config
+                          .slice(0, 5)
+                          .map((item, index) => (
+                            <div
+                              key={item.id}
+                              className={`flex items-center justify-start py-3 ${index !== chartCategories.income.config.slice(0, 5).length - 1 ? "border-b border-zinc-100 dark:border-zinc-700" : ""}`}
+                            >
+                              <div className="flex justify-between items-center gap-3 w-full">
+                                <div className="flex items-center gap-3">
+                                  <CategoryIcon size="small" category={item} />
+                                  <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
+                                    {item.name}
+                                  </span>
+                                </div>
+                                <span className="text-base font-bold text-zinc-600 dark:text-zinc-400">
+                                  {item.percentage}%
                                 </span>
                               </div>
-                              <span className="text-base font-bold text-zinc-600 dark:text-zinc-400">
-                                {item.percentage}%
-                              </span>
                             </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
-                      
+
                       {/* Chart e botão - metade direita */}
                       <div className="w-1/2 flex flex-col items-center">
                         <div className="w-full">
                           <ModernDonutChart />
                         </div>
-                        <Link 
-                          to={{ pathname: '/relatorios', search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
-                          className="mt-4 flex items-center px-4 py-2 rounded-lg border bg-teal-600 text-white dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-700 dark:hover:bg-teal-400 dark:hover:text-zinc-900"
+                        <Link
+                          to={{
+                            pathname: "/relatorios",
+                            search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ""}`,
+                          }}
+                          className="mt-4 flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
                         >
                           Ver relatório
-                          <ArrowRight size={16} className="ml-2"/>
+                          <ArrowRight size={16} className="ml-2" />
                         </Link>
                       </div>
                     </div>
@@ -691,9 +629,9 @@ export default function Dashboard() {
             </div>
 
             {/* Credit Card Bills */}
-            <div className="mb-8">
+            {/* <div className="mb-8">
               <CreditCardBills />
-            </div>
+            </div> */}
 
             {/* Recent Transactions */}
             <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 mt-8 shadow-2xl transition-colors">
@@ -749,8 +687,8 @@ export default function Dashboard() {
                   to={{ pathname: "/transacoes" }}
                   className="flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
                 >
-                  Ver todas as transações
-                  <ChevronRight size={16} className="ml-2" />
+                  Ver completo
+                  <ArrowRight size={16} className="ml-1" />
                 </Link>
               </div>
             </div>

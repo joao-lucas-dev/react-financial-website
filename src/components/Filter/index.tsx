@@ -21,8 +21,8 @@ const DATE_FILTER_LABELS = {
 
 const TYPE_FILTER_LABELS = {
   [TYPE_FILTERS.ALL]: 'Todos',
-  [TYPE_FILTERS.INCOME]: 'Entrada',
-  [TYPE_FILTERS.OUTCOME]: 'Saída',
+  [TYPE_FILTERS.INCOME]: 'Receita',
+  [TYPE_FILTERS.OUTCOME]: 'Receita',
 }
 
 interface FilterProps {
