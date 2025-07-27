@@ -1,57 +1,44 @@
 import {
-  ChartColumnDecreasing,
-  MoveDownLeft,
-  MoveUpRight,
   ChevronRight,
-  ChevronLeft,
-  Calendar,
   Search,
   CreditCard,
   TrendingUp,
   TrendingDown,
-  Wallet,
   PiggyBank,
   Plus,
-  Moon,
-  Sun,
-  BarChart3
-} from 'lucide-react'
-import { Link } from 'react-router-dom'
+  BarChart3,
+  ArrowRight,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
-import TablePreview from '../../components/TablePreview'
-import EmptyChartState from '../../components/EmptyChartState'
-import ChartComponent from '../../components/ChartComponent.tsx'
-import EnhancedChartComponent from '../../components/EnhancedChartComponent.tsx'
-import FloatingButton from '../../components/FloatingButton.tsx'
-import CreditCardBills from '../../components/CreditCardBills'
+import TablePreview from "../../components/TablePreview";
+import EmptyChartState from "../../components/EmptyChartState";
+import FloatingButton from "../../components/FloatingButton.tsx";
+import CreditCardBills from "../../components/CreditCardBills";
 
-import './styles.css'
-import Header from '../../components/Header.tsx'
-import MenuAside from '../../components/MenuAside.tsx'
-import Skeleton from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
-import useDashboard from '../../hooks/useDashboard.ts'
-import { useTheme } from '../../context/ThemeProvider'
-import useTransactions from '../../hooks/useTransactions.ts'
-import CountUp from '../../components/CountUp.tsx'
-import useCategories from '../../hooks/useCategories.ts'
-import { useState, useEffect } from 'react'
-import { ITransaction } from '../../types/transactions.ts'
-import CategoryIcon from '../../components/CategoryIcon'
-import TableTransactions from '../../components/TableTransactions'
-import { Filter } from '../../components/Filter'
+import "./styles.css";
+import MenuAside from "../../components/MenuAside.tsx";
+import "react-loading-skeleton/dist/skeleton.css";
+import useDashboard from "../../hooks/useDashboard.ts";
+import useTransactions from "../../hooks/useTransactions.ts";
+import CountUp from "../../components/CountUp.tsx";
+import useCategories from "../../hooks/useCategories.ts";
+import { useState } from "react";
+import { ITransaction } from "../../types/transactions.ts";
+import TableTransactions from "../../components/TableTransactions";
+import { Filter } from "../../components/Filter";
+import ModernDonutChart from "../../components/ModernDonutChart.tsx";
+import CategoryIcon from "../../components/CategoryIcon/index.tsx";
 
 export default function Dashboard() {
-  const { theme, actualTheme } = useTheme()
-  
   const [openModal, setOpenModal] = useState({
     isOpen: false,
     transaction: {} as ITransaction,
-    type: '',
-  })
+    type: "",
+  });
 
   const { chartCategories, handleGetChartCategories, categories } =
-    useCategories()
+    useCategories();
 
   const {
     rows,
@@ -67,14 +54,9 @@ export default function Dashboard() {
     handleGetRecentTransactions,
     recentTransactions,
     handleDeleteMultipleTransactions,
-  } = useTransactions(handleGetChartCategories)
+  } = useTransactions(handleGetChartCategories);
   const {
-    getMonth,
     getGreeting,
-    getNextMonth,
-    getPreviousMonth,
-    getToday,
-    hasToday,
     currentMonth,
     setCurrentMonth,
   } = useDashboard(
@@ -84,42 +66,53 @@ export default function Dashboard() {
     handleGetBalance,
     handleGetPreviewTransactions,
     handleGetRecentTransactions,
-  )
+  );
 
-  const [sortBy, setSortBy] = useState('updated_at');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | undefined>('desc');
-  const [filter, setFilter] = useState<'before' | 'after' | 'both'>('both');
-  const [typeFilter, setTypeFilter] = useState<'income' | 'outcome' | 'all'>('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState("updated_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(
+    "desc",
+  );
+  const [filter, setFilter] = useState<"before" | "after" | "both">("both");
+  const [typeFilter, setTypeFilter] = useState<"income" | "outcome" | "all">(
+    "all",
+  );
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSort = (field: string, order: 'asc' | 'desc') => {
+  const handleSort = (field: string, order: "asc" | "desc") => {
     setSortBy(field);
     setSortOrder(order);
     handleGetRecentTransactions(filter, field, order, typeFilter);
   };
 
-  const handleFilterChange = (newFilter: 'before' | 'after' | 'both', newType: 'income' | 'outcome' | 'all') => {
+  const handleFilterChange = (
+    newFilter: "before" | "after" | "both",
+    newType: "income" | "outcome" | "all",
+  ) => {
     setFilter(newFilter);
     setTypeFilter(newType);
-    setSortBy('updated_at');
-    setSortOrder('desc');
-    handleGetRecentTransactions(newFilter, 'updated_at', 'desc', newType);
+    setSortBy("updated_at");
+    setSortOrder("desc");
+    handleGetRecentTransactions(newFilter, "updated_at", "desc", newType);
   };
 
   return (
-    <div style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif' }}>
+    <div
+      style={{
+        fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+      }}
+    >
       <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
         {/* <Header title="Dashboard" activePage="dashboard" /> */}
 
         <div className="flex h-full">
           <MenuAside activePage="dashboard" />
 
-          <main 
-            className="flex-1 mt-4 pl-0 xl-lg:pl-64" 
-            style={{ 
-              maxWidth: '1200px', 
-              margin: '0 auto',
-              padding: '2rem'
+          <main
+            className="flex-1 mt-4 pl-0 xl-lg:pl-64"
+            style={{
+              maxWidth: "1200px",
+              margin: "0 auto",
+              padding: "2rem",
             }}
           >
             {/* Welcome Section */}
@@ -134,7 +127,9 @@ export default function Dashboard() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm">Saldo Hoje</p>
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm">
+                    Saldo Hoje
+                  </p>
                   <div className="text-2xl font-bold text-teal-600 dark:text-teal-400">
                     <CountUp valueNumber={balance} />
                   </div>
@@ -145,88 +140,105 @@ export default function Dashboard() {
             {/* Credit Card Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               <div className="lg:col-span-2">
-                <div className="relative group" style={{ maxWidth: '450px' }}>
+                <div className="relative group" style={{ maxWidth: "450px" }}>
                   {/* Second Card (Background) */}
-                  <div 
+                  <div
                     className="absolute cursor-pointer transition-all duration-300"
                     style={{
-                      top: '10px',
-                      right: '-20px',
-                      width: '350px',
-                      height: '220px',
-                      borderRadius: '1rem',
-                      background: 'linear-gradient(135deg, rgba(66, 66, 66, 0.3), rgba(97, 97, 97, 0.3), rgba(117, 117, 117, 0.3))',
-                      transform: 'rotate(5deg)',
+                      top: "10px",
+                      right: "-20px",
+                      width: "350px",
+                      height: "220px",
+                      borderRadius: "1rem",
+                      background:
+                        "linear-gradient(135deg, rgba(66, 66, 66, 0.3), rgba(97, 97, 97, 0.3), rgba(117, 117, 117, 0.3))",
+                      transform: "rotate(5deg)",
                       zIndex: 1,
                       opacity: 0.4,
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)'
+                      backdropFilter: "blur(10px)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
                     }}
                     onMouseEnter={(e) => {
-                      const container = e.currentTarget.parentElement
-                      const button = container?.querySelector('.add-card-button') as HTMLElement
-                      
-                      e.currentTarget.style.opacity = '0.8'
-                      e.currentTarget.style.transform = 'rotate(3deg) translateX(-5px)'
-                      
+                      const container = e.currentTarget.parentElement;
+                      const button = container?.querySelector(
+                        ".add-card-button",
+                      ) as HTMLElement;
+
+                      e.currentTarget.style.opacity = "0.8";
+                      e.currentTarget.style.transform =
+                        "rotate(3deg) translateX(-5px)";
+
                       if (button) {
-                        button.style.background = 'linear-gradient(135deg, #4CAF50, #388E3C)'
-                        button.style.boxShadow = '0 12px 40px rgba(76, 175, 80, 0.3)'
+                        button.style.background =
+                          "linear-gradient(135deg, #4CAF50, #388E3C)";
+                        button.style.boxShadow =
+                          "0 12px 40px rgba(76, 175, 80, 0.3)";
                       }
                     }}
                     onMouseLeave={(e) => {
-                      const container = e.currentTarget.parentElement
-                      const button = container?.querySelector('.add-card-button') as HTMLElement
-                      
-                      e.currentTarget.style.opacity = '0.4'
-                      e.currentTarget.style.transform = 'rotate(5deg) translateX(0px)'
-                      
+                      const container = e.currentTarget.parentElement;
+                      const button = container?.querySelector(
+                        ".add-card-button",
+                      ) as HTMLElement;
+
+                      e.currentTarget.style.opacity = "0.4";
+                      e.currentTarget.style.transform =
+                        "rotate(5deg) translateX(0px)";
+
                       if (button) {
-                        button.style.background = 'linear-gradient(135deg, #616161, #424242)'
-                        button.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)'
+                        button.style.background =
+                          "linear-gradient(135deg, #616161, #424242)";
+                        button.style.boxShadow =
+                          "0 8px 32px rgba(0, 0, 0, 0.1)";
                       }
                     }}
                   />
-                  
+
                   {/* Main Card */}
-                  <div 
+                  <div
                     className="relative overflow-hidden"
                     style={{
-                      width: '100%',
-                      maxWidth: '400px',
-                      height: '240px',
-                      borderRadius: '1rem',
-                      background: 'linear-gradient(135deg, #00695C, #009688, #4DB6AC)',
-                      color: 'white',
-                      padding: '2rem',
-                      position: 'relative',
+                      width: "100%",
+                      maxWidth: "400px",
+                      height: "240px",
+                      borderRadius: "1rem",
+                      background:
+                        "linear-gradient(135deg, #00695C, #009688, #4DB6AC)",
+                      color: "white",
+                      padding: "2rem",
+                      position: "relative",
                       zIndex: 2,
-                      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+                      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
                     }}
                   >
                     {/* Decorative background orb */}
-                    <div 
+                    <div
                       style={{
-                        position: 'absolute',
-                        top: '-50px',
-                        right: '-50px',
-                        width: '200px',
-                        height: '200px',
-                        borderRadius: '50%',
-                        background: 'radial-gradient(circle, rgba(255,184,0,0.3), rgba(0,150,136,0.2))',
-                        filter: 'blur(60px)'
+                        position: "absolute",
+                        top: "-50px",
+                        right: "-50px",
+                        width: "200px",
+                        height: "200px",
+                        borderRadius: "50%",
+                        background:
+                          "radial-gradient(circle, rgba(255,184,0,0.3), rgba(0,150,136,0.2))",
+                        filter: "blur(60px)",
                       }}
                     />
-                    
+
                     <div className="relative z-10">
                       <div className="flex justify-between items-start mb-8">
                         <div>
-                          <p className="text-sm opacity-80 mb-1">Cartão Principal</p>
-                          <p className="text-lg font-medium tracking-wider">•••• •••• •••• 4532</p>
+                          <p className="text-sm opacity-80 mb-1">
+                            Cartão Principal
+                          </p>
+                          <p className="text-lg font-medium tracking-wider">
+                            •••• •••• •••• 4532
+                          </p>
                         </div>
                         <CreditCard className="w-8 h-8 opacity-80" />
                       </div>
-                      
+
                       <div className="flex justify-between items-end">
                         <div>
                           <p className="text-sm opacity-80">Saldo Disponível</p>
@@ -241,82 +253,96 @@ export default function Dashboard() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Add Card Button */}
                   <button
                     className="add-card-button absolute transition-all duration-300 hover:scale-110 active:scale-95"
                     style={{
-                      top: '50%',
-                      right: '-10px',
-                      transform: 'translateY(-50%)',
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #616161, #424242)',
-                      color: 'white',
-                      border: 'none',
-                      cursor: 'pointer',
+                      top: "50%",
+                      right: "-10px",
+                      transform: "translateY(-50%)",
+                      width: "48px",
+                      height: "48px",
+                      borderRadius: "50%",
+                      background: "linear-gradient(135deg, #616161, #424242)",
+                      color: "white",
+                      border: "none",
+                      cursor: "pointer",
                       zIndex: 3,
-                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
+                      boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                     onMouseEnter={(e) => {
-                      const container = e.currentTarget.parentElement
-                      const card = container?.querySelector('.absolute.cursor-pointer') as HTMLElement
-                      
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #4CAF50, #388E3C)'
-                      e.currentTarget.style.boxShadow = '0 12px 40px rgba(76, 175, 80, 0.3)'
-                      
+                      const container = e.currentTarget.parentElement;
+                      const card = container?.querySelector(
+                        ".absolute.cursor-pointer",
+                      ) as HTMLElement;
+
+                      e.currentTarget.style.background =
+                        "linear-gradient(135deg, #4CAF50, #388E3C)";
+                      e.currentTarget.style.boxShadow =
+                        "0 12px 40px rgba(76, 175, 80, 0.3)";
+
                       if (card) {
-                        card.style.opacity = '0.8'
-                        card.style.transform = 'rotate(3deg) translateX(-5px)'
+                        card.style.opacity = "0.8";
+                        card.style.transform = "rotate(3deg) translateX(-5px)";
                       }
                     }}
                     onMouseLeave={(e) => {
-                      const container = e.currentTarget.parentElement
-                      const card = container?.querySelector('.absolute.cursor-pointer') as HTMLElement
-                      
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #616161, #424242)'
-                      e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)'
-                      
+                      const container = e.currentTarget.parentElement;
+                      const card = container?.querySelector(
+                        ".absolute.cursor-pointer",
+                      ) as HTMLElement;
+
+                      e.currentTarget.style.background =
+                        "linear-gradient(135deg, #616161, #424242)";
+                      e.currentTarget.style.boxShadow =
+                        "0 8px 32px rgba(0, 0, 0, 0.1)";
+
                       if (card) {
-                        card.style.opacity = '0.4'
-                        card.style.transform = 'rotate(5deg) translateX(0px)'
+                        card.style.opacity = "0.4";
+                        card.style.transform = "rotate(5deg) translateX(0px)";
                       }
                     }}
                     onClick={() => {
                       // Aqui você pode adicionar a lógica para criar um novo cartão
-                      console.log('Adicionar novo cartão')
+                      console.log("Adicionar novo cartão");
                     }}
                   >
                     <Plus size={24} />
                   </button>
                 </div>
               </div>
-              
+
               {/* Quick Stats */}
               <div className="space-y-4">
                 <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 text-center shadow-md transition-colors">
                   <TrendingUp className="w-6 h-6 mx-auto mb-2 text-teal-600 dark:text-teal-400" />
-                  <p className="text-xs text-zinc-600 dark:text-zinc-400">Total de Entradas</p>
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                    Total de Entradas
+                  </p>
                   <p className="text-lg font-bold text-teal-600 dark:text-zinc-200">
                     <CountUp valueNumber={overview?.income?.total} />
                   </p>
                 </div>
-                
+
                 <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 text-center shadow-md transition-colors">
                   <TrendingDown className="w-6 h-6 mx-auto mb-2 text-red-600 dark:text-red-400" />
-                  <p className="text-xs text-zinc-600 dark:text-zinc-400">Total de Saídas</p>
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                    Total de Saídas
+                  </p>
                   <p className="text-lg font-bold text-red-600 dark:text-zinc-200">
                     <CountUp valueNumber={overview?.outcome?.total} />
                   </p>
                 </div>
-                
+
                 <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 text-center shadow-md transition-colors">
                   <PiggyBank className="w-6 h-6 mx-auto mb-2 text-green-500 dark:text-green-400" />
-                  <p className="text-xs text-zinc-600 dark:text-zinc-400">Economias</p>
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                    Economias
+                  </p>
                   <p className="text-lg font-bold text-zinc-700 dark:text-zinc-200">
                     <CountUp valueNumber={overview?.remaining?.total} />
                   </p>
@@ -334,7 +360,7 @@ export default function Dashboard() {
                   <div className="px-3 py-1 rounded-full text-xs font-medium bg-teal-50 dark:bg-teal-900 text-teal-600 dark:text-teal-300">
                     5 transações hoje
                   </div>
-                  <Link 
+                  <Link
                     to="/transacoes"
                     className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline transition-all"
                   >
@@ -508,11 +534,18 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
-                      <BarChart3 size={20} className="text-teal-600 dark:text-teal-400" />
+                      <BarChart3
+                        size={20}
+                        className="text-teal-600 dark:text-teal-400"
+                      />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-zinc-700 dark:text-zinc-100">Visão Financeira</h3>
-                      <p className="text-sm text-zinc-600 dark:text-zinc-400">Acompanhe suas transações diárias</p>
+                      <h3 className="font-semibold text-zinc-700 dark:text-zinc-100">
+                        Visão Financeira
+                      </h3>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                        Acompanhe suas transações diárias
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -521,7 +554,9 @@ export default function Dashboard() {
                   <TablePreview
                     rows={rows}
                     handleCreateTransaction={handleCreateTransaction}
-                    handleCreateCompleteTransaction={handleCreateCompleteTransaction}
+                    handleCreateCompleteTransaction={
+                      handleCreateCompleteTransaction
+                    }
                     handleDeleteTransaction={handleDeleteTransaction}
                     handleUpdateTransaction={handleUpdateTransaction}
                     currentMonth={currentMonth}
@@ -545,29 +580,33 @@ export default function Dashboard() {
                     Maiores Saídas
                   </h3>
                   {chartCategories.notIncome.config.length === 0 ? (
-                    <EmptyChartState 
-                      type="saidas" 
-                      onAddTransaction={() => setOpenModal({
-                        isOpen: true,
-                        transaction: {} as ITransaction,
-                        type: 'create'
-                      })}
+                    <EmptyChartState
+                      type="saidas"
+                      onAddTransaction={() =>
+                        setOpenModal({
+                          isOpen: true,
+                          transaction: {} as ITransaction,
+                          type: "create",
+                        })
+                      }
                     />
                   ) : (
-                    <div className="flex h-full">
+                    <div className="flex">
                       {/* Lista de categorias centralizadas - metade esquerda */}
                       <div className="w-1/2 pr-4 flex flex-col justify-center">
                         {chartCategories.notIncome.config.slice(0, 5).map((item, index) => (
-                          <div 
-                            key={item.id} 
-                            className={`flex items-center justify-center py-3 ${index !== chartCategories.notIncome.config.slice(0, 5).length - 1 ? 'border-b border-zinc-100 dark:border-zinc-700' : ''}`}
+                          <div
+                            key={item.id}
+                            className={`flex items-center justify-start py-3 ${index !== chartCategories.notIncome.config.slice(0, 5).length - 1 ? 'border-b border-zinc-100 dark:border-zinc-700' : ''}`}
                           >
-                            <div className="flex items-center gap-3">
-                              <CategoryIcon size="small" category={item} />
-                              <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
-                                {item.name}
-                              </span>
-                              <span className="text-lg font-bold text-red-600 dark:text-red-400">
+                            <div className="flex justify-between items-center gap-3 w-full">
+                              <div className="flex items-center gap-3">
+                                <CategoryIcon size="small" category={item} />
+                                <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
+                                  {item.name}
+                                </span>
+                              </div>
+                              <span className="text-base font-bold text-zinc-600 dark:text-zinc-400">
                                 {item.percentage}%
                               </span>
                             </div>
@@ -577,17 +616,15 @@ export default function Dashboard() {
                       
                       {/* Chart e botão - metade direita */}
                       <div className="w-1/2 flex flex-col items-center">
-                        <div className="flex-1 flex items-center justify-center">
-                          <EnhancedChartComponent 
-                            categories={chartCategories.notIncome.chartConfig} 
-                            size={180}
-                          />
+                        <div className="w-full">
+                          <ModernDonutChart />
                         </div>
                         <Link 
-                          to={{ pathname: '/relatorios', search: `?type=outcomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
-                          className="text-xs px-3 py-2 rounded border border-red-600 text-red-600 dark:border-red-400 dark:text-red-400 transition-all mt-2 hover:bg-red-600 hover:text-white dark:hover:bg-red-400 dark:hover:text-zinc-900"
+                          to={{ pathname: '/relatorios', search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
+                          className="mt-4 flex items-center px-4 py-2 rounded-lg border bg-teal-600 text-white dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-700 dark:hover:bg-teal-400 dark:hover:text-zinc-900"
                         >
-                          Ver relatório completo
+                          Ver relatório
+                          <ArrowRight size={16} className="ml-2"/>
                         </Link>
                       </div>
                     </div>
@@ -600,29 +637,33 @@ export default function Dashboard() {
                     Maiores Entradas
                   </h3>
                   {chartCategories.income.config.length === 0 ? (
-                    <EmptyChartState 
-                      type="entradas" 
-                      onAddTransaction={() => setOpenModal({
-                        isOpen: true,
-                        transaction: {} as ITransaction,
-                        type: 'create'
-                      })}
+                    <EmptyChartState
+                      type="entradas"
+                      onAddTransaction={() =>
+                        setOpenModal({
+                          isOpen: true,
+                          transaction: {} as ITransaction,
+                          type: "create",
+                        })
+                      }
                     />
                   ) : (
-                    <div className="flex h-full">
+                    <div className="flex">
                       {/* Lista de categorias centralizadas - metade esquerda */}
                       <div className="w-1/2 pr-4 flex flex-col justify-center">
                         {chartCategories.income.config.slice(0, 5).map((item, index) => (
                           <div 
                             key={item.id} 
-                            className={`flex items-center justify-center py-3 ${index !== chartCategories.income.config.slice(0, 5).length - 1 ? 'border-b border-zinc-100 dark:border-zinc-700' : ''}`}
+                            className={`flex items-center justify-start py-3 ${index !== chartCategories.income.config.slice(0, 5).length - 1 ? 'border-b border-zinc-100 dark:border-zinc-700' : ''}`}
                           >
-                            <div className="flex items-center gap-3">
-                              <CategoryIcon size="small" category={item} />
-                              <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
-                                {item.name}
-                              </span>
-                              <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                            <div className="flex justify-between items-center gap-3 w-full">
+                              <div className="flex items-center gap-3">
+                                <CategoryIcon size="small" category={item} />
+                                <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
+                                  {item.name}
+                                </span>
+                              </div>
+                              <span className="text-base font-bold text-zinc-600 dark:text-zinc-400">
                                 {item.percentage}%
                               </span>
                             </div>
@@ -632,17 +673,15 @@ export default function Dashboard() {
                       
                       {/* Chart e botão - metade direita */}
                       <div className="w-1/2 flex flex-col items-center">
-                        <div className="flex-1 flex items-center justify-center">
-                          <EnhancedChartComponent 
-                            categories={chartCategories.income.chartConfig} 
-                            size={180}
-                          />
+                        <div className="w-full">
+                          <ModernDonutChart />
                         </div>
                         <Link 
                           to={{ pathname: '/relatorios', search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
-                          className="text-xs px-3 py-2 rounded border border-green-600 text-green-600 dark:border-green-400 dark:text-green-400 transition-all mt-2 hover:bg-green-600 hover:text-white dark:hover:bg-green-400 dark:hover:text-zinc-900"
+                          className="mt-4 flex items-center px-4 py-2 rounded-lg border bg-teal-600 text-white dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-700 dark:hover:bg-teal-400 dark:hover:text-zinc-900"
                         >
-                          Ver relatório completo
+                          Ver relatório
+                          <ArrowRight size={16} className="ml-2"/>
                         </Link>
                       </div>
                     </div>
@@ -664,26 +703,26 @@ export default function Dashboard() {
                 </h3>
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                   <div className="relative">
-                    <Search 
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-600 dark:text-zinc-400" 
-                      size={16} 
+                    <Search
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-600 dark:text-zinc-400"
+                      size={16}
                     />
                     <input
                       type="text"
                       placeholder="Buscar transação..."
                       value={searchTerm}
-                      onChange={e => setSearchTerm(e.target.value)}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10 pr-4 py-2 border border-zinc-200 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400 text-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 w-64"
                     />
                   </div>
-                  <Filter 
+                  <Filter
                     currentFilter={filter}
                     currentType={typeFilter}
                     onFilterChange={handleFilterChange}
                   />
                 </div>
               </div>
-              
+
               <div className="max-h-96 overflow-auto">
                 <TableTransactions
                   recentTransactions={recentTransactions}
@@ -694,7 +733,9 @@ export default function Dashboard() {
                   setOpenModal={setOpenModal}
                   handleUpdateTransaction={handleUpdateTransaction}
                   handleDeleteTransaction={handleDeleteTransaction}
-                  handleDeleteMultipleTransactions={handleDeleteMultipleTransactions}
+                  handleDeleteMultipleTransactions={
+                    handleDeleteMultipleTransactions
+                  }
                   currentMonth={currentMonth}
                   setCurrentMonth={setCurrentMonth}
                   categories={categories}
@@ -702,10 +743,10 @@ export default function Dashboard() {
                   searchTerm={searchTerm}
                 />
               </div>
-              
+
               <div className="flex justify-center mt-6">
                 <Link
-                  to={{ pathname: '/transacoes' }}
+                  to={{ pathname: "/transacoes" }}
                   className="flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
                 >
                   Ver todas as transações
@@ -713,12 +754,11 @@ export default function Dashboard() {
                 </Link>
               </div>
             </div>
-
           </main>
         </div>
       </div>
 
       <FloatingButton setOpenModal={setOpenModal} />
     </div>
-  )
+  );
 }

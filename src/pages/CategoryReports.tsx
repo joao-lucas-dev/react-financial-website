@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Tabs from '../components/Tabs';
-import EnhancedChartComponent from '../components/EnhancedChartComponent';
+import ModernDonutChart from '../components/ModernDonutChart';
 import CategoryIcon from '../components/CategoryIcon';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { DateTime } from 'luxon';
@@ -208,7 +208,7 @@ const CategoryReports: React.FC = () => {
                                 }
                                 return (
                                     <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                                        <EnhancedChartComponent categories={chartData} size={300} />
+                                        <ModernDonutChart categories={chartData} size={300} />
                                     </div>
                                 );
                             })()
