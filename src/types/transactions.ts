@@ -18,8 +18,28 @@ interface IShared {
   profileImage: string
 }
 
-// Tipos para sistema de recorrência
-export type RecurrenceType = 'none' | 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'biannually' | 'yearly'
+// Tipos para modo de transação
+export type TransactionMode = 'single' | 'recurring' | 'installments'
+
+// Tipos para sistema de recorrência (infinita)
+export type RecurrenceType = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'biannually' | 'yearly'
+
+// Tipos para sistema de parcelas (com fim)
+export type InstallmentPeriod = 'monthly' | 'quarterly' | 'biannually' | 'yearly'
+
+export interface InstallmentConfig {
+  count: number                    // Número de parcelas (2-60)
+  period: InstallmentPeriod       // Período entre parcelas
+  installmentValue: number        // Valor de cada parcela
+  dates: string[]                 // Datas das parcelas
+}
+
+export interface SimpleInstallmentConfig {
+  count: number                   // Número de parcelas
+  period: InstallmentPeriod      // Período entre parcelas
+  installmentValue: number       // Valor de cada parcela
+  endDate: string                // Data de fim das parcelas
+}
 
 // Tipos para sistema de pagamento
 export type PaymentStatus = 'paid' | 'unpaid' | 'pending'
@@ -40,11 +60,19 @@ export type ITransaction = {
   is_paid?: boolean
   paid_date?: string
   payment_status?: PaymentStatus
-  // Novos campos para sistema de recorrência avançado
+  // Modo da transação
+  transaction_mode?: TransactionMode
+  // Campos para recorrência (infinita)
   recurrence_type?: RecurrenceType
   recurrence_interval?: number
   next_occurrence?: string
-  recurrence_end_date?: string
+  // Campos para parcelas (com fim)
+  installment_count?: number        // Número total de parcelas
+  installment_current?: number      // Parcela atual (1, 2, 3...)
+  installment_value?: number        // Valor de cada parcela
+  installment_period?: InstallmentPeriod // Período entre parcelas
+  installment_end_date?: string     // Data de fim das parcelas
+  parent_transaction_id?: string    // ID da transação pai (para parcelas)
 }
 
 interface IColumn {

@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import 'react-loading-skeleton/dist/skeleton.css'
 import CategoryIcon from '../CategoryIcon'
-import { EllipsisVertical, Search, MessageCircleQuestion } from 'lucide-react'
+import { EllipsisVertical, Search, MessageCircleQuestion, CheckCircle, XCircle, Clock } from 'lucide-react'
 import './styles.css'
 import { DateTime } from 'luxon'
 import { typeMap } from '../../common/constants'
@@ -41,6 +41,34 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+
+  // Função para calcular status de pagamento automático baseado na data
+  const getAutoPaymentStatus = (transactionDate: string | Date) => {
+    const today = new Date()
+    const transDate = new Date(transactionDate)
+    
+    today.setHours(0, 0, 0, 0)
+    transDate.setHours(0, 0, 0, 0)
+    
+    if (transDate < today) return 'paid'    // Passado = pago
+    if (transDate > today) return 'unpaid'  // Futuro = não pago
+    return 'pending'                        // Hoje = pendente
+  }
+
+  // Função para obter ícone de status de pagamento
+  const getPaymentStatusIcon = (transaction: ITransaction) => {
+    const status = transaction.payment_status || getAutoPaymentStatus(transaction.transaction_day)
+    
+    switch (status) {
+      case 'paid':
+        return <CheckCircle className="w-4 h-4 text-green-500" />
+      case 'pending':
+        return <Clock className="w-4 h-4 text-yellow-500" />
+      case 'unpaid':
+      default:
+        return <XCircle className="w-4 h-4 text-red-500" />
+    }
+  }
 
   useEffect(() => {
     setCurrentPage(1);
@@ -191,8 +219,11 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
               </div>
             </td>
             <td className="p-4 text-center text-sm h-16 border-b border-zinc-100 dark:border-zinc-700">
-              <div className="text-zinc-600 dark:text-zinc-400">
-                {formattedDate}
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-zinc-600 dark:text-zinc-400">
+                  {formattedDate}
+                </span>
+                {getPaymentStatusIcon(recentTransaction)}
               </div>
             </td>
             <td className="p-4 text-center text-sm h-16 border-b border-zinc-100 dark:border-zinc-700">

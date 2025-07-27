@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { Calendar, RotateCcw, Clock } from 'lucide-react'
+import { Calendar, RotateCcw, Clock, Calculator } from 'lucide-react'
 import ModernSelect, { SelectOption } from './ModernSelect'
-import { RecurrenceType } from '../types/transactions'
+import InstallmentConfigComponent from './InstallmentConfig'
+import { RecurrenceType, InstallmentConfig } from '../types/transactions'
 
 interface RecurrenceSelectorProps {
   label?: string
   value?: RecurrenceType | boolean
-  onChange?: (value: RecurrenceType, interval?: number) => void
+  onChange?: (value: RecurrenceType, interval?: number, installmentConfig?: InstallmentConfig) => void
   transactionDate?: string
+  transactionValue?: number
   disabled?: boolean
   showPreview?: boolean
 }
@@ -17,6 +19,7 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
   value,
   onChange,
   transactionDate,
+  transactionValue = 0,
   disabled = false,
   showPreview = true
 }) => {
@@ -28,6 +31,7 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
 
   const [interval, setInterval] = useState<number>(1)
   const [previewDates, setPreviewDates] = useState<string[]>([])
+  const [installmentConfig, setInstallmentConfig] = useState<InstallmentConfig | null>(null)
 
   // Opções de recorrência com ícones
   const recurrenceOptions: SelectOption[] = [
@@ -65,6 +69,11 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
       value: 'yearly',
       label: 'Anual',
       icon: <RotateCcw className="w-4 h-4 text-red-500" />
+    },
+    {
+      value: 'installments',
+      label: 'Parcelado',
+      icon: <Calculator className="w-4 h-4 text-indigo-500" />
     }
   ]
 
@@ -123,16 +132,27 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
   const handleRecurrenceChange = (newRecurrence: string) => {
     const recurrenceType = newRecurrence as RecurrenceType
     if (onChange) {
-      onChange(recurrenceType, recurrenceType !== 'none' ? interval : undefined)
+      if (recurrenceType === 'installments') {
+        onChange(recurrenceType, undefined, installmentConfig || undefined)
+      } else {
+        onChange(recurrenceType, recurrenceType !== 'none' ? interval : undefined)
+      }
     }
   }
 
   const handleIntervalChange = (newInterval: number) => {
     if (newInterval > 0 && newInterval <= 99) {
       setInterval(newInterval)
-      if (onChange && currentRecurrence !== 'none') {
+      if (onChange && currentRecurrence !== 'none' && currentRecurrence !== 'installments') {
         onChange(currentRecurrence, newInterval)
       }
+    }
+  }
+
+  const handleInstallmentConfigChange = (config: InstallmentConfig) => {
+    setInstallmentConfig(config)
+    if (onChange && currentRecurrence === 'installments') {
+      onChange(currentRecurrence, undefined, config)
     }
   }
 
@@ -154,6 +174,10 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
         return `Repetir semestralmente${intervalText}`
       case 'yearly':
         return `Repetir anualmente${intervalText}`
+      case 'installments':
+        return installmentConfig 
+          ? `Dividir em ${installmentConfig.count} parcelas de ${installmentConfig.installmentValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`
+          : 'Configurar parcelas'
       default:
         return ''
     }
@@ -198,6 +222,16 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
             </span>
           </div>
         </div>
+      )}
+
+      {/* Configuração de Parcelas */}
+      {currentRecurrence === 'installments' && transactionValue > 0 && transactionDate && (
+        <InstallmentConfigComponent
+          totalValue={transactionValue}
+          transactionDate={transactionDate}
+          onConfigChange={handleInstallmentConfigChange}
+          disabled={disabled}
+        />
       )}
       
       {/* Descrição da recorrência */}

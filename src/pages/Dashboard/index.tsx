@@ -8,6 +8,8 @@ import {
   Plus,
   BarChart3,
   ArrowRight,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -123,8 +125,8 @@ export default function Dashboard() {
             </div>
 
             {/* Credit Card Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-              <div className="lg:col-span-2">
+            <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 mb-8">
+              <div>
                 <div className="relative group max-w-md">
                   {/* Second Card (Background) */}
                   <div
@@ -244,36 +246,105 @@ export default function Dashboard() {
               </div>
 
               {/* Quick Stats */}
-              <div className="space-y-4">
-                <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 text-center shadow-md transition-colors">
-                  <TrendingUp className="w-6 h-6 mx-auto mb-2 text-teal-600 dark:text-teal-400" />
-                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                    Receitas <span className="text-zinc-400">do mês atual</span>
-                  </p>
-                  <p className="text-lg font-bold text-teal-600 dark:text-zinc-200">
-                    <CountUp valueNumber={overview?.income?.total} />
-                  </p>
+              <div className="space-y-6">
+                <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
+                        <TrendingUp className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                          Receitas
+                        </h3>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          do mês atual
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-2xl font-bold text-teal-600 dark:text-teal-400">
+                      <CountUp valueNumber={overview?.income?.total} />
+                    </p>
+                    {overview?.income?.percentage !== undefined && (
+                      <div className="flex items-center gap-1">
+                        {(() => {
+                          const percentage = Number(overview.income.percentage)
+                          if (isNaN(percentage)) return null
+                          
+                          return percentage >= 0 ? (
+                            <>
+                              <ChevronUp className="w-4 h-4 text-green-500" />
+                              <span className="text-sm font-medium text-green-500">
+                                +{percentage.toFixed(1)}%
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <ChevronDown className="w-4 h-4 text-red-500" />
+                              <span className="text-sm font-medium text-red-500">
+                                {percentage.toFixed(1)}%
+                              </span>
+                            </>
+                          )
+                        })()}
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400 ml-1">
+                          em relação ao mês passado
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 text-center shadow-md transition-colors">
-                  <TrendingDown className="w-6 h-6 mx-auto mb-2 text-red-600 dark:text-red-400" />
-                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                    Despesas <span className="text-zinc-400">do mês atual</span>
-                  </p>
-                  <p className="text-lg font-bold text-red-600 dark:text-zinc-200">
-                    <CountUp valueNumber={overview?.outcome?.total} />
-                  </p>
-                </div>
-
-                <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 text-center shadow-md transition-colors">
-                  <PiggyBank className="w-6 h-6 mx-auto mb-2 text-green-500 dark:text-green-400" />
-                  <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                    Economias{" "}
-                    <span className="text-zinc-400">do mês atual</span>
-                  </p>
-                  <p className="text-lg font-bold text-zinc-700 dark:text-zinc-200">
-                    <CountUp valueNumber={overview?.remaining?.total} />
-                  </p>
+                <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
+                        <TrendingDown className="w-5 h-5 text-red-600 dark:text-red-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                          Despesas
+                        </h3>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          do mês atual
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                      <CountUp valueNumber={overview?.outcome?.total} />
+                    </p>
+                    {overview?.outcome?.percentage !== undefined && (
+                      <div className="flex items-center gap-1">
+                        {(() => {
+                          const percentage = Number(overview.outcome.percentage)
+                          if (isNaN(percentage)) return null
+                          
+                          return percentage <= 0 ? (
+                            <>
+                              <ChevronDown className="w-4 h-4 text-green-500" />
+                              <span className="text-sm font-medium text-green-500">
+                                {percentage.toFixed(1)}%
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <ChevronUp className="w-4 h-4 text-red-500" />
+                              <span className="text-sm font-medium text-red-500">
+                                +{percentage.toFixed(1)}%
+                              </span>
+                            </>
+                          )
+                        })()}
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400 ml-1">
+                          em relação ao mês passado
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
