@@ -5,6 +5,7 @@ import MiniInfoModal from '../MiniInfoModal'
 import 'react-loading-skeleton/dist/skeleton.css'
 import './styles.css'
 import CardSkeleton from '../CardSkeleton'
+import VerticalCardSkeleton from '../VerticalCardSkeleton'
 import ModalDelete from '../ModalDelete'
 import useTablePreviewAux from '../../hooks/useTablePreviewAux'
 import { useTheme } from '../../context/ThemeProvider'
@@ -36,6 +37,7 @@ interface IParams {
   resetScroll?: boolean
   maxDays?: number
   showViewAllButton?: boolean
+  variant?: 'horizontal' | 'vertical'
 }
 
 const TablePreview = ({
@@ -53,6 +55,7 @@ const TablePreview = ({
   resetScroll = false,
   maxDays = undefined,
   showViewAllButton = false,
+  variant = 'horizontal',
 }: IParams) => {
   const targetRowRef = useRef<HTMLDivElement>(null)
   const tableContainerRef = useRef<HTMLDivElement>(null)
@@ -133,6 +136,147 @@ const TablePreview = ({
         ? <TrendingDown size={16} className="inline mr-1" /> 
         : null
 
+      // Renderização condicional baseada na variant
+      if (variant === 'vertical') {
+        return (
+          <div
+            key={row.formatted_date}
+            ref={row.isToday ? targetRowRef : null}
+            className={`group relative bg-white dark:bg-zinc-800 rounded-xl p-4 border transition-all duration-300 hover:shadow-lg hover:shadow-teal-500/10 hover:-translate-y-1 ${
+              row.isToday 
+                ? 'border-teal-500 bg-gradient-to-r from-teal-50 to-blue-50 dark:from-teal-900/30 dark:to-blue-900/30 shadow-lg' 
+                : 'border-zinc-200 dark:border-zinc-700 hover:border-teal-300 dark:hover:border-teal-600'
+            }`}
+          >
+            {/* Today Badge */}
+            {row.isToday && (
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-teal-500 to-blue-500 text-white text-xs px-3 py-1 rounded-full font-medium shadow-lg">
+                Hoje
+              </div>
+            )}
+            
+            {/* Vertical Layout: Date Left, Financial Data Right */}
+            <div className="flex gap-4">
+              {/* Date Section - Left */}
+              <div className="flex-shrink-0 w-20">
+                <div className="text-center">
+                  <div className="p-2 bg-zinc-100 dark:bg-zinc-700 rounded-lg mb-1">
+                    <Calendar size={20} className="text-zinc-600 dark:text-zinc-400 mx-auto" />
+                  </div>
+                  <div className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                    {new Date(row.date).getDate()}
+                  </div>
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {new Date(row.date).toLocaleDateString('pt-BR', { month: 'short' }).toUpperCase()}
+                  </div>
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {new Date(row.date).toLocaleDateString('pt-BR', { weekday: 'short' }).toUpperCase()}
+                  </div>
+                </div>
+              </div>
+
+              {/* Financial Data Section - Right */}
+              <div className="flex-1 space-y-2">
+                {/* Income */}
+                <div 
+                  className="relative cursor-pointer p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
+                  onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 1)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp size={14} className="text-green-600 dark:text-green-400" />
+                      <span className="text-xs font-medium text-green-700 dark:text-green-300">
+                        Entradas
+                      </span>
+                    </div>
+                    <p className="font-semibold text-green-700 dark:text-green-300 text-sm">
+                      {row.incomes?.valueFormatted || 'R$ 0,00'}
+                    </p>
+                  </div>
+                  
+                  {hoveredCell?.rowIndex === rowIndex && hoveredCell?.colIndex === 1 && (
+                    <MiniInfoModal
+                      handleCreateTransaction={(value, setValue) =>
+                        handleCreateTransaction(
+                          'incomes',
+                          row,
+                          value,
+                          setValue,
+                          currentMonth,
+                          setCurrentMonth,
+                          from,
+                        )
+                      }
+                      transactions={row.incomes?.transactions || []}
+                      type="income"
+                      setOpenModal={setOpenModal}
+                      tdRect={hoveredCell?.tdRect}
+                    />
+                  )}
+                </div>
+
+                {/* Outcome */}
+                <div 
+                  className="relative cursor-pointer p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+                  onMouseEnter={(e) => handleMouseEnter(e, rowIndex, 2)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <TrendingDown size={14} className="text-red-600 dark:text-red-400" />
+                      <span className="text-xs font-medium text-red-700 dark:text-red-300">
+                        Saídas
+                      </span>
+                    </div>
+                    <p className="font-semibold text-red-700 dark:text-red-300 text-sm">
+                      {row.outcomes?.valueFormatted || 'R$ 0,00'}
+                    </p>
+                  </div>
+                  
+                  {hoveredCell?.rowIndex === rowIndex && hoveredCell?.colIndex === 2 && (
+                    <MiniInfoModal
+                      handleCreateTransaction={(value, setValue) =>
+                        handleCreateTransaction(
+                          'outcomes',
+                          row,
+                          value,
+                          setValue,
+                          currentMonth,
+                          setCurrentMonth,
+                          from,
+                        )
+                      }
+                      transactions={row.outcomes?.transactions || []}
+                      type="outcome"
+                      setOpenModal={setOpenModal}
+                      tdRect={hoveredCell?.tdRect}
+                    />
+                  )}
+                </div>
+
+                {/* Balance */}
+                <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-600">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <BarChart3 size={14} className="text-zinc-600 dark:text-zinc-400" />
+                      <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                        Saldo
+                      </span>
+                    </div>
+                    <p className={`font-bold text-sm flex items-center ${balanceColor}`}>
+                      {balanceIcon}
+                      {row.total.valueFormatted}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
+      // Layout horizontal original
       return (
           <div
             key={row.formatted_date}
@@ -333,7 +477,9 @@ const TablePreview = ({
           )}
         </div>
       ) : (
-        <CardSkeleton count={maxDays || 3} />
+        variant === 'vertical' 
+          ? <VerticalCardSkeleton count={maxDays || 3} />
+          : <CardSkeleton count={maxDays || 3} />
       )}
 
       {openModal.isOpen && (

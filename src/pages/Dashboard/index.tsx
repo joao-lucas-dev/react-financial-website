@@ -500,40 +500,10 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Monthly Overview Table - Full Width */}
-            <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 mb-8 shadow-2xl transition-colors">
-              {/* <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center space-x-2">
-                  <button
-                    className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors text-zinc-600 dark:text-zinc-400"
-                    onClick={() => getPreviousMonth()}
-                  >
-                    <ChevronLeft size={18} />
-                  </button>
-                  <h2 className="text-lg font-medium text-zinc-700 dark:text-zinc-200">
-                    {getMonth ? `${getMonth()}` : <Skeleton height={20} width={100} />}
-                  </h2>
-                  <button
-                    className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors text-zinc-600 dark:text-zinc-400"
-                    onClick={() => getNextMonth()}
-                  >
-                    <ChevronRight size={18} />
-                  </button>
-                </div>
-
-                <button
-                  disabled={hasToday()}
-                  className="px-4 py-2 rounded-lg text-white text-sm font-medium disabled:opacity-50 transition-all bg-teal-600 hover:bg-teal-700 disabled:bg-zinc-300 dark:disabled:bg-zinc-600"
-                  onClick={() => getToday()}
-                >
-                  <Calendar size={16} className="mr-2 inline" />
-                  Hoje
-                </button>
-              </div> */}
-              
-              <div className="dark:border-zinc-600 rounded-xl">
-                {/* Header with View Toggle */}
-                {/* <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg border border-zinc-400 dark:border-zinc-700"> */}
+            {/* Main Content Grid: TablePreview + Categories */}
+            <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 mb-8">
+              {/* Left Column: TablePreview Vertical */}
+              <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors flex flex-col">
                 <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
@@ -546,7 +516,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div>
+                <div className="flex-1">
                   <TablePreview
                     rows={rows}
                     handleCreateTransaction={handleCreateTransaction}
@@ -561,7 +531,111 @@ export default function Dashboard() {
                     from="dashboard"
                     maxDays={3}
                     showViewAllButton={true}
+                    variant="vertical"
                   />
+                </div>
+              </div>
+
+              {/* Right Column: Categories */}
+              <div className="space-y-6 h-full flex flex-col">
+                {/* Outcome Categories - Now on Top */}
+                <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl flex-1 transition-colors">
+                  <h3 className="text-base font-medium mb-4 text-zinc-700 dark:text-zinc-200">
+                    Maiores Saídas
+                  </h3>
+                  {chartCategories.notIncome.config.length === 0 ? (
+                    <div className="h-56 flex items-center justify-center">
+                      <p className="text-zinc-400 dark:text-zinc-500">Sem valores registrados</p>
+                    </div>
+                  ) : (
+                    <div className="flex h-56">
+                      {/* Lista de categorias - metade esquerda */}
+                      <div className="w-1/2 pr-4 overflow-y-auto">
+                        {chartCategories.notIncome.config.slice(0, 5).map((item) => (
+                          <div 
+                            key={item.id} 
+                            className="flex items-center justify-between py-2 border-b last:border-b-0 border-zinc-100 dark:border-zinc-700"
+                          >
+                            <div className="flex items-center min-w-0">
+                              <CategoryIcon size="small" category={item} />
+                              <span className="ml-2 text-sm truncate text-zinc-700 dark:text-zinc-200">
+                                {item.name}
+                              </span>
+                            </div>
+                            <span className="text-sm font-medium ml-2 flex-shrink-0 text-zinc-700 dark:text-zinc-200">
+                              {item.percentage}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Chart e botão - metade direita */}
+                      <div className="w-1/2 flex flex-col items-center">
+                        <div className="flex-1 flex items-center justify-center">
+                          <EnhancedChartComponent 
+                            categories={chartCategories.notIncome.chartConfig} 
+                            size={200}
+                          />
+                        </div>
+                        <Link 
+                          to={{ pathname: '/relatorios', search: `?type=outcomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
+                          className="text-xs px-3 py-2 rounded border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all mt-2 hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
+                        >
+                          Ver relatório completo
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Income Categories - Now on Bottom */}
+                <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl flex-1 transition-colors">
+                  <h3 className="text-base font-medium mb-4 text-zinc-700 dark:text-zinc-200">
+                    Maiores Entradas
+                  </h3>
+                  {chartCategories.income.config.length === 0 ? (
+                    <div className="h-56 flex items-center justify-center">
+                      <p className="text-zinc-400 dark:text-zinc-500">Sem valores registrados</p>
+                    </div>
+                  ) : (
+                    <div className="flex h-56">
+                      {/* Lista de categorias - metade esquerda */}
+                      <div className="w-1/2 pr-4 overflow-y-auto">
+                        {chartCategories.income.config.slice(0, 5).map((item) => (
+                          <div 
+                            key={item.id} 
+                            className="flex items-center justify-between py-2 border-b last:border-b-0 border-zinc-100 dark:border-zinc-700"
+                          >
+                            <div className="flex items-center min-w-0">
+                              <CategoryIcon size="small" category={item} />
+                              <span className="ml-2 text-sm truncate text-zinc-700 dark:text-zinc-200">
+                                {item.name}
+                              </span>
+                            </div>
+                            <span className="text-sm font-medium ml-2 flex-shrink-0 text-zinc-700 dark:text-zinc-200">
+                              {item.percentage}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      {/* Chart e botão - metade direita */}
+                      <div className="w-1/2 flex flex-col items-center">
+                        <div className="flex-1 flex items-center justify-center">
+                          <EnhancedChartComponent 
+                            categories={chartCategories.income.chartConfig} 
+                            size={200}
+                          />
+                        </div>
+                        <Link 
+                          to={{ pathname: '/relatorios', search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
+                          className="text-xs px-3 py-2 rounded border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all mt-2 hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
+                        >
+                          Ver relatório completo
+                        </Link>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -569,109 +643,6 @@ export default function Dashboard() {
             {/* Credit Card Bills */}
             <div className="mb-8">
               <CreditCardBills />
-            </div>
-              
-            {/* Category Spending - Side by Side */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-              {/* Income Categories */}
-              <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl h-80 transition-colors">
-                <h3 className="text-base font-medium mb-4 text-zinc-700 dark:text-zinc-200">
-                  Maiores Entradas
-                </h3>
-                {chartCategories.income.config.length === 0 ? (
-                  <div className="h-56 flex items-center justify-center">
-                    <p className="text-zinc-400 dark:text-zinc-500">Sem valores registrados</p>
-                  </div>
-                ) : (
-                  <div className="flex h-56">
-                    {/* Lista de categorias - metade esquerda */}
-                    <div className="w-1/2 pr-4 overflow-y-auto">
-                      {chartCategories.income.config.slice(0, 5).map((item) => (
-                        <div 
-                          key={item.id} 
-                          className="flex items-center justify-between py-2 border-b last:border-b-0 border-zinc-100 dark:border-zinc-700"
-                        >
-                          <div className="flex items-center min-w-0">
-                            <CategoryIcon size="small" category={item} />
-                            <span className="ml-2 text-sm truncate text-zinc-700 dark:text-zinc-200">
-                              {item.name}
-                            </span>
-                          </div>
-                          <span className="text-sm font-medium ml-2 flex-shrink-0 text-zinc-700 dark:text-zinc-200">
-                            {item.percentage}%
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {/* Chart e botão - metade direita */}
-                    <div className="w-1/2 flex flex-col items-center">
-                      <div className="flex-1 flex items-center justify-center">
-                        <EnhancedChartComponent 
-                          categories={chartCategories.income.chartConfig} 
-                          size={200}
-                        />
-                      </div>
-                      <Link 
-                        to={{ pathname: '/relatorios', search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
-                        className="text-xs px-3 py-2 rounded border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all mt-2 hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
-                      >
-                        Ver relatório completo
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              {/* Outcome Categories */}
-              <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl h-80 transition-colors">
-                <h3 className="text-base font-medium mb-4 text-zinc-700 dark:text-zinc-200">
-                  Maiores Saídas
-                </h3>
-                {chartCategories.notIncome.config.length === 0 ? (
-                  <div className="h-56 flex items-center justify-center">
-                    <p className="text-zinc-400 dark:text-zinc-500">Sem valores registrados</p>
-                  </div>
-                ) : (
-                  <div className="flex h-56">
-                    {/* Lista de categorias - metade esquerda */}
-                    <div className="w-1/2 pr-4 overflow-y-auto">
-                      {chartCategories.notIncome.config.slice(0, 5).map((item) => (
-                        <div 
-                          key={item.id} 
-                          className="flex items-center justify-between py-2 border-b last:border-b-0 border-zinc-100 dark:border-zinc-700"
-                        >
-                          <div className="flex items-center min-w-0">
-                            <CategoryIcon size="small" category={item} />
-                            <span className="ml-2 text-sm truncate text-zinc-700 dark:text-zinc-200">
-                              {item.name}
-                            </span>
-                          </div>
-                          <span className="text-sm font-medium ml-2 flex-shrink-0 text-zinc-700 dark:text-zinc-200">
-                            {item.percentage}%
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {/* Chart e botão - metade direita */}
-                    <div className="w-1/2 flex flex-col items-center">
-                      <div className="flex-1 flex items-center justify-center">
-                        <EnhancedChartComponent 
-                          categories={chartCategories.notIncome.chartConfig} 
-                          size={200}
-                        />
-                      </div>
-                      <Link 
-                        to={{ pathname: '/relatorios', search: `?type=outcomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
-                        className="text-xs px-3 py-2 rounded border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all mt-2 hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
-                      >
-                        Ver relatório completo
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
 
             {/* Recent Transactions */}
