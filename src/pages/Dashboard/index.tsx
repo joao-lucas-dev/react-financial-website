@@ -43,7 +43,8 @@ export default function Dashboard() {
   });
 
   // Credit Cards State
-  const [creditCards, setCreditCards] = useState(mockCreditCards);
+  const [creditCards, setCreditCards] = useState([mockCreditCards[0]]);
+  // const [creditCards, setCreditCards] = useState([]);
   const [showCards, setShowCards] = useState(true); // Toggle for empty state demo
 
   const { chartCategories, handleGetChartCategories, categories } =
@@ -101,11 +102,6 @@ export default function Dashboard() {
   };
 
   // Credit Card Handlers
-  const handleAddCard = () => {
-    console.log("Adicionar novo cartão - modal/página de criação aqui");
-    // TODO: Implementar modal ou página de criação de cartão quando backend estiver pronto
-  };
-
   const handleCardClick = (card: any) => {
     console.log("Cartão clicado:", card);
     // TODO: Implementar navegação para detalhes do cartão ou ações
@@ -148,11 +144,10 @@ export default function Dashboard() {
                 {showCards && creditCards.length > 0 ? (
                   <CreditCardCarousel
                     cards={creditCards}
-                    onAddCard={handleAddCard}
                     onCardClick={handleCardClick}
                   />
                 ) : (
-                  <CreditCardEmptyState onAddCard={handleAddCard} />
+                  <CreditCardEmptyState />
                 )}
               </div>
 

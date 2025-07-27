@@ -1,17 +1,16 @@
 import React, { useState } from 'react'
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import CreditCard from './CreditCard'
 import { CreditCard as CreditCardType } from '../types/creditCards'
+import { Link } from 'react-router'
 
 interface CreditCardCarouselProps {
   cards: CreditCardType[]
-  onAddCard?: () => void
   onCardClick?: (card: CreditCardType) => void
 }
 
 const CreditCardCarousel: React.FC<CreditCardCarouselProps> = ({
   cards,
-  onAddCard,
   onCardClick
 }) => {
   const [activeIndex, setActiveIndex] = useState(0)
@@ -97,7 +96,7 @@ const CreditCardCarousel: React.FC<CreditCardCarouselProps> = ({
           {/* Previous Button */}
           <button
             onClick={prevCard}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all duration-200 z-10"
+            className="absolute left-[-4rem] top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-600 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all duration-200 z-10 shadow-lg"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -105,20 +104,13 @@ const CreditCardCarousel: React.FC<CreditCardCarouselProps> = ({
           {/* Next Button */}
           <button
             onClick={nextCard}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all duration-200 z-10"
+            className="absolute right-[-0.5rem] top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-600 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all duration-200 z-10 shadow-lg"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
         </>
       )}
 
-      {/* Add Card Button */}
-      <button
-        onClick={onAddCard}
-        className="absolute -right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-teal-700 text-white border-0 cursor-pointer z-20 shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-xl active:scale-95 hover:from-teal-400 hover:to-teal-600"
-      >
-        <Plus size={20} />
-      </button>
 
       {/* Dots Indicator */}
       {cards.length > 1 && (
@@ -138,19 +130,30 @@ const CreditCardCarousel: React.FC<CreditCardCarouselProps> = ({
       )}
 
       {/* Card Info */}
-      <div className="mt-4 text-center">
-        <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-200">
-          {cards[activeIndex]?.name}
-        </h3>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Limite disponível: {' '}
-          <span className="font-medium text-teal-600 dark:text-teal-400">
-            {((cards[activeIndex]?.creditLimit || 0) - cards[activeIndex]?.balance).toLocaleString('pt-BR', {
-              style: 'currency',
-              currency: 'BRL'
-            })}
-          </span>
-        </p>
+      <div className="mt-4 text-center flex">
+        <div>
+          <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-200">
+            {cards[activeIndex]?.name}
+          </h3>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Limite disponível: {' '}
+            <span className="font-medium text-teal-600 dark:text-teal-400">
+              {((cards[activeIndex]?.creditLimit || 0) - cards[activeIndex]?.balance).toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+              })}
+            </span>
+          </p>
+        </div>
+        <div className="flex flex-1 items-center justify-center">
+          <Link
+            to="/transacoes"
+            className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg active:scale-95"
+          >
+            Ver fatura
+            <ArrowRight size={16} />
+          </Link>
+        </div>
       </div>
     </div>
   )

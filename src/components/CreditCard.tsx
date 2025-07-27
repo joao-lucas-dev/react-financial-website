@@ -15,38 +15,6 @@ const CreditCard: React.FC<CreditCardProps> = ({
   onClick,
   isActive = false 
 }) => {
-  // Get brand logo/icon based on card brand
-  const getBrandIcon = () => {
-    switch (card.brand) {
-      case 'visa':
-        return (
-          <div className="text-xl font-bold tracking-wider">
-            VISA
-          </div>
-        )
-      case 'mastercard':
-        return (
-          <div className="flex items-center gap-1">
-            <div className="w-6 h-6 rounded-full bg-red-500 opacity-80"></div>
-            <div className="w-6 h-6 rounded-full bg-yellow-500 opacity-80 -ml-3"></div>
-          </div>
-        )
-      case 'elo':
-        return (
-          <div className="text-xl font-bold tracking-wider">
-            elo
-          </div>
-        )
-      case 'amex':
-        return (
-          <div className="text-lg font-bold tracking-wider">
-            AMEX
-          </div>
-        )
-      default:
-        return <CreditCardIcon className="w-6 h-6 opacity-80" />
-    }
-  }
 
   // Get network symbols (circles for mastercard, etc.)
   const getNetworkSymbols = () => {
@@ -118,37 +86,14 @@ const CreditCard: React.FC<CreditCardProps> = ({
         </p>
       </div>
 
-      {/* Card details */}
-      <div className="flex justify-between items-end">
-        <div>
-          <p className="text-xs opacity-70 mb-1">Portador</p>
-          <p className="text-sm font-medium truncate max-w-32">
-            {card.holderName}
-          </p>
-        </div>
-        
+      {/* Card details - only expiry date */}
+      <div className="flex justify-end items-end">
         <div className="text-right">
           <p className="text-xs opacity-70 mb-1">Válido até</p>
           <p className="text-sm font-medium">
             {card.expiryMonth}/{card.expiryYear}
           </p>
         </div>
-      </div>
-
-      {/* Brand logo at bottom */}
-      <div className="absolute bottom-6 right-6 opacity-90">
-        {getBrandIcon()}
-      </div>
-
-      {/* Balance overlay (optional) */}
-      <div className="absolute top-4 left-4">
-        <p className="text-xs opacity-70">{card.name}</p>
-        <p className="text-sm font-semibold">
-          {card.balance.toLocaleString('pt-BR', { 
-            style: 'currency', 
-            currency: 'BRL' 
-          })}
-        </p>
       </div>
     </div>
   )

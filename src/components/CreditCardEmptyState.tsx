@@ -1,11 +1,11 @@
 import React from 'react'
-import { CreditCard, Plus, Sparkles } from 'lucide-react'
+import { CreditCard, Sparkles } from 'lucide-react'
 
 interface CreditCardEmptyStateProps {
-  onAddCard?: () => void
+  // No props needed for display-only empty state
 }
 
-const CreditCardEmptyState: React.FC<CreditCardEmptyStateProps> = ({ onAddCard }) => {
+const CreditCardEmptyState: React.FC<CreditCardEmptyStateProps> = () => {
   return (
     <div className="relative w-full max-w-md mx-auto">
       {/* Empty Card Placeholder */}
@@ -29,18 +29,9 @@ const CreditCardEmptyState: React.FC<CreditCardEmptyStateProps> = ({ onAddCard }
           <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-200 mb-2">
             Nenhum cartão criado ainda
           </h3>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6 px-4">
-            Adicione seu primeiro cartão para começar a gerenciar suas finanças
+          <p className="text-sm text-zinc-600 dark:text-zinc-400 px-4">
+            Nenhum cartão cadastrado ainda. Adicione cartões para visualizar suas informações aqui.
           </p>
-
-          {/* Add button */}
-          <button
-            onClick={onAddCard}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-medium rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95"
-          >
-            <Plus className="w-4 h-4" />
-            Criar primeiro cartão
-          </button>
         </div>
       </div>
 
