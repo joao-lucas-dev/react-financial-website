@@ -4,6 +4,7 @@ import {
   Settings,
   Newspaper,
   ChartColumn,
+  CreditCard,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import LogoutButton from "./LoggoutButton.tsx";
@@ -22,6 +23,12 @@ const MenuAside = ({ activePage }: IParams) => {
       icon: Newspaper,
       label: "Transações",
       path: "/transacoes",
+    },
+    {
+      id: "faturas",
+      icon: CreditCard,
+      label: "Faturas",
+      path: "/faturas",
     },
     {
       id: "relatorios",

@@ -147,7 +147,7 @@ const CreditCardCarousel: React.FC<CreditCardCarouselProps> = ({
         </div>
         <div className="flex flex-1 items-center justify-center">
           <Link
-            to="/transacoes"
+            to="/faturas"
             className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg active:scale-95"
           >
             Ver fatura

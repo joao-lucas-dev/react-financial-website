@@ -56,6 +56,8 @@ export type ITransaction = {
   transaction_day: string
   type?: 'income' | 'outcome'
   is_recurring?: boolean
+  // Campo para vincular transação ao cartão de crédito
+  card_id?: string
   // Novos campos para sistema de pagamento
   is_paid?: boolean
   paid_date?: string

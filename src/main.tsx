@@ -10,6 +10,8 @@ import ProtectPage from './pages/ProtectPage.tsx'
 import RedirectIfAuthenticated from './pages/RedirectIfAuthenticated.tsx'
 import CategoryReports from './pages/CategoryReports'
 import Settings from './pages/Settings'
+import CreditCardBillsPage from './pages/CreditCardBills'
+import CreditCardDetailsPage from './pages/CreditCardDetails'
 import ThemeProvider from './context/ThemeProvider.tsx'
 import ScrollToTop from './components/ScrollToTop'
 
@@ -29,6 +31,8 @@ if (rootElement) {
               <Route element={<ProtectPage />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/transacoes" element={<Transactions />} />
+                <Route path="/faturas" element={<CreditCardBillsPage />} />
+                <Route path="/faturas/:cardId" element={<CreditCardDetailsPage />} />
                 <Route path="/relatorios" element={<CategoryReports />} />
                 <Route path="/configuracoes" element={<Settings />} />
               </Route>

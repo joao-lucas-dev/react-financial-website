@@ -43,7 +43,7 @@ export default function Dashboard() {
   });
 
   // Credit Cards State
-  const [creditCards, setCreditCards] = useState([mockCreditCards[0]]);
+  const [creditCards, setCreditCards] = useState(mockCreditCards);
   // const [creditCards, setCreditCards] = useState([]);
   const [showCards, setShowCards] = useState(true); // Toggle for empty state demo
 
