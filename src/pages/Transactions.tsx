@@ -1,7 +1,7 @@
 import Header from '../components/Header.tsx'
 import MenuAside from '../components/MenuAside.tsx'
 import Skeleton from 'react-loading-skeleton'
-import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import { BarChart3, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
 import TablePreview from '../components/TablePreview'
 import { useState } from 'react'
 import { ITransaction } from '../types/transactions.ts'
@@ -61,10 +61,10 @@ const Transactions = () => {
   }
 
   return (
-    <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
+    <div className="min-h-screen w-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
       <Header title="Transações" activePage="transacoes" />
 
-      <div className="flex h-full">
+      <div className="flex min-h-screen pt-24">
         <MenuAside activePage="transacoes" />
 
         <main 
@@ -75,7 +75,27 @@ const Transactions = () => {
             padding: '2rem'
           }}
         >
+          <div className="mb-8">
+              <h1 className="text-4xl font-bold text-zinc-700 dark:text-zinc-200 mb-2 leading-tight">
+                  Transações Financeiras
+              </h1>
+              <p className="text-zinc-600 dark:text-zinc-400 text-base">
+                  Acompanhe suas transações mensais
+              </p>
+          </div>
           <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors">
+              {/* <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
+                      <BarChart3 size={20} className="text-teal-600 dark:text-teal-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-zinc-700 dark:text-zinc-100">Transações Financeiras</h3>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">Acompanhe suas transações mensais</p>
+                    </div>
+                  </div>
+                </div> */}
+
               <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center mb-4">
                 <h2 className="text-base mb-2 font-medium text-gray dark:text-softGray">
                   {getMonth ? (
@@ -108,7 +128,7 @@ const Transactions = () => {
                 <div className="hidden sm:block">
                   <button
                     disabled={hasToday()}
-                    className="bg-primary px-4 py-1 text-white rounded-lg disabled:bg-orange-300 dark:disabled:bg-auto flex justify-center items-center active:opacity-50"
+                    className="bg-teal-600 px-4 py-1 text-white rounded-lg disabled:opacity-30 dark:disabled:bg-auto flex justify-center items-center active:opacity-50"
                     onClick={handleToday}
                   >
                     <Calendar size={16} className="mr-2" />

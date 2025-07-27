@@ -468,7 +468,7 @@ const TablePreview = ({
             <div className="flex justify-center mt-6">
               <Link
                 to="/transacoes"
-                className="flex items-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium transition-all duration-200 hover:shadow-lg active:scale-95"
+                className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg active:scale-95"
               >
                 Ver todas transações
                 <ArrowRight size={16} />

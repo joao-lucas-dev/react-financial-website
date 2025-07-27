@@ -19,6 +19,7 @@ import {
 import { Link } from 'react-router-dom'
 
 import TablePreview from '../../components/TablePreview'
+import EmptyChartState from '../../components/EmptyChartState'
 import ChartComponent from '../../components/ChartComponent.tsx'
 import EnhancedChartComponent from '../../components/EnhancedChartComponent.tsx'
 import FloatingButton from '../../components/FloatingButton.tsx'
@@ -133,7 +134,7 @@ export default function Dashboard() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm">Saldo Total</p>
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm">Saldo Hoje</p>
                   <div className="text-2xl font-bold text-teal-600 dark:text-teal-400">
                     <CountUp valueNumber={balance} />
                   </div>
@@ -544,27 +545,32 @@ export default function Dashboard() {
                     Maiores Saídas
                   </h3>
                   {chartCategories.notIncome.config.length === 0 ? (
-                    <div className="h-56 flex items-center justify-center">
-                      <p className="text-zinc-400 dark:text-zinc-500">Sem valores registrados</p>
-                    </div>
+                    <EmptyChartState 
+                      type="saidas" 
+                      onAddTransaction={() => setOpenModal({
+                        isOpen: true,
+                        transaction: {} as ITransaction,
+                        type: 'create'
+                      })}
+                    />
                   ) : (
-                    <div className="flex h-56">
-                      {/* Lista de categorias - metade esquerda */}
-                      <div className="w-1/2 pr-4 overflow-y-auto">
-                        {chartCategories.notIncome.config.slice(0, 5).map((item) => (
+                    <div className="flex h-full">
+                      {/* Lista de categorias centralizadas - metade esquerda */}
+                      <div className="w-1/2 pr-4 flex flex-col justify-center">
+                        {chartCategories.notIncome.config.slice(0, 5).map((item, index) => (
                           <div 
                             key={item.id} 
-                            className="flex items-center justify-between py-2 border-b last:border-b-0 border-zinc-100 dark:border-zinc-700"
+                            className={`flex items-center justify-center py-3 ${index !== chartCategories.notIncome.config.slice(0, 5).length - 1 ? 'border-b border-zinc-100 dark:border-zinc-700' : ''}`}
                           >
-                            <div className="flex items-center min-w-0">
+                            <div className="flex items-center gap-3">
                               <CategoryIcon size="small" category={item} />
-                              <span className="ml-2 text-sm truncate text-zinc-700 dark:text-zinc-200">
+                              <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
                                 {item.name}
                               </span>
+                              <span className="text-lg font-bold text-red-600 dark:text-red-400">
+                                {item.percentage}%
+                              </span>
                             </div>
-                            <span className="text-sm font-medium ml-2 flex-shrink-0 text-zinc-700 dark:text-zinc-200">
-                              {item.percentage}%
-                            </span>
                           </div>
                         ))}
                       </div>
@@ -574,12 +580,12 @@ export default function Dashboard() {
                         <div className="flex-1 flex items-center justify-center">
                           <EnhancedChartComponent 
                             categories={chartCategories.notIncome.chartConfig} 
-                            size={200}
+                            size={180}
                           />
                         </div>
                         <Link 
                           to={{ pathname: '/relatorios', search: `?type=outcomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
-                          className="text-xs px-3 py-2 rounded border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all mt-2 hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
+                          className="text-xs px-3 py-2 rounded border border-red-600 text-red-600 dark:border-red-400 dark:text-red-400 transition-all mt-2 hover:bg-red-600 hover:text-white dark:hover:bg-red-400 dark:hover:text-zinc-900"
                         >
                           Ver relatório completo
                         </Link>
@@ -594,27 +600,32 @@ export default function Dashboard() {
                     Maiores Entradas
                   </h3>
                   {chartCategories.income.config.length === 0 ? (
-                    <div className="h-56 flex items-center justify-center">
-                      <p className="text-zinc-400 dark:text-zinc-500">Sem valores registrados</p>
-                    </div>
+                    <EmptyChartState 
+                      type="entradas" 
+                      onAddTransaction={() => setOpenModal({
+                        isOpen: true,
+                        transaction: {} as ITransaction,
+                        type: 'create'
+                      })}
+                    />
                   ) : (
-                    <div className="flex h-56">
-                      {/* Lista de categorias - metade esquerda */}
-                      <div className="w-1/2 pr-4 overflow-y-auto">
-                        {chartCategories.income.config.slice(0, 5).map((item) => (
+                    <div className="flex h-full">
+                      {/* Lista de categorias centralizadas - metade esquerda */}
+                      <div className="w-1/2 pr-4 flex flex-col justify-center">
+                        {chartCategories.income.config.slice(0, 5).map((item, index) => (
                           <div 
                             key={item.id} 
-                            className="flex items-center justify-between py-2 border-b last:border-b-0 border-zinc-100 dark:border-zinc-700"
+                            className={`flex items-center justify-center py-3 ${index !== chartCategories.income.config.slice(0, 5).length - 1 ? 'border-b border-zinc-100 dark:border-zinc-700' : ''}`}
                           >
-                            <div className="flex items-center min-w-0">
+                            <div className="flex items-center gap-3">
                               <CategoryIcon size="small" category={item} />
-                              <span className="ml-2 text-sm truncate text-zinc-700 dark:text-zinc-200">
+                              <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
                                 {item.name}
                               </span>
+                              <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                                {item.percentage}%
+                              </span>
                             </div>
-                            <span className="text-sm font-medium ml-2 flex-shrink-0 text-zinc-700 dark:text-zinc-200">
-                              {item.percentage}%
-                            </span>
                           </div>
                         ))}
                       </div>
@@ -624,12 +635,12 @@ export default function Dashboard() {
                         <div className="flex-1 flex items-center justify-center">
                           <EnhancedChartComponent 
                             categories={chartCategories.income.chartConfig} 
-                            size={200}
+                            size={180}
                           />
                         </div>
                         <Link 
                           to={{ pathname: '/relatorios', search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ''}` }}
-                          className="text-xs px-3 py-2 rounded border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all mt-2 hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
+                          className="text-xs px-3 py-2 rounded border border-green-600 text-green-600 dark:border-green-400 dark:text-green-400 transition-all mt-2 hover:bg-green-600 hover:text-white dark:hover:bg-green-400 dark:hover:text-zinc-900"
                         >
                           Ver relatório completo
                         </Link>

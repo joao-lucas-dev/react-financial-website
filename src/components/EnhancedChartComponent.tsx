@@ -5,11 +5,16 @@ import { ChartData } from '../types/categories'
 interface EnhancedChartComponentProps {
   categories: ChartData | null
   size?: number
+  centerCategory?: {
+    name: string
+    value: string
+  }
 }
 
 const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({ 
   categories, 
-  size = 180 
+  size = 180,
+  centerCategory
 }) => {
   
   if (!categories || !categories.labels || categories.labels.length === 0) {
@@ -44,6 +49,7 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
         data={chartData} 
         size={size}
         innerRadius={0.65}
+        // centerCategory={centerCategory}
       />
     </div>
   )

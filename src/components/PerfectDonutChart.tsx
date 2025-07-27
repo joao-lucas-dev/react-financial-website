@@ -10,12 +10,17 @@ interface PerfectDonutChartProps {
   data: ChartDataItem[]
   size?: number
   innerRadius?: number
+  centerCategory?: {
+    name: string
+    value: string
+  }
 }
 
 const PerfectDonutChart: React.FC<PerfectDonutChartProps> = ({ 
   data, 
   size = 200, 
-  innerRadius = 0.65 
+  innerRadius = 0.65,
+  centerCategory
 }) => {
   if (!data || data.length === 0) {
     return (
@@ -101,32 +106,61 @@ const PerfectDonutChart: React.FC<PerfectDonutChartProps> = ({
           </text>
           
           {/* Texto central */}
-          <text
-            x={centerX}
-            y={centerY - 8}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fill="#424242"
-            fontSize="14"
-            fontWeight="600"
-          >
-            Total
-          </text>
-          <text
-            x={centerX}
-            y={centerY + 8}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fill="#616161"
-            fontSize="10"
-            fontWeight="500"
-          >
-            {total.toLocaleString('pt-BR', {
-              style: 'currency',
-              currency: 'BRL',
-              maximumFractionDigits: 0
-            })}
-          </text>
+          {centerCategory ? (
+            <>
+              <text
+                x={centerX}
+                y={centerY - 8}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill="#424242"
+                fontSize="14"
+                fontWeight="600"
+              >
+                {centerCategory.name}
+              </text>
+              <text
+                x={centerX}
+                y={centerY + 8}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill="#616161"
+                fontSize="10"
+                fontWeight="500"
+              >
+                {centerCategory.value}
+              </text>
+            </>
+          ) : (
+            <>
+              <text
+                x={centerX}
+                y={centerY - 8}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill="#424242"
+                fontSize="14"
+                fontWeight="600"
+              >
+                Total
+              </text>
+              <text
+                x={centerX}
+                y={centerY + 8}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill="#616161"
+                fontSize="10"
+                fontWeight="500"
+              >
+                {total.toLocaleString('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
+                  maximumFractionDigits: 0
+                })}
+              </text>
+            </>
+          )}
         </svg>
       </div>
     )
@@ -227,32 +261,61 @@ const PerfectDonutChart: React.FC<PerfectDonutChartProps> = ({
         />
         
         {/* Texto central */}
-        <text
-          x={centerX}
-          y={centerY - 8}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fill="#424242"
-          fontSize="14"
-          fontWeight="600"
-        >
-          Total
-        </text>
-        <text
-          x={centerX}
-          y={centerY + 8}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fill="#616161"
-          fontSize="10"
-          fontWeight="500"
-        >
-          {total.toLocaleString('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-            maximumFractionDigits: 0
-          })}
-        </text>
+        {centerCategory ? (
+          <>
+            <text
+              x={centerX}
+              y={centerY - 8}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#424242"
+              fontSize="14"
+              fontWeight="600"
+            >
+              {centerCategory.name}
+            </text>
+            <text
+              x={centerX}
+              y={centerY + 8}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#616161"
+              fontSize="10"
+              fontWeight="500"
+            >
+              {centerCategory.value}
+            </text>
+          </>
+        ) : (
+          <>
+            <text
+              x={centerX}
+              y={centerY - 8}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#424242"
+              fontSize="14"
+              fontWeight="600"
+            >
+              Total
+            </text>
+            <text
+              x={centerX}
+              y={centerY + 8}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#616161"
+              fontSize="10"
+              fontWeight="500"
+            >
+              {total.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+                maximumFractionDigits: 0
+              })}
+            </text>
+          </>
+        )}
       </svg>
     </div>
   )

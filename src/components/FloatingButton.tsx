@@ -27,7 +27,7 @@ const FloatingButton = ({ setOpenModal }: IParams) => {
     <div className="fixed bottom-10 right-10 z-30">
       <button
         onClick={toggleMenu}
-        className="bg-primary text-white p-4 rounded-full shadow-lg hover:bg-softOrange transition duration-300"
+        className="bg-teal-600 text-white p-4 rounded-full shadow-lg hover:opacity-80 transition duration-300"
       >
         <Plus
           className={`${isOpen ? 'rotate-45' : 'rotate-0'} transition-all`}
