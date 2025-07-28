@@ -1,11 +1,7 @@
 import {
-  ChevronRight,
   Search,
-  CreditCard,
   TrendingUp,
   TrendingDown,
-  PiggyBank,
-  Plus,
   BarChart3,
   ArrowRight,
   ChevronUp,
@@ -16,7 +12,6 @@ import { Link } from "react-router-dom";
 import TablePreview from "../../components/TablePreview";
 import EmptyChartState from "../../components/EmptyChartState";
 import FloatingButton from "../../components/FloatingButton.tsx";
-import CreditCardBills from "../../components/CreditCardBills";
 import CreditCardCarousel from "../../components/CreditCardCarousel";
 import CreditCardEmptyState from "../../components/CreditCardEmptyState";
 import SavingsGoalsSimple from "../../components/SavingsGoalsSimple";
@@ -256,8 +251,203 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Main Content Grid: TablePreview + Categories */}
+            <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 mb-8">
+              {/* Left Column: TablePreview Vertical */}
+              <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors flex flex-col">
+                <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
+                      <BarChart3
+                        size={20}
+                        className="text-teal-600 dark:text-teal-400"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                        Visão Financeira
+                      </h3>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                        Acompanhe suas transações diárias
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex-1">
+                  <TablePreview
+                    rows={rows}
+                    handleCreateTransaction={handleCreateTransaction}
+                    handleCreateCompleteTransaction={
+                      handleCreateCompleteTransaction
+                    }
+                    handleDeleteTransaction={handleDeleteTransaction}
+                    handleUpdateTransaction={handleUpdateTransaction}
+                    currentMonth={currentMonth}
+                    setCurrentMonth={setCurrentMonth}
+                    openModal={openModal}
+                    setOpenModal={setOpenModal}
+                    categories={categories}
+                    from="dashboard"
+                    maxDays={3}
+                    showViewAllButton={true}
+                    variant="vertical"
+                  />
+                </div>
+              </div>
+
+              {/* Right Column: Categories */}
+              <div className="space-y-6 h-full flex flex-col">
+                {/* Outcome Categories - Now on Top */}
+                <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl flex-1 transition-colors">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
+                        <TrendingDown className="w-5 h-5 text-red-600 dark:text-red-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                          Maiores Despesas
+                        </h3>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          Principais categorias do mês
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  {chartCategories.notIncome.config.length === 0 ? (
+                    <EmptyChartState
+                      type="despesas"
+                      onAddTransaction={() =>
+                        setOpenModal({
+                          isOpen: true,
+                          transaction: {} as ITransaction,
+                          type: "create",
+                        })
+                      }
+                    />
+                  ) : (
+                    <div className="flex">
+                      {/* Lista de categorias centralizadas - metade esquerda */}
+                      <div className="w-1/2 pr-4 flex flex-col justify-center">
+                        {chartCategories.notIncome.config
+                          .slice(0, 5)
+                          .map((item, index) => (
+                            <div
+                              key={item.id}
+                              className={`flex items-center justify-start py-3 ${index !== chartCategories.notIncome.config.slice(0, 5).length - 1 ? "border-b border-zinc-100 dark:border-zinc-700" : ""}`}
+                            >
+                              <div className="flex justify-between items-center gap-3 w-full">
+                                <div className="flex items-center gap-3">
+                                  <CategoryIcon size="small" category={item} />
+                                  <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
+                                    {item.name}
+                                  </span>
+                                </div>
+                                <span className="text-base font-bold text-zinc-600 dark:text-zinc-400">
+                                  {item.percentage}%
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+
+                      {/* Chart e botão - metade direita */}
+                      <div className="w-1/2 flex flex-col items-center">
+                        <div className="w-full">
+                          <ModernDonutChart />
+                        </div>
+                        <Link
+                          to={{
+                            pathname: "/relatorios",
+                            search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ""}`,
+                          }}
+                          className="mt-4 flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
+                        >
+                          Ver relatório
+                          <ArrowRight size={16} className="ml-2" />
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Income Categories - Now on Bottom */}
+                <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl flex-1 transition-colors">
+                  {/* Substituído por SavingsGoalsSimple */}
+                  <SavingsGoalsSimple />
+                  {/* Código antigo comentado para referência futura - foi substituído pelo SavingsGoals */}
+                </div>
+              </div>
+            </div>
+
+            {/* Credit Card Bills */}
+            {/* <div className="mb-8">
+              <CreditCardBills />
+            </div> */}
+
+            {/* Recent Transactions */}
+            <div className="hidden bg-white dark:bg-zinc-800 rounded-xl p-6 mt-8 shadow-2xl transition-colors">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                <h3 className="text-sm font-medium mb-4 sm:mb-0 text-zinc-700 dark:text-zinc-200">
+                  Transações Recentes
+                </h3>
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                  <div className="relative">
+                    <Search
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-600 dark:text-zinc-400"
+                      size={16}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Buscar transação..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 pr-4 py-2 border border-zinc-200 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400 text-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 w-64"
+                    />
+                  </div>
+                  <Filter
+                    currentFilter={filter}
+                    currentType={typeFilter}
+                    onFilterChange={handleFilterChange}
+                  />
+                </div>
+              </div>
+
+              <div className="max-h-96 overflow-auto">
+                <TableTransactions
+                  recentTransactions={recentTransactions}
+                  onSort={handleSort}
+                  sortBy={sortBy}
+                  sortOrder={sortOrder}
+                  openModal={openModal}
+                  setOpenModal={setOpenModal}
+                  handleUpdateTransaction={handleUpdateTransaction}
+                  handleDeleteTransaction={handleDeleteTransaction}
+                  handleDeleteMultipleTransactions={
+                    handleDeleteMultipleTransactions
+                  }
+                  currentMonth={currentMonth}
+                  setCurrentMonth={setCurrentMonth}
+                  categories={categories}
+                  from="dashboard"
+                  searchTerm={searchTerm}
+                />
+              </div>
+
+              <div className="flex justify-center mt-6">
+                <Link
+                  to={{ pathname: "/transacoes" }}
+                  className="flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
+                >
+                  Ver completo
+                  <ArrowRight size={16} className="ml-1" />
+                </Link>
+              </div>
+            </div>
+
             {/* Enhanced Transactions Preview */}
-            <div className="hidden bg-white dark:bg-zinc-800 rounded-xl p-6 mb-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700">
+            <div className="mt-8 bg-white dark:bg-zinc-800 rounded-xl p-6 mb-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-zinc-700 dark:text-zinc-200">
                   Transações Recentes
@@ -430,189 +620,6 @@ export default function Dashboard() {
                     +R$ 3.245,80
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Main Content Grid: TablePreview + Categories */}
-            <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 mb-8">
-              {/* Left Column: TablePreview Vertical */}
-              <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors flex flex-col">
-                <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
-                      <BarChart3
-                        size={20}
-                        className="text-teal-600 dark:text-teal-400"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-zinc-700 dark:text-zinc-100">
-                        Visão Financeira
-                      </h3>
-                      <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                        Acompanhe suas transações diárias
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex-1">
-                  <TablePreview
-                    rows={rows}
-                    handleCreateTransaction={handleCreateTransaction}
-                    handleCreateCompleteTransaction={
-                      handleCreateCompleteTransaction
-                    }
-                    handleDeleteTransaction={handleDeleteTransaction}
-                    handleUpdateTransaction={handleUpdateTransaction}
-                    currentMonth={currentMonth}
-                    setCurrentMonth={setCurrentMonth}
-                    openModal={openModal}
-                    setOpenModal={setOpenModal}
-                    categories={categories}
-                    from="dashboard"
-                    maxDays={3}
-                    showViewAllButton={true}
-                    variant="vertical"
-                  />
-                </div>
-              </div>
-
-              {/* Right Column: Categories */}
-              <div className="space-y-6 h-full flex flex-col">
-                {/* Outcome Categories - Now on Top */}
-                <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl flex-1 transition-colors">
-                  <h3 className="text-base font-medium mb-4 text-zinc-700 dark:text-zinc-200">
-                    Maiores Despesas
-                  </h3>
-                  {chartCategories.notIncome.config.length === 0 ? (
-                    <EmptyChartState
-                      type="despesas"
-                      onAddTransaction={() =>
-                        setOpenModal({
-                          isOpen: true,
-                          transaction: {} as ITransaction,
-                          type: "create",
-                        })
-                      }
-                    />
-                  ) : (
-                    <div className="flex">
-                      {/* Lista de categorias centralizadas - metade esquerda */}
-                      <div className="w-1/2 pr-4 flex flex-col justify-center">
-                        {chartCategories.notIncome.config
-                          .slice(0, 5)
-                          .map((item, index) => (
-                            <div
-                              key={item.id}
-                              className={`flex items-center justify-start py-3 ${index !== chartCategories.notIncome.config.slice(0, 5).length - 1 ? "border-b border-zinc-100 dark:border-zinc-700" : ""}`}
-                            >
-                              <div className="flex justify-between items-center gap-3 w-full">
-                                <div className="flex items-center gap-3">
-                                  <CategoryIcon size="small" category={item} />
-                                  <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
-                                    {item.name}
-                                  </span>
-                                </div>
-                                <span className="text-base font-bold text-zinc-600 dark:text-zinc-400">
-                                  {item.percentage}%
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-
-                      {/* Chart e botão - metade direita */}
-                      <div className="w-1/2 flex flex-col items-center">
-                        <div className="w-full">
-                          <ModernDonutChart />
-                        </div>
-                        <Link
-                          to={{
-                            pathname: "/relatorios",
-                            search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ""}`,
-                          }}
-                          className="mt-4 flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
-                        >
-                          Ver relatório
-                          <ArrowRight size={16} className="ml-2" />
-                        </Link>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Income Categories - Now on Bottom */}
-                <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl flex-1 transition-colors">
-                  {/* Substituído por SavingsGoalsSimple */}
-                  <SavingsGoalsSimple />
-                  {/* Código antigo comentado para referência futura - foi substituído pelo SavingsGoals */}
-                </div>
-              </div>
-            </div>
-
-            {/* Credit Card Bills */}
-            {/* <div className="mb-8">
-              <CreditCardBills />
-            </div> */}
-
-            {/* Recent Transactions */}
-            <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 mt-8 shadow-2xl transition-colors">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                <h3 className="text-lg font-medium mb-4 sm:mb-0 text-zinc-700 dark:text-zinc-200">
-                  Transações Recentes
-                </h3>
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                  <div className="relative">
-                    <Search
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-600 dark:text-zinc-400"
-                      size={16}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Buscar transação..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-zinc-200 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400 text-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 w-64"
-                    />
-                  </div>
-                  <Filter
-                    currentFilter={filter}
-                    currentType={typeFilter}
-                    onFilterChange={handleFilterChange}
-                  />
-                </div>
-              </div>
-
-              <div className="max-h-96 overflow-auto">
-                <TableTransactions
-                  recentTransactions={recentTransactions}
-                  onSort={handleSort}
-                  sortBy={sortBy}
-                  sortOrder={sortOrder}
-                  openModal={openModal}
-                  setOpenModal={setOpenModal}
-                  handleUpdateTransaction={handleUpdateTransaction}
-                  handleDeleteTransaction={handleDeleteTransaction}
-                  handleDeleteMultipleTransactions={
-                    handleDeleteMultipleTransactions
-                  }
-                  currentMonth={currentMonth}
-                  setCurrentMonth={setCurrentMonth}
-                  categories={categories}
-                  from="dashboard"
-                  searchTerm={searchTerm}
-                />
-              </div>
-
-              <div className="flex justify-center mt-6">
-                <Link
-                  to={{ pathname: "/transacoes" }}
-                  className="flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
-                >
-                  Ver completo
-                  <ArrowRight size={16} className="ml-1" />
-                </Link>
               </div>
             </div>
           </main>

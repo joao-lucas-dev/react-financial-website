@@ -66,9 +66,14 @@ const SavingsGoalsSimple: React.FC = () => {
           <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
             <Target size={20} className="text-teal-600 dark:text-teal-400" />
           </div>
-          <h3 className="text-base font-medium text-zinc-700 dark:text-zinc-200">
-            Minhas Caixinhas
-          </h3>
+          <div> 
+            <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+              Minhas Caixinhas
+            </h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Principais objetivos financeiros
+            </p>
+          </div>
         </div>
         <Link
           to="/caixinhas"

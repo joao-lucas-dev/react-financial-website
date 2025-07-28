@@ -112,8 +112,8 @@ export default function useTransactions(
 
   const handleGetPreviewTransactions = useCallback(
     async (date = DateTime.now()) => {
-      const startDate = date.startOf('month');
-      const endDate = date.endOf('month');
+      const startDate = date.minus({ days: 1 });
+      const endDate = date.plus({ days: 1 });
 
       try {
         const { data } = await axiosPrivate.get(

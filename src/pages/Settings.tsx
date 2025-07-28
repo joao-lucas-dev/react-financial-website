@@ -107,14 +107,29 @@ const Settings: React.FC = () => {
         type: 'expense' as 'income' | 'expense'
     });
 
-    const sections = [
-        { id: 'profile', label: 'Perfil', icon: User },
-        { id: 'notifications', label: 'Notificações', icon: Bell },
-        { id: 'appearance', label: 'Aparência', icon: Palette },
-        { id: 'categories', label: 'Categorias', icon: Tags },
-        { id: 'alerts', label: 'Alertas', icon: AlertTriangle },
-        { id: 'privacy', label: 'Privacidade', icon: Shield },
-        { id: 'billing', label: 'Faturamento', icon: CreditCard }
+    const sectionGroups = [
+        {
+            title: 'Conta',
+            sections: [
+                { id: 'profile', label: 'Perfil', icon: User },
+                { id: 'privacy', label: 'Privacidade', icon: Shield }
+            ]
+        },
+        {
+            title: 'Preferências',
+            sections: [
+                { id: 'notifications', label: 'Notificações', icon: Bell },
+                { id: 'appearance', label: 'Aparência', icon: Palette },
+                { id: 'alerts', label: 'Alertas', icon: AlertTriangle }
+            ]
+        },
+        {
+            title: 'Financeiro',
+            sections: [
+                { id: 'categories', label: 'Categorias', icon: Tags },
+                { id: 'billing', label: 'Faturamento', icon: CreditCard }
+            ]
+        }
     ];
 
     const handleInputChange = (field: keyof SettingsFormData, value: any) => {
@@ -1621,20 +1636,29 @@ const Settings: React.FC = () => {
                         <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem' }}>
                             {/* Sidebar */}
                             <div className="bg-white dark:bg-zinc-800 rounded-2xl p-4 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 h-fit transition-colors">
-                                <nav>
-                                    {sections.map((section) => (
-                                        <button
-                                            key={section.id}
-                                            onClick={() => setActiveSection(section.id)}
-                                            className={`flex items-center gap-3 w-full px-4 py-3 mb-2 border-none rounded-xl text-sm font-medium cursor-pointer transition-all text-left ${
-                                                activeSection === section.id 
-                                                    ? 'bg-teal-600 text-white' 
-                                                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700'
-                                            }`}
-                                        >
-                                            <section.icon size={18} />
-                                            {section.label}
-                                        </button>
+                                <nav className="space-y-6">
+                                    {sectionGroups.map((group, groupIndex) => (
+                                        <div key={group.title}>
+                                            <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-zinc-500 dark:text-zinc-400 px-2">
+                                                {group.title}
+                                            </h3>
+                                            <div className="space-y-1">
+                                                {group.sections.map((section) => (
+                                                    <button
+                                                        key={section.id}
+                                                        onClick={() => setActiveSection(section.id)}
+                                                        className={`flex items-center gap-3 w-full px-4 py-3 border-none rounded-xl text-sm font-medium cursor-pointer transition-all text-left ${
+                                                            activeSection === section.id 
+                                                                ? 'bg-teal-600 text-white shadow-lg' 
+                                                                : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-700'
+                                                        }`}
+                                                    >
+                                                        <section.icon size={18} />
+                                                        {section.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
                                     ))}
                                 </nav>
                             </div>
