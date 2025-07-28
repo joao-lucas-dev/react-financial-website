@@ -14,7 +14,7 @@ const CreditCardBillsPage: React.FC = () => {
     return mockCreditCardTransactions
       .filter(transaction => {
         if (transaction.card_id !== cardId) return false
-        const transactionDate = new Date(transaction.transaction_day)
+        const transactionDate = new Date(`${transaction.transaction_day}T00:00:00`)
         return transactionDate.getMonth() + 1 === currentMonth && 
                transactionDate.getFullYear() === currentYear
       })
@@ -35,7 +35,7 @@ const CreditCardBillsPage: React.FC = () => {
         <div className="flex h-full">
           <MenuAside activePage="faturas" />
           
-          <main className="flex-1 mt-4 pl-0 xl-lg:pl-64 max-w-7xl mx-auto p-8">
+          <main className="flex-1 mt-4 pl-0 lg:pl-20 2xl:pl-72 max-w-7xl mx-auto p-8">
             {/* Header Section */}
             <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 mb-8 shadow-2xl transition-colors">
               <div className="flex justify-between items-center">

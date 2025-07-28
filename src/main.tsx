@@ -12,6 +12,7 @@ import CategoryReports from './pages/CategoryReports'
 import Settings from './pages/Settings'
 import CreditCardBillsPage from './pages/CreditCardBills'
 import CreditCardDetailsPage from './pages/CreditCardDetails'
+import SavingsPage from './pages/Savings'
 import ThemeProvider from './context/ThemeProvider.tsx'
 import ScrollToTop from './components/ScrollToTop'
 
@@ -34,6 +35,7 @@ if (rootElement) {
                 <Route path="/faturas" element={<CreditCardBillsPage />} />
                 <Route path="/faturas/:cardId" element={<CreditCardDetailsPage />} />
                 <Route path="/relatorios" element={<CategoryReports />} />
+                <Route path="/caixinhas" element={<SavingsPage />} />
                 <Route path="/configuracoes" element={<Settings />} />
               </Route>
             </Routes>

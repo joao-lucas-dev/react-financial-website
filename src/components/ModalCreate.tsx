@@ -70,10 +70,15 @@ const ModalCreate = ({
   })
 
   useEffect(() => {
-    setValue('transaction_day', DateTime.fromJSDate(new Date(), { zone: Intl.DateTimeFormat().resolvedOptions().timeZone }).toFormat('yyyy-MM-dd'))
+    // Use a data da transação se fornecida, senão use a data atual
+    const transactionDate = openModal.transaction?.transaction_day 
+      ? new Date(`${openModal.transaction.transaction_day}T00:00:00`)
+      : new Date()
+    
+    setValue('transaction_day', DateTime.fromJSDate(transactionDate, { zone: Intl.DateTimeFormat().resolvedOptions().timeZone }).toFormat('yyyy-MM-dd'))
     setValue('recurrence_type', 'none')
     setValue('payment_status', 'unpaid')
-  }, [setValue])
+  }, [setValue, openModal.transaction?.transaction_day])
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {

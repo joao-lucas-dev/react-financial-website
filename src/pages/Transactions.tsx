@@ -64,10 +64,10 @@ const Transactions = () => {
     <div className="min-h-screen w-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
       <Header title="Transações" activePage="transacoes" />
 
-      <div className="flex min-h-screen pt-24">
+      <div className="flex min-h-screen pt-4">
         <MenuAside activePage="transacoes" />
 
-        <main className="flex-1 mt-4 pl-0 xl-lg:pl-64 max-w-7xl mx-auto p-8">
+        <main className="flex-1 mt-4 pl-0 lg:pl-20 2xl:pl-72 max-w-7xl mx-auto p-8">
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-zinc-700 dark:text-zinc-200 mb-2 leading-tight">
               Transações Financeiras

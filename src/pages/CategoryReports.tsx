@@ -5,7 +5,6 @@ import CategoryIcon from '../components/CategoryIcon';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import { DateTime } from 'luxon';
 import MenuAside from '../components/MenuAside';
-import Header from '../components/Header';
 import { useLocation } from 'react-router-dom';
 import useCategories from '../hooks/useCategories';
 import { MessageCircleQuestion } from 'lucide-react';
@@ -106,52 +105,27 @@ const CategoryReports: React.FC = () => {
     const categories = data ? data[tab] : [];
 
     return (
-        <>
+        <div className="font-sans">
             <style>{`
                 @keyframes spin {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }
                 }
             `}</style>
-            <div style={{ 
-                backgroundColor: '#F5F5F5', 
-                minHeight: '100vh',
-                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
-            }}>
-                <Header title="Relatórios" activePage="relatorios" />
-
-            <div className="flex" style={{ paddingTop: '96px' }}>
-                <MenuAside activePage="relatorios" />
-                
-                <div style={{ 
-                    flex: 1, 
-                    marginLeft: '240px',
-                    padding: '2rem',
-                    maxWidth: '1200px',
-                    margin: '0 auto',
-                    marginLeft: '260px'
-                }}>
-                    {/* Header Section */}
-                    <div style={{
-                        marginBottom: '2rem'
-                    }}>
-                        <h1 style={{
-                            fontSize: '2.25rem',
-                            fontWeight: 700,
-                            color: '#424242',
-                            marginBottom: '0.5rem',
-                            lineHeight: 1.2
-                        }}>
-                            Relatórios por Categoria
-                        </h1>
-                        <p style={{
-                            color: '#616161',
-                            fontSize: '1rem',
-                            fontWeight: 400
-                        }}>
-                            Analise seus gastos e receitas por categoria
-                        </p>
-                    </div>
+            <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
+                <div className="flex h-full">
+                    <MenuAside activePage="relatorios" />
+                    
+                    <main className="flex-1 mt-4 pl-0 lg:pl-20 2xl:pl-72 max-w-7xl mx-auto p-8">
+                        {/* Header Section */}
+                        <div className="mb-8">
+                            <h1 className="text-4xl font-bold text-zinc-700 dark:text-zinc-200 mb-2 leading-tight">
+                                Relatórios por Categoria
+                            </h1>
+                            <p className="text-zinc-600 dark:text-zinc-400 text-lg">
+                                Analise seus gastos e receitas por categoria
+                            </p>
+                        </div>
 
                     {/* Controls Section */}
                     <div className="flex items-center justify-between mb-8 bg-white dark:bg-zinc-800 p-6 rounded-2xl shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 transition-colors">
@@ -427,10 +401,10 @@ const CategoryReports: React.FC = () => {
                             </div>
                         </div>
                     </div>
+                    </main>
                 </div>
             </div>
-            </div>
-        </>
+        </div>
     );
 };
 

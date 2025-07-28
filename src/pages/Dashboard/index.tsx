@@ -19,6 +19,7 @@ import FloatingButton from "../../components/FloatingButton.tsx";
 import CreditCardBills from "../../components/CreditCardBills";
 import CreditCardCarousel from "../../components/CreditCardCarousel";
 import CreditCardEmptyState from "../../components/CreditCardEmptyState";
+import SavingsGoalsSimple from "../../components/SavingsGoalsSimple";
 
 import "./styles.css";
 import MenuAside from "../../components/MenuAside.tsx";
@@ -115,7 +116,7 @@ export default function Dashboard() {
         <div className="flex h-full">
           <MenuAside activePage="dashboard" />
 
-          <main className="flex-1 mt-4 pl-0 xl-lg:pl-64 max-w-7xl mx-auto p-8">
+          <main className="flex-1 mt-4 pl-0 lg:pl-20 2xl:pl-72 max-w-7xl mx-auto p-8">
             {/* Welcome Section */}
             <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 mb-8 shadow-2xl transition-colors">
               <div className="flex justify-between items-center">
@@ -542,65 +543,10 @@ export default function Dashboard() {
                 </div>
 
                 {/* Income Categories - Now on Bottom */}
-                <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl flex-1 transition-colors">
-                  <h3 className="text-base font-medium mb-4 text-zinc-700 dark:text-zinc-200">
-                    Maiores Receitas
-                  </h3>
-                  {chartCategories.income.config.length === 0 ? (
-                    <EmptyChartState
-                      type="receitas"
-                      onAddTransaction={() =>
-                        setOpenModal({
-                          isOpen: true,
-                          transaction: {} as ITransaction,
-                          type: "create",
-                        })
-                      }
-                    />
-                  ) : (
-                    <div className="flex">
-                      {/* Lista de categorias centralizadas - metade esquerda */}
-                      <div className="w-1/2 pr-4 flex flex-col justify-center">
-                        {chartCategories.income.config
-                          .slice(0, 5)
-                          .map((item, index) => (
-                            <div
-                              key={item.id}
-                              className={`flex items-center justify-start py-3 ${index !== chartCategories.income.config.slice(0, 5).length - 1 ? "border-b border-zinc-100 dark:border-zinc-700" : ""}`}
-                            >
-                              <div className="flex justify-between items-center gap-3 w-full">
-                                <div className="flex items-center gap-3">
-                                  <CategoryIcon size="small" category={item} />
-                                  <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
-                                    {item.name}
-                                  </span>
-                                </div>
-                                <span className="text-base font-bold text-zinc-600 dark:text-zinc-400">
-                                  {item.percentage}%
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-
-                      {/* Chart e botão - metade direita */}
-                      <div className="w-1/2 flex flex-col items-center">
-                        <div className="w-full">
-                          <ModernDonutChart />
-                        </div>
-                        <Link
-                          to={{
-                            pathname: "/relatorios",
-                            search: `?type=incomes&date=${rows.length > 0 ? rows[0].date.substring(0, 7) : ""}`,
-                          }}
-                          className="mt-4 flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
-                        >
-                          Ver relatório
-                          <ArrowRight size={16} className="ml-2" />
-                        </Link>
-                      </div>
-                    </div>
-                  )}
+                <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl flex-1 transition-colors">
+                  {/* Substituído por SavingsGoalsSimple */}
+                  <SavingsGoalsSimple />
+                  {/* Código antigo comentado para referência futura - foi substituído pelo SavingsGoals */}
                 </div>
               </div>
             </div>

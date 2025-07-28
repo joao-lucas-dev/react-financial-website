@@ -81,7 +81,7 @@ const CreditCardBills: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    const date = new Date(`${dateString}T00:00:00`);
     return date.toLocaleDateString('pt-BR', { 
       day: '2-digit', 
       month: 'short'
@@ -90,7 +90,8 @@ const CreditCardBills: React.FC = () => {
 
   const getDaysUntilDue = (dueDate: string) => {
     const today = new Date();
-    const due = new Date(dueDate);
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(`${dueDate}T00:00:00`);
     const diffTime = due.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;

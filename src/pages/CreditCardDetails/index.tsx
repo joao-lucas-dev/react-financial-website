@@ -18,10 +18,10 @@ const CreditCardDetailsPage: React.FC = () => {
   const filteredTransactions = useMemo(() => {
     return mockCreditCardTransactions.filter(transaction => {
       if (transaction.card_id !== cardId) return false
-      const transactionDate = new Date(transaction.transaction_day)
+      const transactionDate = new Date(`${transaction.transaction_day}T00:00:00`)
       return transactionDate.getMonth() + 1 === selectedMonth && 
              transactionDate.getFullYear() === selectedYear
-    }).sort((a, b) => new Date(b.transaction_day).getTime() - new Date(a.transaction_day).getTime())
+    }).sort((a, b) => new Date(`${b.transaction_day}T00:00:00`).getTime() - new Date(`${a.transaction_day}T00:00:00`).getTime())
   }, [cardId, selectedMonth, selectedYear])
 
   // Calcular estatísticas
@@ -32,7 +32,7 @@ const CreditCardDetailsPage: React.FC = () => {
   // Função para determinar status de pagamento baseado na data
   const getPaymentStatus = (transaction: ITransaction) => {
     const today = new Date()
-    const transactionDate = new Date(transaction.transaction_day)
+    const transactionDate = new Date(`${transaction.transaction_day}T00:00:00`)
     today.setHours(0, 0, 0, 0)
     transactionDate.setHours(0, 0, 0, 0)
 
@@ -88,7 +88,7 @@ const CreditCardDetailsPage: React.FC = () => {
         <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
           <div className="flex h-full">
             <MenuAside activePage="faturas" />
-            <main className="flex-1 mt-4 pl-0 xl-lg:pl-64 max-w-7xl mx-auto p-8">
+            <main className="flex-1 mt-4 pl-0 lg:pl-20 2xl:pl-72 max-w-7xl mx-auto p-8">
               <div className="text-center py-12">
                 <h1 className="text-2xl font-semibold text-zinc-700 dark:text-zinc-200 mb-4">
                   Cartão não encontrado
@@ -113,7 +113,7 @@ const CreditCardDetailsPage: React.FC = () => {
         <div className="flex h-full">
           <MenuAside activePage="faturas" />
           
-          <main className="flex-1 mt-4 pl-0 xl-lg:pl-64 max-w-7xl mx-auto p-8">
+          <main className="flex-1 mt-4 pl-0 lg:pl-20 2xl:pl-72 max-w-7xl mx-auto p-8">
             {/* Header Section */}
             <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 mb-8 shadow-2xl transition-colors">
               <div className="flex items-center justify-between mb-4">
@@ -249,7 +249,7 @@ const CreditCardDetailsPage: React.FC = () => {
                                 {transaction.category.name}
                               </span>
                               <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                                {new Date(transaction.transaction_day).toLocaleDateString('pt-BR')}
+                                {new Date(`${transaction.transaction_day}T00:00:00`).toLocaleDateString('pt-BR')}
                               </span>
                             </div>
                           </div>

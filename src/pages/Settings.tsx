@@ -21,7 +21,6 @@ import {
     X
 } from 'lucide-react';
 import MenuAside from '../components/MenuAside';
-import Header from '../components/Header';
 import { useTheme } from '../context/ThemeProvider';
 
 interface Category {
@@ -1603,23 +1602,12 @@ const Settings: React.FC = () => {
     };
 
     return (
-        <>
-            <div className="bg-zinc-100 dark:bg-zinc-900 min-h-screen transition-colors" style={{
-                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
-            }}>
-                <Header title="Configurações" activePage="configuracoes" />
-
-                <div className="flex" style={{ paddingTop: '96px' }}>
+        <div className="font-sans">
+            <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
+                <div className="flex h-full">
                     <MenuAside activePage="configuracoes" />
                     
-                    <div style={{ 
-                        flex: 1, 
-                        marginLeft: '240px',
-                        padding: '2rem',
-                        maxWidth: '1200px',
-                        margin: '0 auto',
-                        marginLeft: '260px'
-                    }}>
+                    <main className="flex-1 mt-4 pl-0 lg:pl-20 2xl:pl-72 max-w-7xl mx-auto p-8">
                         {/* Header Section */}
                         <div className="mb-8">
                             <h1 className="text-4xl font-bold text-zinc-700 dark:text-zinc-200 mb-2 leading-tight">
@@ -1667,10 +1655,10 @@ const Settings: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </main>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import {
   TrendingUp,
   TrendingDown,
@@ -26,6 +26,8 @@ import {
 } from "../../types/transactions";
 import ModalEdit from "../ModalEdit";
 import ModalCreate from "../ModalCreate.tsx";
+import DayDetailsModal from "../DayDetailsModal";
+import QuickAddModal from "../QuickAddModal";
 
 interface IParams {
   rows: IRow[];
@@ -64,6 +66,23 @@ const TablePreview = ({
 }: IParams) => {
   const targetRowRef = useRef<HTMLDivElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
+  const [dayDetailsModal, setDayDetailsModal] = useState<{
+    isOpen: boolean;
+    dayData: IRow | null;
+    initialFilter?: 'all' | 'income' | 'outcome';
+  }>({
+    isOpen: false,
+    dayData: null,
+    initialFilter: 'all',
+  });
+
+  const [quickAddModal, setQuickAddModal] = useState<{
+    isOpen: boolean;
+    date: string;
+  }>({
+    isOpen: false,
+    date: '',
+  });
 
   useEffect(() => {
     if (targetRowRef.current && tableContainerRef.current) {
@@ -149,15 +168,15 @@ const TablePreview = ({
                     />
                   </div>
                   <div className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                    {new Date(row.date).getDate()}
+                    {new Date(`${row.date}T00:00:00`).getDate()}
                   </div>
                   <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {new Date(row.date)
+                    {new Date(`${row.date}T00:00:00`)
                       .toLocaleDateString("pt-BR", { month: "short" })
                       .toUpperCase()}
                   </div>
                   <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {new Date(row.date)
+                    {new Date(`${row.date}T00:00:00`)
                       .toLocaleDateString("pt-BR", { weekday: "short" })
                       .toUpperCase()}
                   </div>
@@ -167,7 +186,10 @@ const TablePreview = ({
               {/* Financial Data Section - Right */}
               <div className="flex-1 space-y-2">
                 {/* Income */}
-                <div className="p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 transition-colors">
+                <div 
+                  className="group/income-v relative p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 transition-all duration-200 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 hover:scale-105 hover:shadow-md"
+                  onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'income' })}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <TrendingUp
@@ -182,10 +204,40 @@ const TablePreview = ({
                       {row.incomes?.valueFormatted || "R$ 0,00"}
                     </p>
                   </div>
+                  
+                  {/* Add Income Button */}
+                  <button
+                    className="absolute top-1 right-1 p-1 bg-green-200 dark:bg-green-800 hover:bg-green-300 dark:hover:bg-green-700 rounded-full opacity-0 group-hover/income-v:opacity-100 transition-all duration-200 transform hover:scale-110"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenModal({
+                        isOpen: true,
+                        transaction: {
+                          category_id: '',
+                          description: '',
+                          price: '',
+                          category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'income' },
+                          transaction_day: row.date,
+                          type: 'income'
+                        } as any,
+                        type: 'create',
+                        button: 'income'
+                      });
+                    }}
+                    title="Adicionar receita"
+                  >
+                    <Plus
+                      size={10}
+                      className="text-green-700 dark:text-green-300"
+                    />
+                  </button>
                 </div>
 
                 {/* Outcome */}
-                <div className="p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 transition-colors">
+                <div 
+                  className="group/outcome-v relative p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 transition-all duration-200 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/30 hover:scale-105 hover:shadow-md"
+                  onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'outcome' })}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <TrendingDown
@@ -200,6 +252,33 @@ const TablePreview = ({
                       {row.outcomes?.valueFormatted || "R$ 0,00"}
                     </p>
                   </div>
+                  
+                  {/* Add Outcome Button */}
+                  <button
+                    className="absolute top-1 right-1 p-1 bg-red-200 dark:bg-red-800 hover:bg-red-300 dark:hover:bg-red-700 rounded-full opacity-0 group-hover/outcome-v:opacity-100 transition-all duration-200 transform hover:scale-110"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenModal({
+                        isOpen: true,
+                        transaction: {
+                          category_id: '',
+                          description: '',
+                          price: '',
+                          category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'outcome' },
+                          transaction_day: row.date,
+                          type: 'outcome'
+                        } as any,
+                        type: 'create',
+                        button: 'outcome'
+                      });
+                    }}
+                    title="Adicionar despesa"
+                  >
+                    <Plus
+                      size={10}
+                      className="text-red-700 dark:text-red-300"
+                    />
+                  </button>
                 </div>
 
                 {/* Balance */}
@@ -260,7 +339,7 @@ const TablePreview = ({
                   {row.formatted_date}
                 </h3>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {new Date(row.date).toLocaleDateString("pt-BR", {
+                  {new Date(`${row.date}T00:00:00`).toLocaleDateString("pt-BR", {
                     weekday: "long",
                   })}
                 </p>
@@ -272,6 +351,7 @@ const TablePreview = ({
               <button
                 className="p-2 bg-zinc-100 dark:bg-zinc-700 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-lg transition-colors"
                 title="Ver detalhes"
+                onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'all' })}
               >
                 <Eye
                   size={14}
@@ -281,6 +361,7 @@ const TablePreview = ({
               <button
                 className="p-2 bg-zinc-100 dark:bg-zinc-700 hover:bg-teal-100 dark:hover:bg-teal-800 rounded-lg transition-colors"
                 title="Adicionar transação"
+                onClick={() => setQuickAddModal({ isOpen: true, date: row.date })}
               >
                 <Plus
                   size={14}
@@ -293,7 +374,10 @@ const TablePreview = ({
           {/* Financial Data Grid */}
           <div className="grid grid-cols-3 gap-4">
             {/* Income */}
-            <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 transition-colors">
+            <div 
+              className="group/income relative p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 transition-all duration-200 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 hover:scale-105 hover:shadow-md"
+              onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'income' })}
+            >
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp
                   size={14}
@@ -306,10 +390,40 @@ const TablePreview = ({
               <p className="font-semibold text-green-700 dark:text-green-300 text-sm">
                 {row.incomes?.valueFormatted || "R$ 0,00"}
               </p>
+              
+              {/* Add Income Button */}
+              <button
+                className="absolute top-1 right-1 p-1 bg-green-200 dark:bg-green-800 hover:bg-green-300 dark:hover:bg-green-700 rounded-full opacity-0 group-hover/income:opacity-100 transition-all duration-200 transform hover:scale-110"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenModal({
+                    isOpen: true,
+                    transaction: {
+                      category_id: '',
+                      description: '',
+                      price: '',
+                      category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'income' },
+                      transaction_day: row.date,
+                      type: 'income'
+                    } as any,
+                    type: 'create',
+                    button: 'income'
+                  });
+                }}
+                title="Adicionar receita"
+              >
+                <Plus
+                  size={12}
+                  className="text-green-700 dark:text-green-300"
+                />
+              </button>
             </div>
 
             {/* Outcome */}
-            <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 transition-colors">
+            <div 
+              className="group/outcome relative p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 transition-all duration-200 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/30 hover:scale-105 hover:shadow-md"
+              onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'outcome' })}
+            >
               <div className="flex items-center gap-2 mb-1">
                 <TrendingDown
                   size={14}
@@ -322,6 +436,33 @@ const TablePreview = ({
               <p className="font-semibold text-red-700 dark:text-red-300 text-sm">
                 {row.outcomes?.valueFormatted || "R$ 0,00"}
               </p>
+              
+              {/* Add Outcome Button */}
+              <button
+                className="absolute top-1 right-1 p-1 bg-red-200 dark:bg-red-800 hover:bg-red-300 dark:hover:bg-red-700 rounded-full opacity-0 group-hover/outcome:opacity-100 transition-all duration-200 transform hover:scale-110"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenModal({
+                    isOpen: true,
+                    transaction: {
+                      category_id: '',
+                      description: '',
+                      price: '',
+                      category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'outcome' },
+                      transaction_day: row.date,
+                      type: 'outcome'
+                    } as any,
+                    type: 'create',
+                    button: 'outcome'
+                  });
+                }}
+                title="Adicionar despesa"
+              >
+                <Plus
+                  size={12}
+                  className="text-red-700 dark:text-red-300"
+                />
+              </button>
             </div>
 
             {/* Balance */}
@@ -345,22 +486,24 @@ const TablePreview = ({
           </div>
 
           {/* Progress bar for visual balance */}
-          {/* {(row.incomes?.value || row.outcomes?.value) && (
-              <div className="mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-700">
-                <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-1">
-                  <span>Receitas vs Despesas</span>
-                  <span>{Math.abs(totalValue) > 0 ? (isPositive ? '+' : '') + totalValue.toFixed(2) : '0.00'}</span>
-                </div>
-                <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2 overflow-hidden">
-                  <div 
-                    className={`h-full transition-all duration-500 ${
-                      isPositive ? 'bg-gradient-to-r from-green-400 to-green-600' : 'bg-gradient-to-r from-red-400 to-red-600'
-                    }`}
-                    style={{ width: `${Math.min(Math.abs(totalValue) / 1000 * 100, 100)}%` }}
-                  />
-                </div>
-              </div>
-            )} */}
+          <div className="mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-700">
+            <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-1">
+              <span>Receitas vs Despesas</span>
+              <span>{Math.abs(totalValue) > 0 ? (isPositive ? '+' : '') + totalValue.toFixed(2) : '0.00'}</span>
+            </div>
+            <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2 overflow-hidden">
+              <div 
+                className={`h-full transition-all duration-500 ${
+                  totalValue === 0 
+                    ? 'bg-zinc-400 dark:bg-zinc-500' 
+                    : isPositive 
+                      ? 'bg-gradient-to-r from-green-400 to-green-600' 
+                      : 'bg-gradient-to-r from-red-400 to-red-600'
+                }`}
+                style={{ width: totalValue === 0 ? '100%' : `${Math.min(Math.abs(totalValue) / 1000 * 100, 100)}%` }}
+              />
+            </div>
+          </div>
         </div>
       );
     });
@@ -443,6 +586,25 @@ const TablePreview = ({
           </div>
         </div>
       )}
+
+      {/* Day Details Modal */}
+      {dayDetailsModal.isOpen && dayDetailsModal.dayData && (
+        <DayDetailsModal
+          isOpen={dayDetailsModal.isOpen}
+          onClose={() => setDayDetailsModal({ isOpen: false, dayData: null })}
+          dayData={dayDetailsModal.dayData}
+          setOpenModal={setOpenModal}
+          initialFilter={dayDetailsModal.initialFilter}
+        />
+      )}
+
+      {/* Quick Add Modal */}
+      <QuickAddModal
+        isOpen={quickAddModal.isOpen}
+        onClose={() => setQuickAddModal({ isOpen: false, date: '' })}
+        date={quickAddModal.date}
+        setOpenModal={setOpenModal}
+      />
     </>
   );
 };
