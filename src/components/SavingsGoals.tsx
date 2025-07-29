@@ -59,38 +59,38 @@ const GOAL_COLORS = [
 
 const SavingsGoals: React.FC<SavingsGoalsProps> = ({ onAddTransaction }) => {
   const [goals, setGoals] = useState<SavingsGoal[]>([
-    {
-      id: '1',
-      name: 'Carro Novo',
-      targetAmount: 45000,
-      currentAmount: 12500,
-      icon: 'car',
-      color: 'from-blue-500 to-blue-700',
-      deadline: '2024-12-31',
-      description: 'Economizando para comprar um carro 0km',
-      createdAt: '2024-01-15'
-    },
-    {
-      id: '2', 
-      name: 'Viagem Europa',
-      targetAmount: 15000,
-      currentAmount: 8750,
-      icon: 'plane',
-      color: 'from-green-500 to-green-700',
-      deadline: '2024-07-01',
-      description: 'Mochilão pela Europa no meio do ano',
-      createdAt: '2024-01-20'
-    },
-    {
-      id: '3',
-      name: 'Emergência',
-      targetAmount: 20000,
-      currentAmount: 5200,
-      icon: 'piggybank',
-      color: 'from-purple-500 to-purple-700',
-      description: 'Reserva de emergência para 6 meses',
-      createdAt: '2024-02-01'
-    }
+    // {
+    //   id: '1',
+    //   name: 'Carro Novo',
+    //   targetAmount: 45000,
+    //   currentAmount: 12500,
+    //   icon: 'car',
+    //   color: 'from-blue-500 to-blue-700',
+    //   deadline: '2024-12-31',
+    //   description: 'Economizando para comprar um carro 0km',
+    //   createdAt: '2024-01-15'
+    // },
+    // {
+    //   id: '2', 
+    //   name: 'Viagem Europa',
+    //   targetAmount: 15000,
+    //   currentAmount: 8750,
+    //   icon: 'plane',
+    //   color: 'from-green-500 to-green-700',
+    //   deadline: '2024-07-01',
+    //   description: 'Mochilão pela Europa no meio do ano',
+    //   createdAt: '2024-01-20'
+    // },
+    // {
+    //   id: '3',
+    //   name: 'Emergência',
+    //   targetAmount: 20000,
+    //   currentAmount: 5200,
+    //   icon: 'piggybank',
+    //   color: 'from-purple-500 to-purple-700',
+    //   description: 'Reserva de emergência para 6 meses',
+    //   createdAt: '2024-02-01'
+    // }
   ])
 
   const [showCreateModal, setShowCreateModal] = useState(false)

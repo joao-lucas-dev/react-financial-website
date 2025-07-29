@@ -52,7 +52,7 @@ const MenuAside = ({ activePage }: IParams) => {
       title: "Movimentação",
       items: [
         { id: "transacoes", icon: Newspaper, label: "Transações", path: "/transacoes" },
-        { id: "faturas", icon: CreditCard, label: "Faturas", path: "/faturas" },
+        { id: "cartoes", icon: CreditCard, label: "Cartões", path: "/cartoes" },
       ]
     },
     {

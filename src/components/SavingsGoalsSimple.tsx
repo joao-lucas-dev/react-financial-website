@@ -12,32 +12,32 @@ interface SavingsGoal {
 }
 
 const SavingsGoalsSimple: React.FC = () => {
-  const goals: SavingsGoal[] = [
-    {
-      id: '1',
-      name: 'Carro Novo',
-      targetAmount: 45000,
-      currentAmount: 12500,
-      icon: 'car',
-      color: 'from-blue-500 to-blue-700'
-    },
-    {
-      id: '2',
-      name: 'Viagem Europa',
-      targetAmount: 15000,
-      currentAmount: 8750,
-      icon: 'plane',
-      color: 'from-green-500 to-green-700'
-    },
-    {
-      id: '3',
-      name: 'Emergência',
-      targetAmount: 20000,
-      currentAmount: 5200,
-      icon: 'piggybank',
-      color: 'from-purple-500 to-purple-700'
-    }
-  ]
+  const goals: SavingsGoal[] = []
+  //   {
+  //     id: '1',
+  //     name: 'Carro Novo',
+  //     targetAmount: 45000,
+  //     currentAmount: 12500,
+  //     icon: 'car',
+  //     color: 'from-blue-500 to-blue-700'
+  //   },
+  //   {
+  //     id: '2',
+  //     name: 'Viagem Europa',
+  //     targetAmount: 15000,
+  //     currentAmount: 8750,
+  //     icon: 'plane',
+  //     color: 'from-green-500 to-green-700'
+  //   },
+  //   {
+  //     id: '3',
+  //     name: 'Emergência',
+  //     targetAmount: 20000,
+  //     currentAmount: 5200,
+  //     icon: 'piggybank',
+  //     color: 'from-purple-500 to-purple-700'
+  //   }
+  // ]
 
   const formatCurrency = (amount: number) => {
     return amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -53,6 +53,55 @@ const SavingsGoalsSimple: React.FC = () => {
       case 'plane': return <Plane size={20} />
       default: return <PiggyBank size={20} />
     }
+  }
+
+  if (goals.length === 0) {
+    return (
+      <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
+              <Target size={20} className="text-teal-600 dark:text-teal-400" />
+            </div>
+            <div> 
+              <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                Minhas Caixinhas
+              </h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                Principais objetivos financeiros
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/caixinhas"
+            className="flex items-center gap-2 text-sm text-teal-600 dark:text-teal-400 hover:underline"
+          >
+            Ver todas
+            <ArrowRight size={16} />
+          </Link>
+        </div>
+
+        {/* Empty State */}
+        <div className="text-center py-8">
+          <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center mx-auto mb-4">
+            <PiggyBank className="w-8 h-8 text-zinc-400 dark:text-zinc-500" />
+          </div>
+          <p className="text-lg font-medium text-zinc-400 dark:text-zinc-500 mb-2">
+            Nenhuma caixinha criada
+          </p>
+          <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-4">
+            Crie sua primeira caixinha para começar a economizar!
+          </p>
+          <Link
+            to="/caixinhas"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm rounded-lg transition-colors"
+          >
+            <Target size={16} />
+            Criar Primeira Caixinha
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   const totalSaved = goals.reduce((sum, goal) => sum + goal.currentAmount, 0)

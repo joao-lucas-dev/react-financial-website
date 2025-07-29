@@ -85,16 +85,16 @@ const CreditCardDetailsPage: React.FC = () => {
   if (!currentCard) {
     return (
       <div className="font-sans">
-        <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
-          <div className="flex h-full">
-            <MenuAside activePage="faturas" />
+        <div className="min-h-screen w-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
+          <div className="flex min-h-screen">
+            <MenuAside activePage="cartoes" />
             <main className="flex-1 mt-4 pl-0 lg:pl-20 2xl:pl-72 max-w-7xl mx-auto p-8">
               <div className="text-center py-12">
                 <h1 className="text-2xl font-semibold text-zinc-700 dark:text-zinc-200 mb-4">
                   Cartão não encontrado
                 </h1>
                 <Link 
-                  to="/faturas"
+                  to="/cartoes"
                   className="text-teal-600 dark:text-teal-400 hover:underline"
                 >
                   Voltar para lista de cartões
@@ -109,9 +109,9 @@ const CreditCardDetailsPage: React.FC = () => {
 
   return (
     <div className="font-sans">
-      <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
-        <div className="flex h-full">
-          <MenuAside activePage="faturas" />
+      <div className="min-h-screen w-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
+        <div className="flex min-h-screen">
+          <MenuAside activePage="cartoes" />
           
           <main className="flex-1 mt-4 pl-0 lg:pl-20 2xl:pl-72 max-w-7xl mx-auto p-8">
             {/* Header Section */}
@@ -119,7 +119,7 @@ const CreditCardDetailsPage: React.FC = () => {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
                   <Link
-                    to="/faturas"
+                    to="/cartoes"
                     className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-lg transition-colors"
                   >
                     <ArrowLeft size={20} className="text-zinc-600 dark:text-zinc-400" />

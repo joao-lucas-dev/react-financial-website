@@ -255,7 +255,8 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 mb-8">
               {/* Left Column: TablePreview Vertical */}
               <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors flex flex-col">
-                <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
+                {/* <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg"> */}
+                <div className="flex items-center justify-between mb-6 p-4  rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
                       <BarChart3
@@ -372,19 +373,9 @@ export default function Dashboard() {
                   )}
                 </div>
 
-                {/* Income Categories - Now on Bottom */}
-                <div className="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl flex-1 transition-colors">
-                  {/* Substituído por SavingsGoalsSimple */}
-                  <SavingsGoalsSimple />
-                  {/* Código antigo comentado para referência futura - foi substituído pelo SavingsGoals */}
-                </div>
+                <SavingsGoalsSimple />
               </div>
             </div>
-
-            {/* Credit Card Bills */}
-            {/* <div className="mb-8">
-              <CreditCardBills />
-            </div> */}
 
             {/* Recent Transactions */}
             <div className="hidden bg-white dark:bg-zinc-800 rounded-xl p-6 mt-8 shadow-2xl transition-colors">

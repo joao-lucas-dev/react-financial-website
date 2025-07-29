@@ -112,8 +112,8 @@ const CategoryReports: React.FC = () => {
                     100% { transform: rotate(360deg); }
                 }
             `}</style>
-            <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
-                <div className="flex h-full">
+            <div className="min-h-screen w-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
+                <div className="flex min-h-screen">
                     <MenuAside activePage="relatorios" />
                     
                     <main className="flex-1 mt-4 pl-0 lg:pl-20 2xl:pl-72 max-w-7xl mx-auto p-8">
@@ -191,14 +191,7 @@ const CategoryReports: React.FC = () => {
                     {/* Categories List */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {categories.map((cat) => (
-                            <div key={cat.id} style={{
-                                backgroundColor: 'white',
-                                borderRadius: '1rem',
-                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                                border: '1px solid rgba(255, 255, 255, 0.2)',
-                                overflow: 'hidden',
-                                transition: 'all 0.2s ease'
-                            }}>
+                            <div key={cat.id} className="bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 overflow-hidden transition-all">
                                 <button
                                     style={{
                                         display: 'flex',
@@ -361,17 +354,7 @@ const CategoryReports: React.FC = () => {
                         ))}
                     </div>
                     {/* Total Section */}
-                    <div style={{
-                        backgroundColor: 'white',
-                        borderRadius: '1rem',
-                        padding: '1.5rem',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        marginTop: '2rem',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                    }}>
+                    <div className="bg-white dark:bg-zinc-800 rounded-2xl p-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 mt-8 flex justify-between items-center transition-colors">
                         <div>
                             <h3 style={{
                                 fontSize: '1.125rem',

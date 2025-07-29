@@ -32,8 +32,8 @@ if (rootElement) {
               <Route element={<ProtectPage />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/transacoes" element={<Transactions />} />
-                <Route path="/faturas" element={<CreditCardBillsPage />} />
-                <Route path="/faturas/:cardId" element={<CreditCardDetailsPage />} />
+                <Route path="/cartoes" element={<CreditCardBillsPage />} />
+                <Route path="/cartoes/:cardId" element={<CreditCardDetailsPage />} />
                 <Route path="/relatorios" element={<CategoryReports />} />
                 <Route path="/caixinhas" element={<SavingsPage />} />
                 <Route path="/configuracoes" element={<Settings />} />

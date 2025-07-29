@@ -56,51 +56,51 @@ const GOAL_COLORS = [
 ]
 
 const SavingsPage: React.FC = () => {
-  const [goals, setGoals] = useState<SavingsGoal[]>([
-    {
-      id: '1',
-      name: 'Carro Novo',
-      targetAmount: 45000,
-      currentAmount: 12500,
-      icon: 'car',
-      color: 'from-blue-500 to-blue-700',
-      deadline: '2024-12-31',
-      description: 'Economizando para comprar um carro 0km',
-      createdAt: '2024-01-15'
-    },
-    {
-      id: '2', 
-      name: 'Viagem Europa',
-      targetAmount: 15000,
-      currentAmount: 8750,
-      icon: 'plane',
-      color: 'from-green-500 to-green-700',
-      deadline: '2024-07-01',
-      description: 'Mochilão pela Europa no meio do ano',
-      createdAt: '2024-01-20'
-    },
-    {
-      id: '3',
-      name: 'Reserva de Emergência',
-      targetAmount: 20000,
-      currentAmount: 5200,
-      icon: 'piggybank',
-      color: 'from-purple-500 to-purple-700',
-      description: 'Reserva de emergência para 6 meses',
-      createdAt: '2024-02-01'
-    },
-    {
-      id: '4',
-      name: 'Casa Própria',
-      targetAmount: 80000,
-      currentAmount: 23000,
-      icon: 'home',
-      color: 'from-orange-500 to-orange-700',
-      deadline: '2025-06-01',
-      description: 'Entrada para financiamento da casa própria',
-      createdAt: '2024-01-10'
-    }
-  ])
+  const [goals, setGoals] = useState<SavingsGoal[]>([])
+  //   {
+  //     id: '1',
+  //     name: 'Carro Novo',
+  //     targetAmount: 45000,
+  //     currentAmount: 12500,
+  //     icon: 'car',
+  //     color: 'from-blue-500 to-blue-700',
+  //     deadline: '2024-12-31',
+  //     description: 'Economizando para comprar um carro 0km',
+  //     createdAt: '2024-01-15'
+  //   },
+  //   {
+  //     id: '2', 
+  //     name: 'Viagem Europa',
+  //     targetAmount: 15000,
+  //     currentAmount: 8750,
+  //     icon: 'plane',
+  //     color: 'from-green-500 to-green-700',
+  //     deadline: '2024-07-01',
+  //     description: 'Mochilão pela Europa no meio do ano',
+  //     createdAt: '2024-01-20'
+  //   },
+  //   {
+  //     id: '3',
+  //     name: 'Reserva de Emergência',
+  //     targetAmount: 20000,
+  //     currentAmount: 5200,
+  //     icon: 'piggybank',
+  //     color: 'from-purple-500 to-purple-700',
+  //     description: 'Reserva de emergência para 6 meses',
+  //     createdAt: '2024-02-01'
+  //   },
+  //   {
+  //     id: '4',
+  //     name: 'Casa Própria',
+  //     targetAmount: 80000,
+  //     currentAmount: 23000,
+  //     icon: 'home',
+  //     color: 'from-orange-500 to-orange-700',
+  //     deadline: '2025-06-01',
+  //     description: 'Entrada para financiamento da casa própria',
+  //     createdAt: '2024-01-10'
+  //   }
+  // ])
 
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showAddMoneyModal, setShowAddMoneyModal] = useState<string | null>(null)
@@ -190,8 +190,8 @@ const SavingsPage: React.FC = () => {
 
   return (
     <div className="font-sans">
-      <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
-        <div className="flex h-full">
+      <div className="min-h-screen w-full bg-zinc-100 dark:bg-zinc-900 transition-colors">
+        <div className="flex min-h-screen">
           <MenuAside activePage="caixinhas" />
           
           <main className="flex-1 mt-4 pl-0 lg:pl-20 2xl:pl-72 max-w-7xl mx-auto p-8">

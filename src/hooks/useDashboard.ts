@@ -11,9 +11,13 @@ export default function useDashboard(
   handleGetPreviewTransactions: (date?: DateTime) => Promise<void>,
   handleGetRecentTransactions: () => Promise<void>,
 ) {
-  const [currentMonth, setCurrentMonth] = useState(DateTime.now().month)
+  const [currentDate, setCurrentDate] = useState(DateTime.now())
   const [isLoading, setIsLoading] = useState(false)
   const initializedRef = useRef(false)
+  
+  // Keep currentMonth for backward compatibility
+  const currentMonth = currentDate.month
+  const currentYear = currentDate.year
 
   const getMonth = useCallback(() => {
     if (rows.length > 0) {
@@ -27,33 +31,52 @@ export default function useDashboard(
     if (isLoading) return;
     setIsLoading(true);
     try {
-      const newDate = DateTime.now().set({ month: currentMonth }).plus({ months: 1 });
+      const newDate = currentDate.plus({ months: 1 });
       await Promise.all([
         handleGetPreviewTransactions(newDate),
         handleGetChartCategories(newDate),
         handleGetOverviewTransactions(newDate),
       ]);
-      setCurrentMonth(newDate.month);
+      setCurrentDate(newDate);
     } finally {
       setIsLoading(false);
     }
-  }, [currentMonth, isLoading, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
+  }, [currentDate, isLoading, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
 
   const getPreviousMonth = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
     try {
-      const newDate = DateTime.now().set({ month: currentMonth }).minus({ months: 1 });
+      const newDate = currentDate.minus({ months: 1 });
       await Promise.all([
         handleGetPreviewTransactions(newDate),
         handleGetChartCategories(newDate),
         handleGetOverviewTransactions(newDate),
       ]);
-      setCurrentMonth(newDate.month);
+      setCurrentDate(newDate);
     } finally {
       setIsLoading(false);
     }
-  }, [currentMonth, isLoading, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
+  }, [currentDate, isLoading, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
+
+  const getNextWeek = useCallback(async (isBeforeWeek: boolean) => {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const newDate = isBeforeWeek 
+        ? currentDate.minus({ weeks: 1 })
+        : currentDate.plus({ weeks: 1 });
+      
+      await Promise.all([
+        handleGetPreviewTransactions(newDate),
+        handleGetChartCategories(newDate),
+        handleGetOverviewTransactions(newDate),
+      ]);
+      setCurrentDate(newDate);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading, currentDate, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
 
   const getToday = useCallback(async () => {
     if (isLoading) return;
@@ -65,7 +88,7 @@ export default function useDashboard(
         handleGetChartCategories(newDate),
         handleGetOverviewTransactions(newDate),
       ]);
-      setCurrentMonth(newDate.month);
+      setCurrentDate(newDate);
     } finally {
       setIsLoading(false);
     }
@@ -116,15 +139,50 @@ export default function useDashboard(
     initializeDashboard();
   }, [handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions, handleGetBalance, handleGetRecentTransactions])
 
+  const setCurrentMonth = useCallback(async (month: number) => {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const newDate = currentDate.set({ month });
+      await Promise.all([
+        handleGetPreviewTransactions(newDate),
+        handleGetChartCategories(newDate),
+        handleGetOverviewTransactions(newDate),
+      ]);
+      setCurrentDate(newDate);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentDate, isLoading, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
+
+  const setCurrentYear = useCallback(async (year: number) => {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const newDate = currentDate.set({ year });
+      await Promise.all([
+        handleGetPreviewTransactions(newDate),
+        handleGetChartCategories(newDate),
+        handleGetOverviewTransactions(newDate),
+      ]);
+      setCurrentDate(newDate);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentDate, isLoading, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
+
   return {
     getMonth,
     getNextMonth,
     getPreviousMonth,
+    getNextWeek,
     getToday,
     getGreeting,
     hasToday,
     currentMonth,
+    currentYear,
     setCurrentMonth,
+    setCurrentYear,
     isLoading,
   }
 }

@@ -1,8 +1,9 @@
 import Header from "../components/Header.tsx";
 import MenuAside from "../components/MenuAside.tsx";
 import Skeleton from "react-loading-skeleton";
-import { BarChart3, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { BarChart3, Calendar, ChevronLeft, ChevronRight, List, Grid3X3 } from "lucide-react";
 import TablePreview from "../components/TablePreview";
+import TransactionsListView from "../components/TransactionsListView";
 import { useState } from "react";
 import { ITransaction } from "../types/transactions.ts";
 import useCategories from "../hooks/useCategories.ts";
@@ -16,6 +17,7 @@ const Transactions = () => {
     type: "",
   });
   const [resetScroll, setResetScroll] = useState(false);
+  const [viewMode, setViewMode] = useState<'table' | 'list'>('table');
 
   const { handleGetChartCategories, categories } = useCategories();
 
@@ -35,8 +37,11 @@ const Transactions = () => {
     getToday,
     hasToday,
     currentMonth,
+    currentYear,
     setCurrentMonth,
+    setCurrentYear,
     getNextWeek,
+    isLoading,
   } = useDashboard(
     rows,
     handleGetChartCategories,
@@ -54,10 +59,17 @@ const Transactions = () => {
   };
 
   const handleToday = async () => {
-    setResetScroll(true);
+    // Only trigger scroll reset in table view
+    if (viewMode === 'table') {
+      setResetScroll(true);
+    }
+    
     await getToday();
-    // Reset the flag after a short delay to allow the scroll to complete
-    setTimeout(() => setResetScroll(false), 100);
+    
+    // Reset the flag after a short delay to allow the scroll to complete (only in table view)
+    if (viewMode === 'table') {
+      setTimeout(() => setResetScroll(false), 100);
+    }
   };
 
   return (
@@ -76,75 +88,121 @@ const Transactions = () => {
               Acompanhe suas transações mensais
             </p>
           </div>
-          <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors">
-            {/* <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
-                      <BarChart3 size={20} className="text-teal-600 dark:text-teal-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-zinc-700 dark:text-zinc-100">Transações Financeiras</h3>
-                      <p className="text-sm text-zinc-600 dark:text-zinc-400">Acompanhe suas transações mensais</p>
-                    </div>
-                  </div>
-                </div> */}
-
-            <div className="flex flex-col sm:flex-row justify-center sm:justify-between items-center mb-4">
-              <h2 className="text-base mb-2 font-medium text-gray dark:text-softGray">
-                {getMonth ? (
-                  `${getMonth()}`
-                ) : (
-                  <Skeleton height={20} width={100} />
-                )}
-              </h2>
-              <div className="flex flex-1 items-center justify-center">
-                <button
-                  className="text-base font-medium text-gray dark:text-softGray active:opacity-50 rounded-2xl hover:bg-zinc-100 p-2"
-                  onClick={() => handleNextWeek(true)}
-                >
-                  <ChevronLeft size={18} />
-                </button>
-                <span className="text-base font-medium text-gray dark:text-softGray mx-2">
-                  {rows.length > 0 ? (
-                    `${rows[0].formatted_date} à ${rows[rows.length - 1].formatted_date}`
-                  ) : (
-                    <Skeleton height={20} width={100} />
-                  )}
-                </span>
-                <button
-                  className="text-sm font-medium text-gray dark:text-softGray active:opacity-50 rounded-2xl hover:bg-zinc-100 p-2"
-                  onClick={() => handleNextWeek(false)}
-                >
-                  <ChevronRight size={18} />
-                </button>
+          {/* Controls Header */}
+          <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors mb-6">
+            <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
+              {/* Month/Year Selectors */}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Período:
+                  </label>
+                  <select
+                    value={currentMonth}
+                    onChange={(e) => setCurrentMonth(Number(e.target.value))}
+                    disabled={isLoading}
+                    className="px-3 py-2 border border-zinc-200 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 disabled:opacity-50"
+                  >
+                    {Array.from({ length: 12 }, (_, i) => {
+                      const month = i + 1;
+                      const monthName = new Date(2024, i).toLocaleDateString('pt-BR', { month: 'long' });
+                      return (
+                        <option key={month} value={month}>
+                          {monthName.charAt(0).toUpperCase() + monthName.slice(1)}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <select
+                    value={currentYear}
+                    onChange={(e) => setCurrentYear(Number(e.target.value))}
+                    disabled={isLoading}
+                    className="px-3 py-2 border border-zinc-200 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 disabled:opacity-50"
+                  >
+                    {Array.from({ length: 5 }, (_, i) => {
+                      const year = new Date().getFullYear() - 2 + i;
+                      return (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
               </div>
-              <div className="hidden sm:block">
-                <button
-                  disabled={hasToday()}
-                  className="bg-teal-600 px-4 py-1 text-white rounded-lg disabled:opacity-30 dark:disabled:bg-auto flex justify-center items-center active:opacity-50"
-                  onClick={handleToday}
-                >
-                  <Calendar size={16} className="mr-2" />
-                  Hoje
-                </button>
+
+              {/* Right side controls */}
+              <div className="flex items-center gap-3">
+                {/* View Toggle */}
+                <div className="flex items-center bg-zinc-100 dark:bg-zinc-700 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('table')}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === 'table'
+                        ? 'bg-teal-600 text-white shadow-sm'
+                        : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-600'
+                    }`}
+                    title="Visualização em tabela"
+                  >
+                    <Grid3X3 size={16} />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === 'list'
+                        ? 'bg-teal-600 text-white shadow-sm'
+                        : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-600'
+                    }`}
+                    title="Visualização em lista"
+                  >
+                    <List size={16} />
+                  </button>
+                </div>
+                
+                <div className="hidden sm:block">
+                  <button
+                    disabled={hasToday()}
+                    className="bg-teal-600 px-4 py-1 text-white rounded-lg disabled:opacity-30 dark:disabled:bg-auto flex justify-center items-center active:opacity-50"
+                    onClick={handleToday}
+                  >
+                    <Calendar size={16} className="mr-2" />
+                    Hoje
+                  </button>
+                </div>
               </div>
             </div>
+          </div>
 
-            <TablePreview
+          {/* Content Views */}
+          {viewMode === 'table' ? (
+            <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors">
+              <TablePreview
+                rows={rows}
+                handleCreateTransaction={handleCreateTransaction}
+                handleCreateCompleteTransaction={handleCreateCompleteTransaction}
+                handleDeleteTransaction={handleDeleteTransaction}
+                handleUpdateTransaction={handleUpdateTransaction}
+                currentMonth={currentMonth}
+                setCurrentMonth={setCurrentMonth}
+                openModal={openModal}
+                setOpenModal={setOpenModal}
+                categories={categories}
+                from="transacoes"
+                resetScroll={resetScroll}
+              />
+            </div>
+          ) : (
+            <TransactionsListView
               rows={rows}
-              handleCreateTransaction={handleCreateTransaction}
-              handleCreateCompleteTransaction={handleCreateCompleteTransaction}
-              handleDeleteTransaction={handleDeleteTransaction}
-              handleUpdateTransaction={handleUpdateTransaction}
-              currentMonth={currentMonth}
-              setCurrentMonth={setCurrentMonth}
-              openModal={openModal}
               setOpenModal={setOpenModal}
               categories={categories}
-              from="transacoes"
-              resetScroll={resetScroll}
+              handleCreateTransaction={handleCreateTransaction}
+              handleUpdateTransaction={handleUpdateTransaction}
+              handleDeleteTransaction={handleDeleteTransaction}
+              currentMonth={currentMonth}
+              setCurrentMonth={setCurrentMonth}
             />
-          </div>
+          )}
         </main>
       </div>
     </div>
