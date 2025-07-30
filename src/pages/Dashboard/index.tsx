@@ -6,6 +6,14 @@ import {
   ArrowRight,
   ChevronUp,
   ChevronDown,
+  Filter as FilterIcon,
+  Edit3,
+  Trash2,
+  MoreHorizontal,
+  X,
+  CheckCircle2,
+  Clock,
+  SlidersHorizontal,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -23,7 +31,7 @@ import useDashboard from "../../hooks/useDashboard.ts";
 import useTransactions from "../../hooks/useTransactions.ts";
 import CountUp from "../../components/CountUp.tsx";
 import useCategories from "../../hooks/useCategories.ts";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ITransaction } from "../../types/transactions.ts";
 import { mockCreditCards } from "../../types/creditCards";
 import TableTransactions from "../../components/TableTransactions";
@@ -79,12 +87,119 @@ export default function Dashboard() {
     "all",
   );
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Recent Transactions Filters
+  const [recentSearchTerm, setRecentSearchTerm] = useState("");
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState<"all" | "paid" | "unpaid">("all");
+  const [recentTypeFilter, setRecentTypeFilter] = useState<"all" | "income" | "outcome">("all");
+  
+  // Action Menu State
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  
+  // Filter UI State
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  
+  // Pagination State  
+  const [itemsToShow, setItemsToShow] = useState(5);
+  const itemsPerLoad = 5;
 
   const handleSort = (field: string, order: "asc" | "desc") => {
     setSortBy(field);
     setSortOrder(order);
     handleGetRecentTransactions(filter, field, order, typeFilter);
   };
+
+  // Função para determinar se uma transação está paga
+  const isTransactionPaid = (transaction: any) => {
+    // Se tem campo is_paid, usar ele
+    if (transaction.is_paid !== undefined) {
+      return transaction.is_paid;
+    }
+    // Se tem payment_status, usar ele
+    if (transaction.payment_status) {
+      return transaction.payment_status === 'paid';
+    }
+    // Fallback: considerar pago se a data da transação já passou
+    const transactionDate = new Date(transaction.transaction_day);
+    const today = new Date();
+    return transactionDate <= today;
+  };
+
+  // Função para filtrar transações recentes
+  const filteredRecentTransactions = recentTransactions.filter(transaction => {
+    // Filtro por busca na descrição
+    const searchMatch = transaction.description?.toLowerCase().includes(recentSearchTerm.toLowerCase()) || 
+                       transaction.category?.name?.toLowerCase().includes(recentSearchTerm.toLowerCase());
+    
+    // Filtro por tipo (receita/despesa)
+    const typeMatch = recentTypeFilter === "all" || transaction.type === recentTypeFilter;
+    
+    // Filtro por status de pagamento
+    const paymentMatch = paymentStatusFilter === "all" || 
+                        (paymentStatusFilter === "paid" && isTransactionPaid(transaction)) ||
+                        (paymentStatusFilter === "unpaid" && !isTransactionPaid(transaction));
+    
+    return searchMatch && typeMatch && paymentMatch;
+  });
+
+  // Contar filtros ativos
+  const activeFiltersCount = [
+    recentSearchTerm !== "",
+    recentTypeFilter !== "all",
+    paymentStatusFilter !== "all"
+  ].filter(Boolean).length;
+
+  // Calcular transações visíveis e restantes
+  const visibleTransactions = filteredRecentTransactions.slice(0, itemsToShow);
+  const remainingTransactions = filteredRecentTransactions.length - itemsToShow;
+  const hasMoreTransactions = remainingTransactions > 0;
+
+  // Fechar menu ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setActiveMenuId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Handlers para ações das transações
+  const handleEditTransaction = (transaction: any) => {
+    setOpenModal({
+      isOpen: true,
+      transaction: transaction,
+      type: "edit"
+    });
+    setActiveMenuId(null);
+  };
+
+  const handleDeleteRecentTransaction = async (transactionId: string) => {
+    if (window.confirm('Tem certeza que deseja excluir esta transação?')) {
+      try {
+        await handleDeleteTransaction(transactionId, currentMonth, setCurrentMonth, 'dashboard');
+        setActiveMenuId(null);
+      } catch (error) {
+        console.error('Erro ao deletar transação:', error);
+      }
+    }
+  };
+
+  // Função para carregar mais transações
+  const handleLoadMore = () => {
+    setItemsToShow(prev => prev + itemsPerLoad);
+  };
+
+  // Reset itemsToShow quando os filtros mudarem
+  useEffect(() => {
+    setItemsToShow(5);
+  }, [recentSearchTerm, recentTypeFilter, paymentStatusFilter]);
 
   const handleFilterChange = (
     newFilter: "before" | "after" | "both",
@@ -225,17 +340,17 @@ export default function Dashboard() {
                           const percentage = Number(overview.outcome.percentage)
                           if (isNaN(percentage)) return null
                           
-                          return percentage <= 0 ? (
+                          return percentage < 0 ? (
                             <>
-                              <ChevronDown className="w-4 h-4 text-green-500" />
-                              <span className="text-sm font-medium text-green-500">
+                              <ChevronDown className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
+                              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
                                 {percentage.toFixed(1)}%
                               </span>
                             </>
                           ) : (
                             <>
-                              <ChevronUp className="w-4 h-4 text-red-500" />
-                              <span className="text-sm font-medium text-red-500">
+                              <ChevronUp className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
+                              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
                                 +{percentage.toFixed(1)}%
                               </span>
                             </>
@@ -377,213 +492,359 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Recent Transactions */}
-            <div className="hidden bg-white dark:bg-zinc-800 rounded-xl p-6 mt-8 shadow-2xl transition-colors">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                <h3 className="text-sm font-medium mb-4 sm:mb-0 text-zinc-700 dark:text-zinc-200">
-                  Transações Recentes
-                </h3>
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                  <div className="relative">
-                    <Search
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-600 dark:text-zinc-400"
-                      size={16}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Buscar transação..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-zinc-200 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 dark:focus:ring-teal-400 text-sm bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 w-64"
-                    />
-                  </div>
-                  <Filter
-                    currentFilter={filter}
-                    currentType={typeFilter}
-                    onFilterChange={handleFilterChange}
-                  />
-                </div>
-              </div>
-
-              <div className="max-h-96 overflow-auto">
-                <TableTransactions
-                  recentTransactions={recentTransactions}
-                  onSort={handleSort}
-                  sortBy={sortBy}
-                  sortOrder={sortOrder}
-                  openModal={openModal}
-                  setOpenModal={setOpenModal}
-                  handleUpdateTransaction={handleUpdateTransaction}
-                  handleDeleteTransaction={handleDeleteTransaction}
-                  handleDeleteMultipleTransactions={
-                    handleDeleteMultipleTransactions
-                  }
-                  currentMonth={currentMonth}
-                  setCurrentMonth={setCurrentMonth}
-                  categories={categories}
-                  from="dashboard"
-                  searchTerm={searchTerm}
-                />
-              </div>
-
-              <div className="flex justify-center mt-6">
-                <Link
-                  to={{ pathname: "/transacoes" }}
-                  className="flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
-                >
-                  Ver completo
-                  <ArrowRight size={16} className="ml-1" />
-                </Link>
-              </div>
-            </div>
-
             {/* Enhanced Transactions Preview */}
             <div className="mt-8 bg-white dark:bg-zinc-800 rounded-xl p-6 mb-6 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-zinc-700 dark:text-zinc-200">
-                  Transações Recentes
-                </h2>
                 <div className="flex items-center gap-3">
-                  <div className="px-3 py-1 rounded-full text-xs font-medium bg-teal-50 dark:bg-teal-900 text-teal-600 dark:text-teal-300">
-                    5 transações hoje
+                  <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
+                    <BarChart3 className="w-5 h-5 text-teal-600 dark:text-teal-400" />
                   </div>
-                  <Link
-                    to="/transacoes"
-                    className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline transition-all"
+                  <div>
+                    <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                      Transações Recentes
+                    </h3>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Suas últimas movimentações
+                    </p>
+                  </div>
+                </div>
+
+                {/* Controles de Busca e Filtro */}
+                <div className="flex items-center gap-2">
+                  {/* Busca Expansível */}
+                  <div className="flex items-center">
+                    {searchExpanded ? (
+                      <div className="flex items-center gap-2">
+                        <div className="relative">
+                          <input
+                            type="text"
+                            placeholder="Buscar transações..."
+                            value={recentSearchTerm}
+                            onChange={(e) => setRecentSearchTerm(e.target.value)}
+                            className="pl-3 pr-8 py-2 w-64 border border-zinc-200 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400 focus:border-transparent text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 transition-all"
+                            autoFocus
+                            onBlur={() => {
+                              if (!recentSearchTerm) {
+                                setSearchExpanded(false);
+                              }
+                            }}
+                          />
+                          <button
+                            onClick={() => {
+                              setRecentSearchTerm("");
+                              setSearchExpanded(false);
+                            }}
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded transition-all"
+                          >
+                            <X size={14} className="text-zinc-400" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setSearchExpanded(true)}
+                        className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-lg transition-all"
+                        title="Buscar transações"
+                      >
+                        <Search size={18} className="text-zinc-500 dark:text-zinc-400" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Botão de Filtros */}
+                  <button
+                    onClick={() => setFiltersExpanded(!filtersExpanded)}
+                    className={`p-2 rounded-lg transition-all ${
+                      activeFiltersCount > 0 || filtersExpanded
+                        ? 'bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-300'
+                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400'
+                    }`}
+                    title="Filtros"
                   >
-                    Ver todas
-                  </Link>
+                    <div className="relative">
+                      <SlidersHorizontal size={18} />
+                      {activeFiltersCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-teal-500 text-white text-xs rounded-full flex items-center justify-center">
+                          {activeFiltersCount}
+                        </span>
+                      )}
+                    </div>
+                  </button>
                 </div>
               </div>
+
+              {/* Painel de Filtros Expandido */}
+              {filtersExpanded && (
+                <div className="mb-6 bg-zinc-50 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-600 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                      Filtrar transações
+                    </h4>
+                    {activeFiltersCount > 0 && (
+                      <button
+                        onClick={() => {
+                          setRecentSearchTerm("");
+                          setRecentTypeFilter("all");
+                          setPaymentStatusFilter("all");
+                        }}
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-600 rounded-lg transition-all"
+                      >
+                        <X size={12} />
+                        Limpar filtros
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Filtro de Tipo com Chips */}
+                      <div>
+                        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                          Tipo de Transação
+                        </label>
+                        <div className="flex gap-2">
+                          {[
+                            { value: 'all', label: 'Todas', icon: null },
+                            { value: 'income', label: 'Receitas', icon: TrendingUp },
+                            { value: 'outcome', label: 'Despesas', icon: TrendingDown }
+                          ].map(({ value, label, icon: Icon }) => (
+                            <button
+                              key={value}
+                              onClick={() => setRecentTypeFilter(value as any)}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                                recentTypeFilter === value
+                                  ? 'bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700'
+                                  : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-600'
+                              }`}
+                            >
+                              {Icon && <Icon size={14} />}
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Filtro de Status com Chips */}
+                      <div>
+                        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                          Status de Pagamento
+                        </label>
+                        <div className="flex gap-2">
+                          {[
+                            { value: 'all', label: 'Todos', icon: null },
+                            { value: 'paid', label: 'Pagas', icon: CheckCircle2 },
+                            { value: 'unpaid', label: 'Pendentes', icon: Clock }
+                          ].map(({ value, label, icon: Icon }) => (
+                            <button
+                              key={value}
+                              onClick={() => setPaymentStatusFilter(value as any)}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                                paymentStatusFilter === value
+                                  ? 'bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700'
+                                  : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-600'
+                              }`}
+                            >
+                              {Icon && <Icon size={14} />}
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              {/* Chips de Filtros Ativos */}
+              {activeFiltersCount > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {recentSearchTerm && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm rounded-full">
+                      <Search size={12} />
+                      <span>"{recentSearchTerm}"</span>
+                      <button
+                        onClick={() => setRecentSearchTerm("")}
+                        className="hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5 transition-all"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  )}
+                  {recentTypeFilter !== "all" && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-sm rounded-full">
+                      {recentTypeFilter === 'income' ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                      <span>{recentTypeFilter === 'income' ? 'Receitas' : 'Despesas'}</span>
+                      <button
+                        onClick={() => setRecentTypeFilter("all")}
+                        className="hover:bg-green-200 dark:hover:bg-green-800 rounded-full p-0.5 transition-all"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  )}
+                  {paymentStatusFilter !== "all" && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-sm rounded-full">
+                      {paymentStatusFilter === 'paid' ? <CheckCircle2 size={12} /> : <Clock size={12} />}
+                      <span>{paymentStatusFilter === 'paid' ? 'Pagas' : 'Pendentes'}</span>
+                      <button
+                        onClick={() => setPaymentStatusFilter("all")}
+                        className="hover:bg-orange-200 dark:hover:bg-orange-800 rounded-full p-0.5 transition-all"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Modern Transaction Cards */}
               <div className="space-y-3 mb-6">
-                {/* Transaction 1 - Income */}
-                <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-700 transition-all duration-200 hover:shadow-md hover:bg-zinc-100 dark:hover:bg-zinc-600 hover:border-teal-500 cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg bg-gradient-to-br from-green-500 to-green-700">
-                      💰
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-sm text-zinc-700 dark:text-zinc-200">
-                        Salário Janeiro
-                      </h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs px-2 py-1 rounded-full bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-300">
-                          Receita
-                        </span>
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                          26 Jan, 09:15
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-lg font-semibold text-green-500 dark:text-green-400">
-                      +R$ 5.500,00
-                    </div>
-                    <div className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">
-                      Conta Corrente
-                    </div>
-                  </div>
-                </div>
+                {visibleTransactions.length > 0 ? (
+                  visibleTransactions.map((transaction) => {
+                    const isIncome = transaction.type === 'income'
+                    const formattedPrice = new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL'
+                    }).format(Number(transaction.price))
+                    const formattedDate = new Date(transaction.transaction_day).toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })
+                    
+                    return (
+                      <div key={transaction.id} className="relative flex items-center justify-between p-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-700 transition-all duration-200 hover:shadow-md hover:bg-zinc-100 dark:hover:bg-zinc-600 hover:border-teal-500">
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white relative ${
+                            isIncome 
+                              ? 'bg-gradient-to-br from-green-500 to-green-700'
+                              : 'bg-gradient-to-br from-red-500 to-red-700'
+                          }`}>
+                            {transaction.category ? (
+                              <CategoryIcon 
+                                category={transaction.category} 
+                              />
+                            ) : (
+                              <span className="text-lg">💳</span>
+                            )}
+                            {transaction.is_recurring && (
+                              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-xs bg-orange-500 text-white">
+                                ↻
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-sm text-zinc-700 dark:text-zinc-200">
+                              {transaction.description}
+                            </h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`text-xs px-2 py-1 rounded-full ${
+                                isIncome
+                                  ? 'bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-300'
+                                  : 'bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-300'
+                              }`}>
+                                {transaction.category?.name}
+                              </span>
+                              {(transaction.tags || []).map((tag, index) => (
+                                <span key={index} className="text-xs px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-300">
+                                  {tag}
+                                </span>
+                              ))}
+                              <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                                {formattedDate}
+                              </span>
+                            </div>
+                            {transaction.location && (
+                              <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                                📍 {transaction.location}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="flex items-center justify-end gap-2 mb-1">
+                            <div className={`text-lg font-semibold ${
+                              isIncome
+                                ? 'text-green-500 dark:text-green-400'
+                                : 'text-red-500 dark:text-red-400'
+                            }`}>
+                              {isIncome ? '+' : '-'}{formattedPrice}
+                            </div>
+                            <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              isTransactionPaid(transaction)
+                                ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
+                                : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300'
+                            }`}>
+                              {isTransactionPaid(transaction) ? '✓ Paga' : '⏳ Pendente'}
+                            </div>
+                          </div>
+                          <div className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">
+                            {transaction.payment_method || 'N/A'}
+                          </div>
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                            Score: {Math.round((transaction.confidence_score || 0) * 100)}%
+                          </div>
+                        </div>
 
-                {/* Transaction 2 - Expense */}
-                <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-700 transition-all duration-200 hover:shadow-md hover:bg-zinc-100 dark:hover:bg-zinc-600 hover:border-teal-500 cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg bg-gradient-to-br from-orange-500 to-red-600">
-                      🍽️
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-sm text-zinc-700 dark:text-zinc-200">
-                        Almoço Restaurante
-                      </h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs px-2 py-1 rounded-full bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-300">
-                          Alimentação
-                        </span>
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                          25 Jan, 13:45
-                        </span>
+                        {/* Menu de Ações */}
+                        <div className="relative ml-2" ref={activeMenuId === transaction.id ? menuRef : null}>
+                          <button
+                            onClick={() => setActiveMenuId(activeMenuId === transaction.id ? null : transaction.id)}
+                            className="p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-all"
+                          >
+                            <MoreHorizontal size={16} className="text-zinc-500 dark:text-zinc-400" />
+                          </button>
+                          
+                          {activeMenuId === transaction.id && (
+                            <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-zinc-800 rounded-lg shadow-lg border border-zinc-200 dark:border-zinc-600 z-10">
+                              <div className="py-1">
+                                <button
+                                  onClick={() => handleEditTransaction(transaction)}
+                                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all"
+                                >
+                                  <Edit3 size={14} />
+                                  Editar Transação
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteRecentTransaction(transaction.id)}
+                                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                                >
+                                  <Trash2 size={14} />
+                                  Excluir Transação
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
+                    )
+                  })
+                ) : (
+                  <div className="flex items-center justify-center p-8 text-zinc-500 dark:text-zinc-400">
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">📊</div>
+                      <p className="text-sm">Nenhuma transação recente encontrada</p>
+                      <p className="text-xs mt-1">As transações aparecerão aqui quando disponíveis</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-lg font-semibold text-red-500 dark:text-red-400">
-                      -R$ 45,90
-                    </div>
-                    <div className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">
-                      Cartão Débito
-                    </div>
-                  </div>
-                </div>
-
-                {/* Transaction 3 - Transfer */}
-                <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-700 transition-all duration-200 hover:shadow-md hover:bg-zinc-100 dark:hover:bg-zinc-600 hover:border-teal-500 cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg bg-gradient-to-br from-blue-500 to-blue-700">
-                      🚗
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-sm text-zinc-700 dark:text-zinc-200">
-                        Combustível Posto Shell
-                      </h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-300">
-                          Transporte
-                        </span>
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                          24 Jan, 18:30
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-lg font-semibold text-red-500 dark:text-red-400">
-                      -R$ 120,00
-                    </div>
-                    <div className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">
-                      Cartão Crédito
-                    </div>
-                  </div>
-                </div>
-
-                {/* Transaction 4 - Recurring */}
-                <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-700 transition-all duration-200 hover:shadow-md hover:bg-zinc-100 dark:hover:bg-zinc-600 hover:border-teal-500 cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg relative bg-gradient-to-br from-purple-500 to-purple-700">
-                      🎮
-                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-xs bg-orange-500 text-white">
-                        ↻
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-sm text-zinc-700 dark:text-zinc-200">
-                        Netflix Assinatura
-                      </h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs px-2 py-1 rounded-full bg-purple-50 dark:bg-purple-900 text-purple-800 dark:text-purple-300">
-                          Lazer
-                        </span>
-                        <span className="text-xs px-2 py-1 rounded-full bg-orange-50 dark:bg-orange-900 text-orange-700 dark:text-orange-300">
-                          Recorrente
-                        </span>
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                          23 Jan, 10:00
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-lg font-semibold text-red-500 dark:text-red-400">
-                      -R$ 39,90
-                    </div>
-                    <div className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">
-                      Débito Automático
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
+
+              {/* Botão Ver Mais */}
+              {hasMoreTransactions && (
+                <div className="flex justify-center mb-6">
+                  <button
+                    onClick={handleLoadMore}
+                    className="flex items-center gap-2 px-6 py-3 bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 text-zinc-700 dark:text-zinc-300 rounded-xl border border-zinc-200 dark:border-zinc-600 transition-all duration-200 hover:shadow-md group"
+                  >
+                    <span className="text-sm font-medium">
+                      Ver mais {Math.min(remainingTransactions, itemsPerLoad)} transações
+                    </span>
+                    <ChevronDown size={16} className="group-hover:translate-y-0.5 transition-transform" />
+                    <div className="px-2 py-1 bg-zinc-200 dark:bg-zinc-600 text-xs text-zinc-600 dark:text-zinc-400 rounded-full">
+                      +{remainingTransactions}
+                    </div>
+                  </button>
+                </div>
+              )}
 
               {/* Quick Stats */}
               <div className="grid grid-cols-3 gap-4 p-4 rounded-lg bg-zinc-100 dark:bg-zinc-700">
