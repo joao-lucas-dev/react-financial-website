@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction, useCallback, useState, useRef } from '
 import { IOverview, IRow, ITransaction } from '../types/transactions.ts'
 import { DateTime } from 'luxon'
 import useAxiosPrivate from './useAxiosPrivate.tsx'
+import { enhanceTransactionsWithMockData, EnhancedTransaction } from '../utils/mockTransactionEnhancer.ts'
 
 export default function useTransactions(
   handleGetChartCategories: (date?: DateTime) => Promise<void>,
@@ -25,7 +26,7 @@ export default function useTransactions(
     },
   })
   const [balance, setBalance] = useState(0)
-  const [recentTransactions, setRecentTransactions] = useState([])
+  const [recentTransactions, setRecentTransactions] = useState<EnhancedTransaction[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const axiosPrivate = useAxiosPrivate()
   const loadingRef = useRef<Record<string, boolean>>({})
@@ -46,7 +47,8 @@ export default function useTransactions(
           `/transactions/recent?filter=${filter}&sort=${sort}&direction=${direction.toUpperCase()}&type=${type}`,
         )
 
-        setRecentTransactions(response.data)
+        const enhancedData = enhanceTransactionsWithMockData(response.data)
+        setRecentTransactions(enhancedData)
       } catch (err) {
         console.log(err)
       } finally {
