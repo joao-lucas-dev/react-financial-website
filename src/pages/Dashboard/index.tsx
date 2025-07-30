@@ -290,11 +290,11 @@ export default function Dashboard() {
                           const percentage = Number(overview.income.percentage)
                           if (isNaN(percentage)) return null
                           
-                          return percentage >= 0 ? (
+                          return overview?.income?.isPositive ? (
                             <>
                               <ChevronUp className="w-4 h-4 text-green-500" />
                               <span className="text-sm font-medium text-green-500">
-                                +{percentage.toFixed(1)}%
+                                {percentage.toFixed(1)}%
                               </span>
                             </>
                           ) : (
@@ -340,18 +340,18 @@ export default function Dashboard() {
                           const percentage = Number(overview.outcome.percentage)
                           if (isNaN(percentage)) return null
                           
-                          return percentage < 0 ? (
+                          return overview?.outcome?.isPositive ? (
                             <>
-                              <ChevronDown className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
-                              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                              <ChevronDown className="w-4 h-4 text-green-500 dark:text-green-400" />
+                              <span className="text-sm font-medium text-green-500 dark:text-green-400">
                                 {percentage.toFixed(1)}%
                               </span>
                             </>
                           ) : (
                             <>
-                              <ChevronUp className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
-                              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                                +{percentage.toFixed(1)}%
+                              <ChevronUp className="w-4 h-4 text-red-500 dark:text-red-400" />
+                              <span className="text-sm font-medium text-red-500 dark:text-red-400">
+                                {percentage.toFixed(1)}%
                               </span>
                             </>
                           )
