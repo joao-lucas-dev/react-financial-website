@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect } from 'react'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import {
   IHandleUpdateTransaction,
   IOpenModal,
@@ -6,19 +6,19 @@ import {
   ISetOpenModal,
   ITransaction,
   RecurrenceType,
-  PaymentStatus,
 } from '../types/transactions.ts'
 import Input from './Input.tsx'
 import ModernDatePicker from './ModernDatePicker.tsx'
-import ModernSelect, { SelectOption } from './ModernSelect.tsx'
-import PaymentStatusComponent from './PaymentStatus.tsx'
-import RecurrenceSelector from './RecurrenceSelector.tsx'
+import ModernSelect, { SelectOption } from './ModernSelectRadix.tsx'
+import RecurrenceOptions, { RecurrenceConfig } from './RecurrenceOptions.tsx'
+import PaymentStatusIcon from './PaymentStatusIcon.tsx'
 import CategoryIcon from './CategoryIcon/index.tsx'
 import { X, Edit3, TrendingUp, TrendingDown } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ICategory } from '../types/categories.ts'
+import { DateTime } from 'luxon'
 
 interface IParams {
   openModal: IOpenModal
@@ -37,9 +37,13 @@ const modalEditSchema = z.object({
     message: 'Data é obrigatória e deve ser uma data válida',
   }),
   category: z.string().min(1, 'Categoria é obrigatória'),
-  type: z.string().min(1, 'Tipo é obrigatório'),
-  recurrence_type: z.string().optional(),
-  payment_status: z.string().optional(),
+  recurrence_config: z.object({
+    mode: z.enum(['single', 'fixed', 'installment']),
+    frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'yearly']).optional(),
+    installmentCount: z.number().optional(),
+    installmentPeriod: z.enum(['months', 'years']).optional(),
+  }).optional(),
+  is_paid: z.boolean(),
 })
 
 type ModalEditData = z.infer<typeof modalEditSchema>
@@ -53,21 +57,26 @@ const ModalEdit = ({
   categories,
   from,
 }: IParams) => {
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-    setValue,
-    watch,
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [isPaidManuallyOverridden, setIsPaidManuallyOverridden] = useState(false)
+
+  const { 
+    register, 
+    handleSubmit, 
+    control, 
+    formState: { errors }, 
+    setValue, 
+    watch 
   } = useForm<ModalEditData>({
     resolver: zodResolver(modalEditSchema),
   })
 
+  const transactionDay = watch('transaction_day')
+  const isPaid = watch('is_paid')
+
   useEffect(() => {
     setValue('description', openModal.transaction.description || '')
-    
-    // Formatar valor como moeda brasileira
+
     const price = openModal.transaction.price
     let formattedPrice = ''
     if (typeof price === 'number' && !isNaN(price)) {
@@ -81,20 +90,44 @@ const ModalEdit = ({
       }
     }
     setValue('price', formattedPrice)
-    
-    setValue(
-      'transaction_day',
-      openModal.transaction.transaction_day
-        ? openModal.transaction.transaction_day.split('T')[0]
-        : ''
-    )
+
+    const transactionDateStr = openModal.transaction.transaction_day
+    const formattedDate = transactionDateStr ? transactionDateStr.split('T')[0] : ''
+    setValue('transaction_day', formattedDate)
+
     setValue('category', openModal.transaction.category?.id ? String(openModal.transaction.category.id) : '')
-    setValue('type', openModal.transaction.type || '')
-    
-    // Novos campos
-    setValue('recurrence_type', openModal.transaction.recurrence_type || 'none')
-    setValue('payment_status', openModal.transaction.payment_status || 'unpaid')
+    setValue('is_paid', openModal.transaction.is_paid || false)
+
+    const recurrenceConfig: RecurrenceConfig = {
+      mode: openModal.transaction.is_recurring ? 'fixed' : 'single',
+      frequency: openModal.transaction.recurrence_type,
+    }
+    setValue('recurrence_config', recurrenceConfig)
+
   }, [openModal.transaction, setValue])
+
+  useEffect(() => {
+    if (!isPaidManuallyOverridden) {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const selectedDate = new Date(transactionDay)
+      selectedDate.setHours(0, 0, 0, 0)
+
+      const newIsPaid = selectedDate <= today
+      if (newIsPaid !== isPaid) {
+        setValue('is_paid', newIsPaid)
+        setIsAnimating(true)
+        setTimeout(() => setIsAnimating(false), 1000)
+      }
+    }
+  }, [transactionDay, isPaid, setValue, isPaidManuallyOverridden])
+
+  const handleToggleIsPaid = () => {
+    setIsPaidManuallyOverridden(true)
+    setValue('is_paid', !isPaid)
+    setIsAnimating(true)
+    setTimeout(() => setIsAnimating(false), 1000)
+  }
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -117,17 +150,24 @@ const ModalEdit = ({
   const handleUpdate = useCallback(
     async (data: ModalEditData) => {
       try {
+        const recurrenceConfig = data.recurrence_config || { mode: 'single' }
+        let recurrenceType: RecurrenceType = 'none'
+
+        if (recurrenceConfig.mode === 'fixed' && recurrenceConfig.frequency) {
+          recurrenceType = recurrenceConfig.frequency as RecurrenceType
+        } else if (recurrenceConfig.mode === 'installment') {
+          recurrenceType = 'monthly'
+        }
+
         const updatedTransaction = {
           ...openModal.transaction,
           description: data.description,
           price: Number(data.price.replace(/\D/g, '')) / 100,
           category_id: Number(data.category),
           transaction_day: new Date(`${data.transaction_day}T00:00:00`),
-          type: data.type,
-          is_recurring: data.recurrence_type !== 'none',
-          recurrence_type: data.recurrence_type as RecurrenceType,
-          payment_status: data.payment_status as PaymentStatus,
-          is_paid: data.payment_status === 'paid',
+          is_recurring: recurrenceConfig.mode !== 'single',
+          recurrence_type: recurrenceType,
+          is_paid: data.is_paid,
         } as unknown as ITransaction
 
         await handleUpdateTransaction(
@@ -156,7 +196,6 @@ const ModalEdit = ({
     ],
   )
 
-  // Preparar opções de categoria para o ModernSelect
   const categoryOptions: SelectOption[] = categories
     .filter((cat) => {
       if (openModal.transaction.type === 'income') {
@@ -172,32 +211,20 @@ const ModalEdit = ({
       icon: <CategoryIcon size="small" category={cat} />,
     }))
 
-  // Opções de tipo de transação
-  const typeOptions: SelectOption[] = [
-    {
-      value: 'income',
-      label: 'Receita',
-      icon: <TrendingUp className="w-4 h-4 text-green-500" />,
-    },
-    {
-      value: 'outcome',
-      label: 'Despesa',
-      icon: <TrendingDown className="w-4 h-4 text-red-500" />,
-    },
-  ]
-
   return (
-    <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={e => {
-      if (e.target === e.currentTarget) {
-        setOpenModal({
-          isOpen: false,
-          transaction: {} as ITransaction,
-          type: '',
-        })
-      }
-    }}>
+    <div
+      className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          setOpenModal({
+            isOpen: false,
+            transaction: {} as ITransaction,
+            type: '',
+          })
+        }
+      }}
+    >
       <div className="bg-white dark:bg-zinc-800 w-[600px] max-w-[90vw] max-h-[95vh] rounded-2xl shadow-2xl p-8 relative transition-colors overflow-hidden">
-        {/* Header moderno */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/30">
@@ -226,124 +253,110 @@ const ModalEdit = ({
           </button>
         </div>
 
-        {/* Form com layout moderno */}
-        <form onSubmit={handleSubmit(handleUpdate)} className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto space-y-6 pr-2" style={{ maxHeight: 'calc(95vh - 200px)' }}>
-          {/* Descrição */}
-          <Input
-            label="Descrição"
-            placeholder="Ex: Almoço no restaurante, Salário janeiro..."
-            required={true}
-            {...register('description')}
-          />
-          {errors.description && (
-            <span className="text-red-500 text-sm">
-              {errors.description.message}
-            </span>
-          )}
-
-          {/* Valor, Data e Tipo - Layout em grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <form
+          onSubmit={handleSubmit(handleUpdate)}
+          className="flex flex-col h-full"
+        >
+          <div
+            className="flex-1 overflow-y-auto space-y-4 pr-2"
+            style={{ maxHeight: 'calc(95vh - 200px)' }}
+          >
             <div>
               <Input
-                label="Valor"
-                placeholder="R$ 0,00"
+                label="Descrição"
+                placeholder="Ex: Almoço no restaurante, Salário janeiro..."
                 required={true}
-                {...register('price')}
-                onChange={handleChange}
+                compact={true}
+                {...register('description')}
               />
-              {errors.price && (
+              {errors.description && (
                 <span className="text-red-500 text-sm mt-1 block">
-                  {errors.price.message}
+                  {errors.description.message}
                 </span>
               )}
             </div>
 
-            <div>
-              <Controller
-                name="transaction_day"
-                control={control}
-                render={({ field }) => (
-                  <ModernDatePicker
-                    label="Data da Transação"
-                    value={field.value}
-                    onChange={field.onChange}
-                    required={true}
-                    error={errors.transaction_day?.message}
-                  />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Input
+                  label="Valor"
+                  placeholder="R$ 0,00"
+                  required={true}
+                  compact={true}
+                  {...register('price')}
+                  onChange={handleChange}
+                />
+                {errors.price && (
+                  <span className="text-red-500 text-sm mt-1 block">
+                    {errors.price.message}
+                  </span>
                 )}
-              />
+              </div>
+
+              <div>
+                <div className="flex gap-3 items-end">
+                  <div className="flex-1">
+                    <Controller
+                      name="transaction_day"
+                      control={control}
+                      render={({ field }) => (
+                        <ModernDatePicker
+                          label="Data da Transação"
+                          value={field.value}
+                          onChange={(date) => {
+                            field.onChange(date)
+                            setIsPaidManuallyOverridden(false)
+                          }}
+                          required={true}
+                          error={errors.transaction_day?.message}
+                        />
+                      )}
+                    />
+                  </div>
+                  <PaymentStatusIcon
+                    isPaid={isPaid}
+                    isAnimating={isAnimating}
+                    onClick={handleToggleIsPaid}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div>
+            {categoryOptions.length > 0 && (
               <Controller
-                name="type"
+                name="category"
                 control={control}
                 render={({ field }) => (
                   <ModernSelect
-                    label="Tipo"
-                    options={typeOptions}
+                    label="Categoria"
+                    options={categoryOptions}
                     value={field.value}
                     onChange={field.onChange}
                     required={true}
-                    error={errors.type?.message}
-                    isSearchable={false}
-                    placeholder="Selecione o tipo..."
+                    error={
+                      errors.category?.message === 'Required'
+                        ? 'Selecione uma categoria'
+                        : errors.category?.message
+                    }
+                    placeholder="Selecione uma categoria..."
                   />
                 )}
               />
-            </div>
-          </div>
+            )}
 
-          {/* Categoria */}
-          {categoryOptions.length > 0 && (
             <Controller
-              name="category"
+              name="recurrence_config"
               control={control}
               render={({ field }) => (
-                <ModernSelect
-                  label="Categoria"
-                  options={categoryOptions}
-                  value={field.value}
-                  onChange={field.onChange}
-                  required={true}
-                  error={errors.category?.message}
-                  placeholder="Selecione uma categoria..."
+                <RecurrenceOptions
+                  value={field.value as RecurrenceConfig}
+                  onChange={(config) => field.onChange(config)}
+                  error={errors.recurrence_config?.message}
                 />
               )}
             />
-          )}
-
-          {/* Sistema de Recorrência */}
-          <Controller
-            name="recurrence_type"
-            control={control}
-            render={({ field }) => (
-              <RecurrenceSelector
-                value={field.value as RecurrenceType}
-                onChange={(recurrenceType) => field.onChange(recurrenceType)}
-                transactionDate={watch('transaction_day')}
-                showPreview={true}
-              />
-            )}
-          />
-
-          {/* Sistema de Pagamento */}
-          <Controller
-            name="payment_status"
-            control={control}
-            render={({ field }) => (
-              <PaymentStatusComponent
-                value={field.value as PaymentStatus}
-                onChange={field.onChange}
-                transactionDate={watch('transaction_day')}
-                showAutoLogic={true}
-              />
-            )}
-          />
           </div>
 
-          {/* Botões fixos no final */}
           <div className="flex gap-4 pt-6 border-t border-zinc-200 dark:border-zinc-700 mt-6">
             <button
               type="button"
