@@ -84,9 +84,58 @@ const Transactions = () => {
             <h1 className="text-4xl font-bold text-zinc-700 dark:text-zinc-200 mb-2 leading-tight">
               Transações Financeiras
             </h1>
-            <p className="text-zinc-600 dark:text-zinc-400 text-base">
+            <p className="text-zinc-600 dark:text-zinc-400 text-base mb-4">
               Acompanhe suas transações mensais
             </p>
+            
+            {/* Month Summary Stats */}
+            {rows.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
+                  <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                    <BarChart3 size={20} className="text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-green-700 dark:text-green-300">
+                      Total de Receitas
+                    </div>
+                    <div className="text-lg font-bold text-green-600 dark:text-green-400">
+                      {rows.reduce((total, row) => total + (row.incomes?.transactions?.length || 0), 0)} transações
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+                  <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
+                    <BarChart3 size={20} className="text-red-600 dark:text-red-400" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-red-700 dark:text-red-300">
+                      Total de Despesas
+                    </div>
+                    <div className="text-lg font-bold text-red-600 dark:text-red-400">
+                      {rows.reduce((total, row) => total + (row.outcomes?.transactions?.length || 0), 0)} transações
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 p-4 bg-zinc-50 dark:bg-zinc-700/50 rounded-xl border border-zinc-200 dark:border-zinc-600">
+                  <div className="p-2 bg-zinc-100 dark:bg-zinc-700 rounded-lg">
+                    <BarChart3 size={20} className="text-zinc-600 dark:text-zinc-400" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                      Total Geral
+                    </div>
+                    <div className="text-lg font-bold text-zinc-600 dark:text-zinc-400">
+                      {rows.reduce((total, row) => 
+                        total + (row.incomes?.transactions?.length || 0) + (row.outcomes?.transactions?.length || 0), 0
+                      )} transações
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           {/* Controls Header */}
           <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors mb-6">

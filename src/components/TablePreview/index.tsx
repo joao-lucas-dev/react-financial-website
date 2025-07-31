@@ -161,16 +161,16 @@ const TablePreview = ({
               {/* Date Section - Left */}
               <div className="flex-shrink-0 w-20">
                 <div className="text-center">
-                  <div className="p-2 bg-zinc-100 dark:bg-zinc-700 rounded-lg mb-1">
+                  <div className="p-2.5 bg-zinc-100 dark:bg-zinc-700 rounded-lg mb-1.5">
                     <Calendar
-                      size={20}
+                      size={18}
                       className="text-zinc-600 dark:text-zinc-400 mx-auto"
                     />
                   </div>
-                  <div className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                  <div className="text-xl font-bold text-zinc-900 dark:text-zinc-100 leading-none">
                     {new Date(`${row.date}T00:00:00`).getDate()}
                   </div>
-                  <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                     {new Date(`${row.date}T00:00:00`)
                       .toLocaleDateString("pt-BR", { month: "short" })
                       .toUpperCase()}
@@ -184,16 +184,16 @@ const TablePreview = ({
               </div>
 
               {/* Financial Data Section - Right */}
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 space-y-2.5">
                 {/* Income */}
                 <div 
-                  className="group/income-v relative p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 transition-all duration-200 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 hover:scale-105 hover:shadow-md"
+                  className="group/income-v relative p-2.5 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 transition-all duration-200 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 hover:scale-105 hover:shadow-md"
                   onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'income' })}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <TrendingUp
-                        size={14}
+                        size={12}
                         className="text-green-600 dark:text-green-400"
                       />
                       <span className="text-xs font-medium text-green-700 dark:text-green-300">
@@ -203,6 +203,27 @@ const TablePreview = ({
                     <p className="font-semibold text-green-700 dark:text-green-300 text-sm">
                       {row.incomes?.valueFormatted || "R$ 0,00"}
                     </p>
+                  </div>
+                  
+                  {/* Transaction Count and Status */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-green-600 dark:text-green-400">
+                      {row.incomes?.transactions?.length || 0} transações
+                    </span>
+                    {row.incomes?.transactions && row.incomes.transactions.length > 0 && (
+                      <div className="flex items-center gap-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                        <span className="text-green-600 dark:text-green-400">
+                          {row.incomes.transactions.filter(t => {
+                            const today = new Date();
+                            const transDate = new Date(`${t.transaction_day}T00:00:00`);
+                            today.setHours(0, 0, 0, 0);
+                            transDate.setHours(0, 0, 0, 0);
+                            return t.is_paid !== undefined ? t.is_paid : transDate <= today;
+                          }).length} pagas
+                        </span>
+                      </div>
+                    )}
                   </div>
                   
                   {/* Add Income Button */}
@@ -235,13 +256,13 @@ const TablePreview = ({
 
                 {/* Outcome */}
                 <div 
-                  className="group/outcome-v relative p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 transition-all duration-200 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/30 hover:scale-105 hover:shadow-md"
+                  className="group/outcome-v relative p-2.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 transition-all duration-200 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/30 hover:scale-105 hover:shadow-md"
                   onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'outcome' })}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <TrendingDown
-                        size={14}
+                        size={12}
                         className="text-red-600 dark:text-red-400"
                       />
                       <span className="text-xs font-medium text-red-700 dark:text-red-300">
@@ -251,6 +272,27 @@ const TablePreview = ({
                     <p className="font-semibold text-red-700 dark:text-red-300 text-sm">
                       {row.outcomes?.valueFormatted || "R$ 0,00"}
                     </p>
+                  </div>
+                  
+                  {/* Transaction Count and Status */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-red-600 dark:text-red-400">
+                      {row.outcomes?.transactions?.length || 0} transações
+                    </span>
+                    {row.outcomes?.transactions && row.outcomes.transactions.length > 0 && (
+                      <div className="flex items-center gap-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                        <span className="text-red-600 dark:text-red-400">
+                          {row.outcomes.transactions.filter(t => {
+                            const today = new Date();
+                            const transDate = new Date(`${t.transaction_day}T00:00:00`);
+                            today.setHours(0, 0, 0, 0);
+                            transDate.setHours(0, 0, 0, 0);
+                            return t.is_paid !== undefined ? t.is_paid : transDate <= today;
+                          }).length} pagas
+                        </span>
+                      </div>
+                    )}
                   </div>
                   
                   {/* Add Outcome Button */}
@@ -282,11 +324,11 @@ const TablePreview = ({
                 </div>
 
                 {/* Balance */}
-                <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-600">
-                  <div className="flex items-center justify-between">
+                <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-600">
+                  <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <BarChart3
-                        size={14}
+                        size={12}
                         className="text-zinc-600 dark:text-zinc-400"
                       />
                       <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
@@ -300,7 +342,112 @@ const TablePreview = ({
                       {row.total.valueFormatted}
                     </p>
                   </div>
+                  
+                  {/* Total Transaction Count */}
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-zinc-600 dark:text-zinc-400">
+                      Total: {((row.incomes?.transactions?.length || 0) + (row.outcomes?.transactions?.length || 0))} transações
+                    </span>
+                    <button
+                      onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'all' })}
+                      className="text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
+                      title="Ver todas"
+                    >
+                      <Eye size={11} />
+                    </button>
+                  </div>
                 </div>
+                
+                {/* Quick Transaction Preview - Only show if there are transactions and limit to 1 transaction */}
+                {((row.incomes?.transactions?.length || 0) + (row.outcomes?.transactions?.length || 0)) > 0 && (
+                  <div className="mt-2.5 pt-2.5 border-t border-zinc-200 dark:border-zinc-700">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                        Última Transação
+                      </span>
+                      <button
+                        onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'all' })}
+                        className="text-xs text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
+                      >
+                        Ver todas
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      {[
+                        ...(row.incomes?.transactions || []).map(t => ({ ...t, type: 'income' as const })),
+                        ...(row.outcomes?.transactions || []).map(t => ({ ...t, type: 'outcome' as const }))
+                      ]
+                        .slice(0, 1) // Show only first 1 transaction
+                        .map((transaction, index) => (
+                          <div
+                            key={transaction.id || index}
+                            className="flex items-center justify-between p-2 bg-white dark:bg-zinc-800 rounded border border-zinc-100 dark:border-zinc-600"
+                          >
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                              <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${
+                                transaction.type === 'income'
+                                  ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400'
+                                  : 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400'
+                              }`}>
+                                {transaction.type === 'income' ? '+' : '-'}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                                  {transaction.description}
+                                </div>
+                                <div className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                                  {transaction.category?.name || 'Sem categoria'}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-right ml-2">
+                              <div className={`text-xs font-semibold ${
+                                transaction.type === 'income'
+                                  ? 'text-green-600 dark:text-green-400'
+                                  : 'text-red-600 dark:text-red-400'
+                              }`}>
+                                {Math.abs(Number(transaction.price)).toLocaleString('pt-BR', {
+                                  style: 'currency',
+                                  currency: 'BRL',
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0
+                                })}
+                              </div>
+                              <div className={`w-1.5 h-1.5 rounded-full mx-auto mt-1 ${
+                                (() => {
+                                  const today = new Date();
+                                  const transDate = new Date(`${transaction.transaction_day}T00:00:00`);
+                                  today.setHours(0, 0, 0, 0);
+                                  transDate.setHours(0, 0, 0, 0);
+                                  const isPaid = transaction.is_paid !== undefined ? transaction.is_paid : transDate <= today;
+                                  return isPaid ? 'bg-green-500' : 'bg-red-500';
+                                })()
+                              }`}
+                              title={(() => {
+                                const today = new Date();
+                                const transDate = new Date(`${transaction.transaction_day}T00:00:00`);
+                                today.setHours(0, 0, 0, 0);
+                                transDate.setHours(0, 0, 0, 0);
+                                const isPaid = transaction.is_paid !== undefined ? transaction.is_paid : transDate <= today;
+                                return isPaid ? 'Pago' : 'Pendente';
+                              })()}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                    {((row.incomes?.transactions?.length || 0) + (row.outcomes?.transactions?.length || 0)) > 1 && (
+                      <div className="text-center mt-1.5">
+                        <button
+                          onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'all' })}
+                          className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+                        >
+                          +{((row.incomes?.transactions?.length || 0) + (row.outcomes?.transactions?.length || 0)) - 1} mais
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -387,9 +534,23 @@ const TablePreview = ({
                   Receitas
                 </span>
               </div>
-              <p className="font-semibold text-green-700 dark:text-green-300 text-sm">
+              <p className="font-semibold text-green-700 dark:text-green-300 text-sm mb-1">
                 {row.incomes?.valueFormatted || "R$ 0,00"}
               </p>
+              <div className="text-xs text-green-600 dark:text-green-400">
+                {row.incomes?.transactions?.length || 0} transações
+                {row.incomes?.transactions && row.incomes.transactions.length > 0 && (
+                  <span className="ml-2">
+                    • {row.incomes.transactions.filter(t => {
+                      const today = new Date();
+                      const transDate = new Date(`${t.transaction_day}T00:00:00`);
+                      today.setHours(0, 0, 0, 0);
+                      transDate.setHours(0, 0, 0, 0);
+                      return t.is_paid !== undefined ? t.is_paid : transDate <= today;
+                    }).length} pagas
+                  </span>
+                )}
+              </div>
               
               {/* Add Income Button */}
               <button
@@ -433,9 +594,23 @@ const TablePreview = ({
                   Despesas
                 </span>
               </div>
-              <p className="font-semibold text-red-700 dark:text-red-300 text-sm">
+              <p className="font-semibold text-red-700 dark:text-red-300 text-sm mb-1">
                 {row.outcomes?.valueFormatted || "R$ 0,00"}
               </p>
+              <div className="text-xs text-red-600 dark:text-red-400">
+                {row.outcomes?.transactions?.length || 0} transações
+                {row.outcomes?.transactions && row.outcomes.transactions.length > 0 && (
+                  <span className="ml-2">
+                    • {row.outcomes.transactions.filter(t => {
+                      const today = new Date();
+                      const transDate = new Date(`${t.transaction_day}T00:00:00`);
+                      today.setHours(0, 0, 0, 0);
+                      transDate.setHours(0, 0, 0, 0);
+                      return t.is_paid !== undefined ? t.is_paid : transDate <= today;
+                    }).length} pagas
+                  </span>
+                )}
+              </div>
               
               {/* Add Outcome Button */}
               <button
@@ -477,11 +652,14 @@ const TablePreview = ({
                 </span>
               </div>
               <p
-                className={`font-bold text-sm flex items-center ${balanceColor}`}
+                className={`font-bold text-sm flex items-center ${balanceColor} mb-1`}
               >
                 {balanceIcon}
                 {row.total.valueFormatted}
               </p>
+              <div className="text-xs text-zinc-600 dark:text-zinc-400">
+                Total: {((row.incomes?.transactions?.length || 0) + (row.outcomes?.transactions?.length || 0))} transações
+              </div>
             </div>
           </div>
 

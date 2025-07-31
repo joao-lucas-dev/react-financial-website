@@ -33,7 +33,7 @@ import CountUp from "../../components/CountUp.tsx";
 import useCategories from "../../hooks/useCategories.ts";
 import { useState, useRef, useEffect } from "react";
 import { ITransaction } from "../../types/transactions.ts";
-import { mockCreditCards } from "../../types/creditCards";
+import useCreditCards from "../../hooks/useCreditCards";
 import TableTransactions from "../../components/TableTransactions";
 import { Filter } from "../../components/Filter";
 import ModernDonutChart from "../../components/ModernDonutChart.tsx";
@@ -46,10 +46,15 @@ export default function Dashboard() {
     type: "",
   });
 
-  // Credit Cards State
-  const [creditCards, setCreditCards] = useState(mockCreditCards);
-  // const [creditCards, setCreditCards] = useState([]);
-  const [showCards, setShowCards] = useState(true); // Toggle for empty state demo
+  // Credit Cards Hook
+  const {
+    creditCards,
+    summary: creditCardSummary,
+    isLoading: creditCardsLoading,
+    error: creditCardsError,
+    fetchCreditCards,
+    fetchCreditCardSummary
+  } = useCreditCards();
 
   const { chartCategories, handleGetChartCategories, categories } =
     useCategories();
@@ -68,6 +73,8 @@ export default function Dashboard() {
     handleGetRecentTransactions,
     recentTransactions,
     handleDeleteMultipleTransactions,
+    handleGetPeriodsSummary,
+    periodsSummary,
   } = useTransactions(handleGetChartCategories);
   const { getGreeting, currentMonth, setCurrentMonth } = useDashboard(
     rows,
@@ -76,6 +83,7 @@ export default function Dashboard() {
     handleGetBalance,
     handleGetPreviewTransactions,
     handleGetRecentTransactions,
+    handleGetPeriodsSummary,
   );
 
   const [sortBy, setSortBy] = useState("updated_at");
@@ -201,6 +209,12 @@ export default function Dashboard() {
     setItemsToShow(5);
   }, [recentSearchTerm, recentTypeFilter, paymentStatusFilter]);
 
+  // Load credit cards on component mount
+  useEffect(() => {
+    fetchCreditCards();
+    fetchCreditCardSummary();
+  }, [fetchCreditCards, fetchCreditCardSummary]);
+
   const handleFilterChange = (
     newFilter: "before" | "after" | "both",
     newType: "income" | "outcome" | "all",
@@ -252,7 +266,26 @@ export default function Dashboard() {
             {/* Credit Card Section */}
             <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 mb-8">
               <div>
-                {showCards && creditCards.length > 0 ? (
+                {creditCardsLoading ? (
+                  <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl">
+                    <div className="animate-pulse">
+                      <div className="h-6 bg-zinc-200 dark:bg-zinc-700 rounded mb-4"></div>
+                      <div className="h-40 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
+                    </div>
+                  </div>
+                ) : creditCardsError ? (
+                  <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl">
+                    <div className="text-center text-red-500 dark:text-red-400">
+                      <p className="mb-2">Erro ao carregar cartões de crédito</p>
+                      <button 
+                        onClick={() => fetchCreditCards()}
+                        className="text-sm text-teal-600 dark:text-teal-400 hover:underline"
+                      >
+                        Tentar novamente
+                      </button>
+                    </div>
+                  </div>
+                ) : creditCards.length > 0 ? (
                   <CreditCardCarousel
                     cards={creditCards}
                     onCardClick={handleCardClick}
@@ -369,13 +402,12 @@ export default function Dashboard() {
             {/* Main Content Grid: TablePreview + Categories */}
             <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 mb-8">
               {/* Left Column: TablePreview Vertical */}
-              <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors flex flex-col">
-                {/* <div className="flex items-center justify-between mb-6 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-lg"> */}
-                <div className="flex items-center justify-between mb-6 p-4  rounded-lg">
+              <div className="bg-white dark:bg-zinc-800 rounded-xl p-4 shadow-2xl transition-colors flex flex-col">
+                <div className="flex items-center justify-between mb-4 p-3 rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
                       <BarChart3
-                        size={20}
+                        size={18}
                         className="text-teal-600 dark:text-teal-400"
                       />
                     </div>
@@ -384,7 +416,7 @@ export default function Dashboard() {
                         Visão Financeira
                       </h3>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        Acompanhe suas transações diárias
+                        Últimos dias
                       </p>
                     </div>
                   </div>
@@ -405,7 +437,7 @@ export default function Dashboard() {
                     setOpenModal={setOpenModal}
                     categories={categories}
                     from="dashboard"
-                    maxDays={3}
+                    maxDays={2}
                     showViewAllButton={true}
                     variant="vertical"
                   />
@@ -471,7 +503,7 @@ export default function Dashboard() {
                       {/* Chart e botão - metade direita */}
                       <div className="w-1/2 flex flex-col items-center">
                         <div className="w-full">
-                          <ModernDonutChart />
+                          <ModernDonutChart data={chartCategories.notIncome.config} />
                         </div>
                         <Link
                           to={{
@@ -705,22 +737,17 @@ export default function Dashboard() {
                     }).format(Number(transaction.price))
                     const formattedDate = new Date(transaction.transaction_day).toLocaleDateString('pt-BR', {
                       day: '2-digit',
-                      month: 'short',
-                      hour: '2-digit',
-                      minute: '2-digit'
+                      month: 'short'
                     })
                     
                     return (
                       <div key={transaction.id} className="relative flex items-center justify-between p-4 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-700 transition-all duration-200 hover:shadow-md hover:bg-zinc-100 dark:hover:bg-zinc-600 hover:border-teal-500">
                         <div className="flex items-center gap-4 flex-1">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white relative ${
-                            isIncome 
-                              ? 'bg-gradient-to-br from-green-500 to-green-700'
-                              : 'bg-gradient-to-br from-red-500 to-red-700'
-                          }`}>
+                          <div className="w-12 h-12 flex items-center justify-center relative">
                             {transaction.category ? (
                               <CategoryIcon 
                                 category={transaction.category} 
+                                size="large"
                               />
                             ) : (
                               <span className="text-lg">💳</span>
@@ -736,27 +763,13 @@ export default function Dashboard() {
                               {transaction.description}
                             </h4>
                             <div className="flex items-center gap-2 mt-1">
-                              <span className={`text-xs px-2 py-1 rounded-full ${
-                                isIncome
-                                  ? 'bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-300'
-                                  : 'bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-300'
-                              }`}>
+                              <span className={`text-xs px-2 py-1 rounded-full ${transaction.category.color} text-white`}>
                                 {transaction.category?.name}
                               </span>
-                              {(transaction.tags || []).map((tag, index) => (
-                                <span key={index} className="text-xs px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-300">
-                                  {tag}
-                                </span>
-                              ))}
                               <span className="text-xs text-zinc-500 dark:text-zinc-400">
                                 {formattedDate}
                               </span>
                             </div>
-                            {transaction.location && (
-                              <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                                📍 {transaction.location}
-                              </div>
-                            )}
                           </div>
                         </div>
                         <div className="text-right">
@@ -775,12 +788,6 @@ export default function Dashboard() {
                             }`}>
                               {isTransactionPaid(transaction) ? '✓ Paga' : '⏳ Pendente'}
                             </div>
-                          </div>
-                          <div className="text-xs mt-1 text-zinc-500 dark:text-zinc-400">
-                            {transaction.payment_method || 'N/A'}
-                          </div>
-                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                            Score: {Math.round((transaction.confidence_score || 0) * 100)}%
                           </div>
                         </div>
 
@@ -853,7 +860,7 @@ export default function Dashboard() {
                     Hoje
                   </div>
                   <div className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                    +R$ 5.294,20
+                    <CountUp valueNumber={periodsSummary.today.balance} />
                   </div>
                 </div>
                 <div className="text-center">
@@ -861,7 +868,7 @@ export default function Dashboard() {
                     Esta Semana
                   </div>
                   <div className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                    +R$ 4.850,40
+                    <CountUp valueNumber={periodsSummary.thisWeek.balance} />
                   </div>
                 </div>
                 <div className="text-center">
@@ -869,7 +876,7 @@ export default function Dashboard() {
                     Este Mês
                   </div>
                   <div className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                    +R$ 3.245,80
+                    <CountUp valueNumber={periodsSummary.thisMonth.balance} />
                   </div>
                 </div>
               </div>

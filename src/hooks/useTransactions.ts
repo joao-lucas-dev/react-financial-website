@@ -28,6 +28,11 @@ export default function useTransactions(
   const [balance, setBalance] = useState(0)
   const [recentTransactions, setRecentTransactions] = useState<EnhancedTransaction[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [periodsSummary, setPeriodsSummary] = useState({
+    today: { balance: 0 },
+    thisWeek: { balance: 0 },
+    thisMonth: { balance: 0 },
+  })
   const axiosPrivate = useAxiosPrivate()
   const loadingRef = useRef<Record<string, boolean>>({})
 
@@ -71,6 +76,15 @@ export default function useTransactions(
       console.log(err)
     }
   }, [setBalance, axiosPrivate])
+
+  const handleGetPeriodsSummary = useCallback(async () => {
+    try {
+      const { data } = await axiosPrivate.get('/transactions/summary-periods')
+      setPeriodsSummary(data)
+    } catch (err) {
+      console.log(err)
+    }
+  }, [axiosPrivate])
 
   const handleGetOverviewTransactions = useCallback(
     async (date = DateTime.now()) => {
@@ -412,6 +426,8 @@ export default function useTransactions(
     handleGetRecentTransactions,
     recentTransactions,
     handleDeleteMultipleTransactions,
+    handleGetPeriodsSummary,
+    periodsSummary,
     isLoading,
   }
 }

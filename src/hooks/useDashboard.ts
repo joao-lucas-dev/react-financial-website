@@ -10,6 +10,7 @@ export default function useDashboard(
   handleGetBalance: () => Promise<void>,
   handleGetPreviewTransactions: (date?: DateTime) => Promise<void>,
   handleGetRecentTransactions: () => Promise<void>,
+  handleGetPeriodsSummary: () => Promise<void>,
 ) {
   const [currentDate, setCurrentDate] = useState(DateTime.now())
   const [isLoading, setIsLoading] = useState(false)
@@ -129,6 +130,7 @@ export default function useDashboard(
           handleGetOverviewTransactions(),
           handleGetBalance(),
           handleGetRecentTransactions(),
+          handleGetPeriodsSummary(),
         ]);
         initializedRef.current = true;
       } finally {
@@ -137,7 +139,7 @@ export default function useDashboard(
     };
 
     initializeDashboard();
-  }, [handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions, handleGetBalance, handleGetRecentTransactions])
+  }, [handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions, handleGetBalance, handleGetRecentTransactions, handleGetPeriodsSummary])
 
   const setCurrentMonth = useCallback(async (month: number) => {
     if (isLoading) return;

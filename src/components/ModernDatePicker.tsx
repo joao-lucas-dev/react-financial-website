@@ -25,11 +25,11 @@ const customTheme = {
   },
   components: {
     DatePicker: {
-      colorBorder: '#d9d9d9',
+      colorBorder: '#d4d4d8', // zinc-300
       colorBorderHover: '#009688',
       colorPrimaryHover: '#00695C',
-      controlHeight: 48,
-      paddingInline: 20,
+      controlHeight: 40, // h-10 equivalent
+      paddingInline: 12, // px-3 equivalent
     }
   }
 }
@@ -47,8 +47,8 @@ const ModernDatePicker = forwardRef<any, ModernDatePickerProps>(
 
     return (
       <ConfigProvider theme={customTheme} locale={locale}>
-        <div className="flex flex-col mt-4">
-          <label className="text-md font-semibold text-gray dark:text-softGray mb-2">
+        <div className="flex flex-col">
+          <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
             {label}
             {required && <span className="text-red-600 ml-1">*</span>}
           </label>
@@ -69,7 +69,7 @@ const ModernDatePicker = forwardRef<any, ModernDatePickerProps>(
               ${error ? 'border-red-500' : ''}
             `}
             style={{
-              height: '48px',
+              height: '40px',
             }}
             popupStyle={{
               zIndex: 1050,

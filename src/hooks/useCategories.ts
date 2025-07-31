@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { colorsMap } from '../common/constants'
 import { useCallback, useEffect, useState } from 'react'
-import { CategoryData, ICategory } from '../types/categories.ts'
+import { CategoryChartData, ICategory } from '../types/categories.ts'
 import useAxiosPrivate from './useAxiosPrivate.tsx'
 
 export default function useCategories() {
@@ -11,6 +11,7 @@ export default function useCategories() {
   const [chartCategories, setChartCategories] = useState({
     notIncome: {
       config: [] as ICategory[],
+      total: 0,
       chartConfig: {
         labels: ['sem valor'],
         datasets: [
@@ -24,6 +25,7 @@ export default function useCategories() {
     },
     income: {
       config: [] as ICategory[],
+      total: 0,
       chartConfig: {
         labels: ['sem valor'],
         datasets: [
@@ -43,8 +45,8 @@ export default function useCategories() {
         const startDate = date.startOf('month')
         const endDate = date.endOf('month')
 
-        const { data } = await axiosPrivate.get<CategoryData>(
-          `/categories/overview/chart?startDate=${startDate}&endDate=${endDate}&limited=${limited}`,
+        const { data } = await axiosPrivate.get<CategoryChartData>(
+          `/categories/chart?startDate=${startDate}&endDate=${endDate}`,
         )
 
         const pricesNotIncome: number[] = []
@@ -56,15 +58,15 @@ export default function useCategories() {
         const hoverBackgroundColorNotIncome: (string | undefined)[] = []
         const hoverBackgroundColorIncome: (string | undefined)[] = []
 
-        data.notIncome.forEach((item) => {
-          pricesNotIncome.push(item.total)
+        data.notIncome.config.forEach((item) => {
+          pricesNotIncome.push(item.total || 0)
           labelsNotIncome.push(item.name)
           backgroundColorNotIncome.push(colorsMap.get(item.color)?.color)
           hoverBackgroundColorNotIncome.push(colorsMap.get(item.color)?.hover)
         })
 
-        data.income.forEach((item) => {
-          pricesIncome.push(item.total)
+        data.income.config.forEach((item) => {
+          pricesIncome.push(item.total || 0)
           labelsIncome.push(item.name)
           backgroundColorIncome.push(colorsMap.get(item.color)?.color)
           hoverBackgroundColorIncome.push(colorsMap.get(item.color)?.hover)
@@ -72,7 +74,8 @@ export default function useCategories() {
 
         setChartCategories({
           notIncome: {
-            config: data.notIncome,
+            config: data.notIncome.config,
+            total: data.notIncome.total,
             chartConfig: {
               labels: labelsNotIncome,
               datasets: [
@@ -87,7 +90,8 @@ export default function useCategories() {
             },
           },
           income: {
-            config: data.income,
+            config: data.income.config,
+            total: data.income.total,
             chartConfig: {
               labels: labelsIncome,
               datasets: [

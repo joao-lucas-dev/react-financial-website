@@ -6,14 +6,13 @@ import {
   ISetOpenModal,
   ITransaction,
   RecurrenceType,
-  PaymentStatus,
 } from '../types/transactions.ts'
 import Input from './Input.tsx'
 import Button from './Button.tsx'
 import ModernDatePicker from './ModernDatePicker.tsx'
-import ModernSelect, { SelectOption } from './ModernSelect.tsx'
-import PaymentStatusComponent from './PaymentStatus.tsx'
-import RecurrenceSelector from './RecurrenceSelector.tsx'
+import ModernSelect, { SelectOption } from './ModernSelectRadix.tsx'
+import RecurrenceOptions, { RecurrenceConfig } from './RecurrenceOptions.tsx'
+import PaymentStatusIcon from './PaymentStatusIcon.tsx'
 import CategoryIcon from './CategoryIcon/index.tsx'
 import { X, CreditCard, TrendingUp, TrendingDown } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
@@ -38,8 +37,13 @@ const modalCreateSchema = z.object({
     message: 'Data é obrigatória e deve ser uma data válida',
   }),
   category: z.string().min(1, 'Categoria é obrigatória'),
-  recurrence_type: z.string().optional(),
-  payment_status: z.string().optional(),
+  recurrence_config: z.object({
+    mode: z.enum(['single', 'fixed', 'installment']),
+    frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'yearly']).optional(),
+    installmentCount: z.number().optional(),
+    installmentPeriod: z.enum(['months', 'years']).optional(),
+  }).optional(),
+  is_paid_override: z.boolean().optional(),
 })
 
 type ModalCreateData = z.infer<typeof modalCreateSchema>
@@ -76,8 +80,7 @@ const ModalCreate = ({
       : new Date()
     
     setValue('transaction_day', DateTime.fromJSDate(transactionDate, { zone: Intl.DateTimeFormat().resolvedOptions().timeZone }).toFormat('yyyy-MM-dd'))
-    setValue('recurrence_type', 'none')
-    setValue('payment_status', 'unpaid')
+    setValue('recurrence_config', { mode: 'single' })
   }, [setValue, openModal.transaction?.transaction_day])
 
   const handleChange = useCallback(
@@ -101,17 +104,32 @@ const ModalCreate = ({
   const handleCreate = useCallback(
     async (data: ModalCreateData) => {
       try {
+        // Automatic payment status logic based on transaction date
+        const transactionDate = new Date(`${data.transaction_day}T00:00:00`)
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        transactionDate.setHours(0, 0, 0, 0)
+        
+        // Convert new recurrence config to old format for backend compatibility
+        const recurrenceConfig = data.recurrence_config || { mode: 'single' }
+        let recurrenceType: RecurrenceType = 'none'
+        
+        if (recurrenceConfig.mode === 'fixed' && recurrenceConfig.frequency) {
+          recurrenceType = recurrenceConfig.frequency as RecurrenceType
+        } else if (recurrenceConfig.mode === 'installment') {
+          recurrenceType = 'monthly' // Default for installments
+        }
+        
         const createTransaction = {
           type: openModal.button,
           description: data.description,
           price: Number(data.price.replace(/\D/g, '')) / 100,
           category_id: Number(data.category),
-          transaction_day: new Date(`${data.transaction_day}T00:00:00`),
+          transaction_day: transactionDate,
           shared_id: null,
-          is_recurring: data.recurrence_type !== 'none',
-          recurrence_type: data.recurrence_type as RecurrenceType,
-          payment_status: data.payment_status as PaymentStatus,
-          is_paid: data.payment_status === 'paid',
+          is_recurring: recurrenceConfig.mode !== 'single',
+          recurrence_type: recurrenceType,
+          is_paid: transactionDate <= today,
         } as unknown as ITransaction
 
         await handleCreateCompleteTransaction(
@@ -202,27 +220,31 @@ const ModalCreate = ({
 
         {/* Form com layout moderno */}
         <form onSubmit={handleSubmit(handleCreate)} className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto space-y-6 pr-2" style={{ maxHeight: 'calc(95vh - 200px)' }}>
+          <div className="flex-1 overflow-y-auto space-y-4 pr-2" style={{ maxHeight: 'calc(95vh - 200px)' }}>
           {/* Descrição */}
-          <Input
-            label="Descrição"
-            placeholder="Ex: Almoço no restaurante, Salário janeiro..."
-            required={true}
-            {...register('description')}
-          />
-          {errors.description && (
-            <span className="text-red-500 text-sm">
-              {errors.description.message}
-            </span>
-          )}
+          <div>
+            <Input
+              label="Descrição"
+              placeholder="Ex: Almoço no restaurante, Salário janeiro..."
+              required={true}
+              compact={true}
+              {...register('description')}
+            />
+            {errors.description && (
+              <span className="text-red-500 text-sm mt-1 block">
+                {errors.description.message}
+              </span>
+            )}
+          </div>
 
           {/* Valor e Data - Layout em grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Input
                 label="Valor"
                 placeholder="R$ 0,00"
                 required={true}
+                compact={true}
                 {...register('price')}
                 onChange={handleChange}
               />
@@ -234,19 +256,26 @@ const ModalCreate = ({
             </div>
 
             <div>
-              <Controller
-                name="transaction_day"
-                control={control}
-                render={({ field }) => (
-                  <ModernDatePicker
-                    label="Data da Transação"
-                    value={field.value}
-                    onChange={field.onChange}
-                    required={true}
-                    error={errors.transaction_day?.message}
+              <div className="flex gap-3 items-end">
+                <div className="flex-1">
+                  <Controller
+                    name="transaction_day"
+                    control={control}
+                    render={({ field }) => (
+                      <ModernDatePicker
+                        label="Data da Transação"
+                        value={field.value}
+                        onChange={field.onChange}
+                        required={true}
+                        error={errors.transaction_day?.message}
+                      />
+                    )}
                   />
-                )}
-              />
+                </div>
+                <PaymentStatusIcon 
+                  transactionDate={watch('transaction_day')} 
+                />
+              </div>
             </div>
           </div>
 
@@ -273,30 +302,15 @@ const ModalCreate = ({
             />
           )}
 
-          {/* Sistema de Recorrência */}
+          {/* Sistema de Recorrência Melhorado */}
           <Controller
-            name="recurrence_type"
+            name="recurrence_config"
             control={control}
             render={({ field }) => (
-              <RecurrenceSelector
-                value={field.value as RecurrenceType}
-                onChange={(recurrenceType) => field.onChange(recurrenceType)}
-                transactionDate={watch('transaction_day')}
-                showPreview={true}
-              />
-            )}
-          />
-
-          {/* Sistema de Pagamento */}
-          <Controller
-            name="payment_status"
-            control={control}
-            render={({ field }) => (
-              <PaymentStatusComponent
-                value={field.value as PaymentStatus}
-                onChange={field.onChange}
-                transactionDate={watch('transaction_day')}
-                showAutoLogic={true}
+              <RecurrenceOptions
+                value={field.value as RecurrenceConfig}
+                onChange={(config) => field.onChange(config)}
+                error={errors.recurrence_config?.message}
               />
             )}
           />

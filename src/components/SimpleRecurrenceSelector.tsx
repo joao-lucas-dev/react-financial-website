@@ -1,37 +1,66 @@
 import React from 'react'
-import ModernSelect, { SelectOption } from './ModernSelect'
-import { RecurrenceType } from '../types/transactions'
+import { Calendar, RotateCcw, X, Clock } from 'lucide-react'
+import ModernSelect, { SelectOption } from './ModernSelectRadix'
+
+export type SimpleRecurrenceType = 'none' | 'daily' | 'weekly' | 'monthly'
 
 interface SimpleRecurrenceSelectorProps {
-  value?: string
-  onChange?: (value: string) => void
+  label?: string
+  value?: SimpleRecurrenceType
+  onChange?: (value: SimpleRecurrenceType) => void
   disabled?: boolean
+  required?: boolean
+  error?: string
 }
 
 const SimpleRecurrenceSelector: React.FC<SimpleRecurrenceSelectorProps> = ({
+  label = 'Recorrência',
   value = 'none',
   onChange,
-  disabled = false
+  disabled = false,
+  required = false,
+  error
 }) => {
+  // Opções de recorrência simplificadas conforme o plano
   const recurrenceOptions: SelectOption[] = [
-    { value: 'none', label: 'Avulso (sem recorrência)', icon: <span>📝</span> },
-    { value: 'daily', label: 'Diário', icon: <span>📅</span> },
-    { value: 'weekly', label: 'Semanal', icon: <span>📆</span> },
-    { value: 'monthly', label: 'Mensal', icon: <span>🗓️</span> },
-    { value: 'quarterly', label: 'Trimestral', icon: <span>📊</span> },
-    { value: 'biannually', label: 'Semestral', icon: <span>📋</span> },
-    { value: 'yearly', label: 'Anual', icon: <span>📄</span> }
+    {
+      value: 'none',
+      label: 'Não se repete',
+      icon: <X className="w-4 h-4 text-zinc-500" />
+    },
+    {
+      value: 'daily',
+      label: 'Diariamente',
+      icon: <Calendar className="w-4 h-4 text-blue-500" />
+    },
+    {
+      value: 'weekly',
+      label: 'Semanalmente',
+      icon: <RotateCcw className="w-4 h-4 text-green-500" />
+    },
+    {
+      value: 'monthly',
+      label: 'Mensalmente',
+      icon: <Clock className="w-4 h-4 text-teal-500" />
+    }
   ]
+
+  const handleRecurrenceChange = (newValue: string) => {
+    if (onChange) {
+      onChange(newValue as SimpleRecurrenceType)
+    }
+  }
 
   return (
     <ModernSelect
-      label="Tipo de Recorrência"
+      label={label}
       options={recurrenceOptions}
       value={value}
-      onChange={onChange}
+      onChange={handleRecurrenceChange}
       disabled={disabled}
-      isSearchable={false}
-      placeholder="Selecione o tipo de recorrência..."
+      required={required}
+      error={error}
+      placeholder="Selecione a recorrência"
     />
   )
 }
