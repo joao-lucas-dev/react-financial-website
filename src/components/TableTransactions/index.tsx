@@ -8,6 +8,7 @@ import { typeMap } from '../../common/constants'
 import ModalEdit from '../ModalEdit.tsx'
 import ModalDelete from '../ModalDelete.tsx'
 import { ITransaction } from '../../types/transactions'
+import { ICreditCard } from '../../types/creditCards'
 
 interface TableRecentTransactionsProps {
   recentTransactions: ITransaction[]
@@ -30,13 +31,14 @@ interface TableRecentTransactionsProps {
   currentMonth: number
   setCurrentMonth: any
   categories: any[]
+  creditCards: ICreditCard[]
   from: string
   searchTerm?: string
 }
 
 const ITEMS_PER_PAGE = 10;
 
-const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder, openModal, setOpenModal, handleUpdateTransaction, handleDeleteTransaction, handleDeleteMultipleTransactions, currentMonth, setCurrentMonth, categories, from, searchTerm = '' }: TableRecentTransactionsProps) => {
+const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder, openModal, setOpenModal, handleUpdateTransaction, handleDeleteTransaction, handleDeleteMultipleTransactions, currentMonth, setCurrentMonth, categories, creditCards, from, searchTerm = '' }: TableRecentTransactionsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
@@ -425,6 +427,7 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
           currentMonth={currentMonth}
           setCurrentMonth={setCurrentMonth}
           categories={categories}
+          creditCards={creditCards}
           from={from}
         />
       )}

@@ -41,8 +41,10 @@ const modalCreateSchema = z.object({
   category: z.string().min(1, 'Categoria é obrigatória'),
   card_id: z.string().optional(),
   recurrence_config: z.object({
-    mode: z.enum(['single', 'fixed']),
-    frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'yearly']).optional(),
+    mode: z.enum(['single', 'fixed', 'installment']),
+    frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'semiannual', 'annual']).optional(),
+    installmentCount: z.number().optional(),
+    installmentPeriod: z.enum(['months', 'years']).optional(),
   }).optional(),
   is_paid: z.boolean(),
 })
@@ -76,9 +78,6 @@ const ModalCreate = ({
     watch,
   } = useForm<ModalCreateData>({
     resolver: zodResolver(modalCreateSchema),
-    defaultValues: {
-      is_paid: true,
-    },
   })
 
   const transactionDay = watch('transaction_day')
@@ -96,6 +95,14 @@ const ModalCreate = ({
     setValue('transaction_day', formattedDate)
     setValue('recurrence_config', { mode: 'single' })
     setValue('card_id', "account")
+    
+    // Definir is_paid inicial baseado na data, mas permitir override manual
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    transactionDate.setHours(0, 0, 0, 0)
+    const initialIsPaid = transactionDate <= today
+    setValue('is_paid', initialIsPaid)
+    setIsPaidManuallyOverridden(false) // Reset manual override flag
   }, [setValue, openModal.transaction?.transaction_day])
 
   useEffect(() => {
@@ -115,8 +122,10 @@ const ModalCreate = ({
   }, [transactionDay, isPaid, setValue, isPaidManuallyOverridden])
 
   const handleToggleIsPaid = () => {
+    console.log('🔘 ModalCreate - Manual toggle clicked, current isPaid:', isPaid);
     setIsPaidManuallyOverridden(true)
     setValue('is_paid', !isPaid)
+    console.log('🔘 ModalCreate - New isPaid value:', !isPaid);
     setIsAnimating(true)
     setTimeout(() => setIsAnimating(false), 1000)
   }
@@ -139,32 +148,83 @@ const ModalCreate = ({
     [setValue],
   )
 
+  // Função para calcular data final baseada no parcelamento
+  const calculateEndDate = (startDate: Date, installmentCount: number, installmentPeriod: 'months' | 'years') => {
+    const endDate = new Date(startDate)
+    
+    if (installmentPeriod === 'months') {
+      endDate.setMonth(endDate.getMonth() + installmentCount - 1)
+    } else if (installmentPeriod === 'years') {
+      endDate.setFullYear(endDate.getFullYear() + installmentCount - 1)
+    }
+    
+    return endDate
+  }
+
   const handleCreate = useCallback(
     async (data: ModalCreateData) => {
       try {
-        console.log('Creating transaction with data:', data)
         const transactionDate = new Date(`${data.transaction_day}T00:00:00`)
 
         const recurrenceConfig = data.recurrence_config || { mode: 'single' }
+        console.log('🔍 ModalCreate - Recurrence config:', recurrenceConfig)
 
-        if (recurrenceConfig.mode === 'fixed') {
+        if (recurrenceConfig.mode === 'fixed' || recurrenceConfig.mode === 'installment') {
+          console.log('🚀 ModalCreate - Using recurring transaction path');
+          let recurrencePattern: RecurrenceType = 'monthly'
+          let endDate: Date | undefined = undefined
+          let adjustedPrice = Number(data.price.replace(/\D/g, '')) / 100
+
+          if (recurrenceConfig.mode === 'fixed') {
+            recurrencePattern = recurrenceConfig.frequency as RecurrenceType
+          } else if (recurrenceConfig.mode === 'installment') {
+            console.log('💳 ModalCreate - Processing installment mode');
+            // Para parcelamento, sempre usar frequência mensal
+            recurrencePattern = recurrenceConfig.installmentPeriod === 'years' ? 'annual' : 'monthly'
+            
+            // Calcular data final baseada no número de parcelas
+            if (recurrenceConfig.installmentCount && recurrenceConfig.installmentPeriod) {
+              endDate = calculateEndDate(transactionDate, recurrenceConfig.installmentCount, recurrenceConfig.installmentPeriod)
+              
+              // Para parcelamento, dividir o valor pelo número de parcelas
+              adjustedPrice = adjustedPrice / recurrenceConfig.installmentCount
+              
+              console.log('💳 ModalCreate - Installment details:', {
+                installmentCount: recurrenceConfig.installmentCount,
+                installmentPeriod: recurrenceConfig.installmentPeriod,
+                originalPrice: Number(data.price.replace(/\D/g, '')) / 100,
+                adjustedPrice,
+                endDate,
+                recurrencePattern
+              });
+            }
+          }
+
           const createRecurringTransaction = {
             type: openModal.button,
             description: data.description,
-            price: Number(data.price.replace(/\D/g, '')) / 100,
+            price: adjustedPrice,
             category_id: Number(data.category),
             start_date: transactionDate,
+            transaction_day: transactionDate,
             shared_id: null,
-            recurrence_pattern: recurrenceConfig.frequency as RecurrenceType,
+            recurrence_pattern: recurrencePattern,
+            recurrence_interval: 1,
+            end_date: endDate,
             is_paid: data.is_paid,
             card_id: data.card_id === 'account' ? null : data.card_id,
           } as unknown as ITransaction
+
+          console.log('🚀 ModalCreate - Final recurring transaction object:', createRecurringTransaction);
+          console.log('💰 ModalCreate - is_paid value:', data.is_paid);
+          console.log('🔄 ModalCreate - isPaidManuallyOverridden:', isPaidManuallyOverridden);
 
           await handleCreateRecurringTransaction(
             createRecurringTransaction,
             currentMonth,
           )
         } else {
+          console.log('📝 ModalCreate - Using single transaction path');
           const createTransaction = {
             type: openModal.button,
             description: data.description,
@@ -176,6 +236,9 @@ const ModalCreate = ({
             is_paid: data.is_paid,
             card_id: data.card_id === 'account' ? null : data.card_id,
           } as unknown as ITransaction
+
+          console.log('📝 ModalCreate - Single transaction is_paid value:', data.is_paid);
+          console.log('🔄 ModalCreate - isPaidManuallyOverridden:', isPaidManuallyOverridden);
 
           await handleCreateCompleteTransaction(
             createTransaction,
@@ -218,7 +281,7 @@ const ModalCreate = ({
 
   const paymentMethodOptions: SelectOption[] = [
     { value: 'account', label: 'Conta Principal' },
-    ...creditCards.map((card) => ({
+    ...(creditCards || []).map((card) => ({
       value: card.id,
       label: `${card.name} **** ${card.maskedNumber.slice(-4)}`,
     })),
@@ -328,6 +391,7 @@ const ModalCreate = ({
                           value={field.value}
                           onChange={(date) => {
                             field.onChange(date)
+                            // Reset manual override quando data for alterada
                             setIsPaidManuallyOverridden(false)
                           }}
                           required={true}

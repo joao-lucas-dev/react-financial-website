@@ -414,19 +414,28 @@ export default function useTransactions(
   const handleCreateRecurringTransaction = useCallback(
     async (createTransaction: ITransaction, currentMonth: number) => {
       try {
-        await axiosPrivate.post('/transactions/recurring/create', {
+        console.log('🎯 useTransactions - handleCreateRecurringTransaction called');
+        console.log('🎯 useTransactions - Input transaction:', createTransaction);
+        
+        const payload = {
           description: createTransaction.description,
           price: createTransaction.price,
           category_id: createTransaction.category_id,
           type: createTransaction.type,
           shared_id: null,
-          start_date: createTransaction.transaction_day,
+          start_date: createTransaction.start_date || createTransaction.transaction_day,
           recurrence_pattern: createTransaction.recurrence_pattern,
-          recurrence_interval: createTransaction.recurrence_interval,
-          end_date: createTransaction.end_date,
+          recurrence_interval: createTransaction.recurrence_interval || 1,
+          end_date: createTransaction.end_date ? createTransaction.end_date.toISOString().split('T')[0] : undefined,
           card_id: createTransaction.card_id,
           is_paid: createTransaction.is_paid,
-        })
+        }
+        
+        console.log('🎯 useTransactions - Final payload to send:', payload);
+        console.log('🎯 useTransactions - Making POST to /transactions/recurring/create');
+        
+        const response = await axiosPrivate.post('/transactions/recurring/create', payload)
+        console.log('🎯 useTransactions - Response:', response.data);
 
         const newDate = DateTime.fromISO(
           createTransaction.transaction_day,
@@ -444,7 +453,11 @@ export default function useTransactions(
           await Promise.all(promises)
         }
       } catch (err) {
-        console.log(err)
+        console.error('Error creating recurring transaction:', err)
+        if (err.response) {
+          console.error('Response data:', err.response.data)
+          console.error('Response status:', err.response.status)
+        }
       }
     },
     [

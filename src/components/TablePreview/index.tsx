@@ -740,6 +740,7 @@ const TablePreview = ({
                 currentMonth={currentMonth}
                 setCurrentMonth={setCurrentMonth}
                 categories={categories}
+                creditCards={creditCards}
                 from={from}
               />
             ) : openModal.type === "delete" ? (

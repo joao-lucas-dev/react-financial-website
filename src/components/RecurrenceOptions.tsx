@@ -3,7 +3,7 @@ import { Calendar, Calculator } from 'lucide-react'
 import ModernSelect, { SelectOption } from './ModernSelectRadix'
 
 export type RecurrenceMode = 'single' | 'fixed' | 'installment'
-export type RecurrenceFrequency = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly'
+export type RecurrenceFrequency = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'semiannual' | 'annual'
 export type InstallmentPeriod = 'months' | 'years'
 
 export interface RecurrenceConfig {
@@ -58,7 +58,12 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
       icon: <Calendar className="w-4 h-4 text-orange-500" />
     },
     {
-      value: 'yearly',
+      value: 'semiannual',
+      label: 'Semestral',
+      icon: <Calendar className="w-4 h-4 text-indigo-500" />
+    },
+    {
+      value: 'annual',
       label: 'Anual',
       icon: <Calendar className="w-4 h-4 text-purple-500" />
     }

@@ -22,7 +22,7 @@ interface IShared {
 export type TransactionMode = 'single' | 'recurring' | 'installments'
 
 // Tipos para sistema de recorrência (infinita)
-export type RecurrenceType = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'biannually' | 'yearly'
+export type RecurrenceType = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'semiannual' | 'annual'
 
 // Tipos para sistema de parcelas (com fim)
 export type InstallmentPeriod = 'monthly' | 'quarterly' | 'biannually' | 'yearly'
