@@ -224,13 +224,14 @@ export default function useTransactions(
     async (createTransaction: ITransaction, currentMonth: number) => {
       try {
         await axiosPrivate.post('/transactions/create', {
+          type: createTransaction.type,
           description: createTransaction.description,
           price: createTransaction.price,
           category_id: createTransaction.category_id,
-          type: createTransaction.type,
-          shared_id: null,
           transaction_day: createTransaction.transaction_day,
-          is_recurring: createTransaction.is_recurring,
+          shared_id: null,
+          is_paid: createTransaction.is_paid,
+          card_id: createTransaction.card_id,
         })
 
         const newDate = DateTime.fromISO(
@@ -410,6 +411,52 @@ export default function useTransactions(
     ],
   )
 
+  const handleCreateRecurringTransaction = useCallback(
+    async (createTransaction: ITransaction, currentMonth: number) => {
+      try {
+        await axiosPrivate.post('/transactions/recurring/create', {
+          description: createTransaction.description,
+          price: createTransaction.price,
+          category_id: createTransaction.category_id,
+          type: createTransaction.type,
+          shared_id: null,
+          start_date: createTransaction.transaction_day,
+          recurrence_pattern: createTransaction.recurrence_pattern,
+          recurrence_interval: createTransaction.recurrence_interval,
+          end_date: createTransaction.end_date,
+          card_id: createTransaction.card_id,
+          is_paid: createTransaction.is_paid,
+        })
+
+        const newDate = DateTime.fromISO(
+          createTransaction.transaction_day,
+        ) as DateTime
+
+        const promises = []
+
+        if (newDate.month === currentMonth) {
+          promises.push(handleGetTransactionsMonth(newDate))
+          promises.push(handleGetChartCategories(newDate))
+          promises.push(handleGetBalance())
+          promises.push(handleGetOverviewTransactions(newDate))
+          promises.push(handleGetRecentTransactions())
+
+          await Promise.all(promises)
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [
+      handleGetTransactionsMonth,
+      handleGetChartCategories,
+      handleGetBalance,
+      handleGetOverviewTransactions,
+      axiosPrivate,
+      handleGetRecentTransactions,
+    ],
+  )
+
   return {
     rows,
     setRows,
@@ -423,6 +470,7 @@ export default function useTransactions(
     handleGetTransactionsMonth,
     handleGetPreviewTransactions,
     handleCreateCompleteTransaction,
+    handleCreateRecurringTransaction, // Add this line
     handleGetRecentTransactions,
     recentTransactions,
     handleDeleteMultipleTransactions,

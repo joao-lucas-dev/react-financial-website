@@ -38,6 +38,7 @@ import TableTransactions from "../../components/TableTransactions";
 import { Filter } from "../../components/Filter";
 import ModernDonutChart from "../../components/ModernDonutChart.tsx";
 import CategoryIcon from "../../components/CategoryIcon/index.tsx";
+import PaymentStatusIcon from "../../components/PaymentStatusIcon.tsx";
 
 export default function Dashboard() {
   const [openModal, setOpenModal] = useState({
@@ -63,6 +64,7 @@ export default function Dashboard() {
     rows,
     handleCreateTransaction,
     handleCreateCompleteTransaction,
+    handleCreateRecurringTransaction,
     handleDeleteTransaction,
     handleUpdateTransaction,
     handleGetOverviewTransactions,
@@ -188,15 +190,13 @@ export default function Dashboard() {
     setActiveMenuId(null);
   };
 
-  const handleDeleteRecentTransaction = async (transactionId: string) => {
-    if (window.confirm('Tem certeza que deseja excluir esta transação?')) {
-      try {
-        await handleDeleteTransaction(transactionId, currentMonth, setCurrentMonth, 'dashboard');
-        setActiveMenuId(null);
-      } catch (error) {
-        console.error('Erro ao deletar transação:', error);
-      }
-    }
+  const handleDeleteRecentTransaction = (transactionId: string) => {
+    setOpenModal({
+      isOpen: true,
+      transaction: { id: transactionId } as ITransaction,
+      type: 'delete',
+    });
+    setActiveMenuId(null);
   };
 
   // Função para carregar mais transações
@@ -429,6 +429,12 @@ export default function Dashboard() {
                     handleCreateCompleteTransaction={
                       handleCreateCompleteTransaction
                     }
+                    handleCreateRecurringTransaction={
+                      handleCreateRecurringTransaction
+                    }
+                    handleCreateRecurringTransaction={
+                      handleCreateRecurringTransaction
+                    }
                     handleDeleteTransaction={handleDeleteTransaction}
                     handleUpdateTransaction={handleUpdateTransaction}
                     currentMonth={currentMonth}
@@ -436,6 +442,7 @@ export default function Dashboard() {
                     openModal={openModal}
                     setOpenModal={setOpenModal}
                     categories={categories}
+                    creditCards={creditCards}
                     from="dashboard"
                     maxDays={2}
                     showViewAllButton={true}
@@ -781,12 +788,13 @@ export default function Dashboard() {
                             }`}>
                               {isIncome ? '+' : '-'}{formattedPrice}
                             </div>
-                            <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              isTransactionPaid(transaction)
-                                ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
-                                : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300'
-                            }`}>
-                              {isTransactionPaid(transaction) ? '✓ Paga' : '⏳ Pendente'}
+                            <div className={`px-2 py-1 rounded-full text-xs font-medium `}>
+                              <PaymentStatusIcon
+                                isPaid={isTransactionPaid(transaction)}
+                                isAnimating={false}
+                                onClick={() => {}}
+                                title={isTransactionPaid(transaction) ? 'Pago' : 'Não Pago'}
+                              />
                             </div>
                           </div>
                         </div>

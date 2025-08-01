@@ -55,26 +55,12 @@ export type ITransaction = {
   updated_at?: string
   transaction_day: string
   type?: 'income' | 'outcome'
-  is_recurring?: boolean
-  // Campo para vincular transação ao cartão de crédito
   card_id?: string
-  // Novos campos para sistema de pagamento
   is_paid?: boolean
   paid_date?: string
-  payment_status?: PaymentStatus
-  // Modo da transação
-  transaction_mode?: TransactionMode
-  // Campos para recorrência (infinita)
-  recurrence_type?: RecurrenceType
+  recurrence_pattern?: RecurrenceType
   recurrence_interval?: number
-  next_occurrence?: string
-  // Campos para parcelas (com fim)
-  installment_count?: number        // Número total de parcelas
-  installment_current?: number      // Parcela atual (1, 2, 3...)
-  installment_value?: number        // Valor de cada parcela
-  installment_period?: InstallmentPeriod // Período entre parcelas
-  installment_end_date?: string     // Data de fim das parcelas
-  parent_transaction_id?: string    // ID da transação pai (para parcelas)
+  end_date?: string
 }
 
 interface IColumn {

@@ -7,7 +7,6 @@ import { DateTime } from 'luxon'
 import { typeMap } from '../../common/constants'
 import ModalEdit from '../ModalEdit.tsx'
 import ModalDelete from '../ModalDelete.tsx'
-import ModalCreate from '../ModalCreate.tsx'
 import { ITransaction } from '../../types/transactions'
 
 interface TableRecentTransactionsProps {

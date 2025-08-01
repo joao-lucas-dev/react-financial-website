@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect, useState, useRef } from 'react'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import {
   IHandleCreateCompleteTransaction,
   IOpenModal,
@@ -8,26 +8,28 @@ import {
   RecurrenceType,
 } from '../types/transactions.ts'
 import Input from './Input.tsx'
-import Button from './Button.tsx'
 import ModernDatePicker from './ModernDatePicker.tsx'
 import ModernSelect, { SelectOption } from './ModernSelectRadix.tsx'
 import RecurrenceOptions, { RecurrenceConfig } from './RecurrenceOptions.tsx'
 import PaymentStatusIcon from './PaymentStatusIcon.tsx'
 import CategoryIcon from './CategoryIcon/index.tsx'
-import { X, CreditCard, TrendingUp, TrendingDown } from 'lucide-react'
+import { X, TrendingUp, TrendingDown } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ICategory } from '../types/categories.ts'
+import { ICreditCard } from '../types/creditCards.ts'
 import { DateTime } from 'luxon'
 
 interface IParams {
   openModal: IOpenModal
   setOpenModal: ISetOpenModal
   handleCreateCompleteTransaction: IHandleCreateCompleteTransaction
+  handleCreateRecurringTransaction: (transaction: ITransaction, currentMonth: number) => Promise<void>;
   currentMonth: number
   setCurrentMonth: ISetCurrentMonth
   categories: ICategory[]
+  creditCards: ICreditCard[]
 }
 
 const modalCreateSchema = z.object({
@@ -37,11 +39,10 @@ const modalCreateSchema = z.object({
     message: 'Data é obrigatória e deve ser uma data válida',
   }),
   category: z.string().min(1, 'Categoria é obrigatória'),
+  card_id: z.string().optional(),
   recurrence_config: z.object({
-    mode: z.enum(['single', 'fixed', 'installment']),
+    mode: z.enum(['single', 'fixed']),
     frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'yearly']).optional(),
-    installmentCount: z.number().optional(),
-    installmentPeriod: z.enum(['months', 'years']).optional(),
   }).optional(),
   is_paid: z.boolean(),
 })
@@ -52,9 +53,11 @@ const ModalCreate = ({
   openModal,
   setOpenModal,
   handleCreateCompleteTransaction,
+  handleCreateRecurringTransaction,
   currentMonth,
   setCurrentMonth,
   categories,
+  creditCards,
 }: IParams) => {
   const [isAnimating, setIsAnimating] = useState(false)
   const [isPaidManuallyOverridden, setIsPaidManuallyOverridden] = useState(false)
@@ -92,6 +95,7 @@ const ModalCreate = ({
 
     setValue('transaction_day', formattedDate)
     setValue('recurrence_config', { mode: 'single' })
+    setValue('card_id', "account")
   }, [setValue, openModal.transaction?.transaction_day])
 
   useEffect(() => {
@@ -138,35 +142,47 @@ const ModalCreate = ({
   const handleCreate = useCallback(
     async (data: ModalCreateData) => {
       try {
+        console.log('Creating transaction with data:', data)
         const transactionDate = new Date(`${data.transaction_day}T00:00:00`)
-        transactionDate.setHours(0, 0, 0, 0)
 
         const recurrenceConfig = data.recurrence_config || { mode: 'single' }
-        let recurrenceType: RecurrenceType = 'none'
 
-        if (recurrenceConfig.mode === 'fixed' && recurrenceConfig.frequency) {
-          recurrenceType = recurrenceConfig.frequency as RecurrenceType
-        } else if (recurrenceConfig.mode === 'installment') {
-          recurrenceType = 'monthly'
+        if (recurrenceConfig.mode === 'fixed') {
+          const createRecurringTransaction = {
+            type: openModal.button,
+            description: data.description,
+            price: Number(data.price.replace(/\D/g, '')) / 100,
+            category_id: Number(data.category),
+            start_date: transactionDate,
+            shared_id: null,
+            recurrence_pattern: recurrenceConfig.frequency as RecurrenceType,
+            is_paid: data.is_paid,
+            card_id: data.card_id === 'account' ? null : data.card_id,
+          } as unknown as ITransaction
+
+          await handleCreateRecurringTransaction(
+            createRecurringTransaction,
+            currentMonth,
+          )
+        } else {
+          const createTransaction = {
+            type: openModal.button,
+            description: data.description,
+            price: Number(data.price.replace(/\D/g, '')) / 100,
+            category_id: Number(data.category),
+            transaction_day: transactionDate,
+            shared_id: null,
+            is_recurring: recurrenceConfig.mode !== 'single',
+            is_paid: data.is_paid,
+            card_id: data.card_id === 'account' ? null : data.card_id,
+          } as unknown as ITransaction
+
+          await handleCreateCompleteTransaction(
+            createTransaction,
+            currentMonth,
+            setCurrentMonth,
+          )
         }
-
-        const createTransaction = {
-          type: openModal.button,
-          description: data.description,
-          price: Number(data.price.replace(/\D/g, '')) / 100,
-          category_id: Number(data.category),
-          transaction_day: transactionDate,
-          shared_id: null,
-          is_recurring: recurrenceConfig.mode !== 'single',
-          recurrence_type: recurrenceType,
-          is_paid: data.is_paid,
-        } as unknown as ITransaction
-
-        await handleCreateCompleteTransaction(
-          createTransaction,
-          currentMonth,
-          setCurrentMonth,
-        )
 
         setOpenModal({
           isOpen: false,
@@ -179,6 +195,7 @@ const ModalCreate = ({
     },
     [
       handleCreateCompleteTransaction,
+      handleCreateRecurringTransaction,
       openModal.button,
       setOpenModal,
       currentMonth,
@@ -198,6 +215,14 @@ const ModalCreate = ({
       label: cat.name,
       icon: <CategoryIcon size="small" category={cat} />,
     }))
+
+  const paymentMethodOptions: SelectOption[] = [
+    { value: 'account', label: 'Conta Principal' },
+    ...creditCards.map((card) => ({
+      value: card.id,
+      label: `${card.name} **** ${card.maskedNumber.slice(-4)}`,
+    })),
+  ]
 
   return (
     <div
@@ -320,7 +345,7 @@ const ModalCreate = ({
               </div>
             </div>
 
-            {categoryOptions.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Controller
                 name="category"
                 control={control}
@@ -340,7 +365,20 @@ const ModalCreate = ({
                   />
                 )}
               />
-            )}
+              <Controller
+                name="card_id"
+                control={control}
+                render={({ field }) => (
+                  <ModernSelect
+                    label="Método de Pagamento"
+                    options={paymentMethodOptions}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Selecione um método..."
+                  />
+                )}
+              />
+            </div>
 
             <Controller
               name="recurrence_config"

@@ -38,10 +38,8 @@ const modalEditSchema = z.object({
   }),
   category: z.string().min(1, 'Categoria é obrigatória'),
   recurrence_config: z.object({
-    mode: z.enum(['single', 'fixed', 'installment']),
+    mode: z.enum(['single', 'fixed']),
     frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'yearly']).optional(),
-    installmentCount: z.number().optional(),
-    installmentPeriod: z.enum(['months', 'years']).optional(),
   }).optional(),
   is_paid: z.boolean(),
 })
@@ -155,8 +153,6 @@ const ModalEdit = ({
 
         if (recurrenceConfig.mode === 'fixed' && recurrenceConfig.frequency) {
           recurrenceType = recurrenceConfig.frequency as RecurrenceType
-        } else if (recurrenceConfig.mode === 'installment') {
-          recurrenceType = 'monthly'
         }
 
         const updatedTransaction = {

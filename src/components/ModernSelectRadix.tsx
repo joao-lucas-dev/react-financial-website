@@ -30,8 +30,6 @@ const ModernSelect: React.FC<ModernSelectProps> = ({
   error,
   disabled = false,
 }) => {
-  const selectedOption = options.find(opt => opt.value === value)
-
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">

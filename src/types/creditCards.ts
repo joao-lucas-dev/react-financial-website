@@ -2,6 +2,24 @@ export type CardBrand = 'visa' | 'mastercard' | 'elo' | 'amex' | 'hipercard'
 export type CardType = 'credit' | 'debit' | 'prepaid'
 export type CardNetwork = 'visa' | 'mastercard' | 'elo' | 'amex' | 'hipercard'
 
+export interface ICreditCard {
+  id: string
+  name: string
+  maskedNumber: string // Format: "•••• •••• •••• 1234"
+  brand: CardBrand
+  network: CardNetwork
+  type: CardType
+  balance: number
+  creditLimit?: number
+  expiryMonth: string // Format: "12"
+  expiryYear: string   // Format: "28"
+  holderName: string
+  isActive: boolean
+  gradientFrom: string  // Tailwind color class
+  gradientTo: string    // Tailwind color class
+  accentColor: string   // Tailwind color class for text/icons
+}
+
 export interface CreditCard {
   id: string
   name: string

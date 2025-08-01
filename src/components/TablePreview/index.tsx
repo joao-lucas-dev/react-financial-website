@@ -23,16 +23,19 @@ import {
   IRow,
   ISetCurrentMonth,
   ISetOpenModal,
+  ITransaction,
 } from "../../types/transactions";
 import ModalEdit from "../ModalEdit";
 import ModalCreate from "../ModalCreate.tsx";
 import DayDetailsModal from "../DayDetailsModal";
 import QuickAddModal from "../QuickAddModal";
+import { ICreditCard } from "../../types/creditCards.ts";
 
 interface IParams {
   rows: IRow[];
   handleCreateTransaction: IHandleCreateTransaction;
   handleCreateCompleteTransaction: IHandleCreateCompleteTransaction;
+  handleCreateRecurringTransaction: (transaction: ITransaction, currentMonth: number) => Promise<void>;
   handleUpdateTransaction: IHandleUpdateTransaction;
   handleDeleteTransaction: IHandleDeleteTransaction;
   currentMonth: number;
@@ -40,6 +43,7 @@ interface IParams {
   openModal: IOpenModal;
   setOpenModal: ISetOpenModal;
   categories: any[];
+  creditCards: ICreditCard[];
   from: string;
   resetScroll?: boolean;
   maxDays?: number;
@@ -51,6 +55,7 @@ const TablePreview = ({
   rows,
   handleCreateTransaction,
   handleCreateCompleteTransaction,
+  handleCreateRecurringTransaction,
   handleDeleteTransaction,
   handleUpdateTransaction,
   currentMonth,
@@ -58,6 +63,7 @@ const TablePreview = ({
   openModal,
   setOpenModal,
   categories,
+  creditCards,
   from = "transacoes",
   resetScroll = false,
   maxDays = undefined,
@@ -242,7 +248,6 @@ const TablePreview = ({
                           type: 'income'
                         } as any,
                         type: 'create',
-                        button: 'income'
                       });
                     }}
                     title="Adicionar receita"
@@ -311,7 +316,6 @@ const TablePreview = ({
                           type: 'outcome'
                         } as any,
                         type: 'create',
-                        button: 'outcome'
                       });
                     }}
                     title="Adicionar despesa"
@@ -568,7 +572,6 @@ const TablePreview = ({
                       type: 'income'
                     } as any,
                     type: 'create',
-                    button: 'income'
                   });
                 }}
                 title="Adicionar receita"
@@ -628,7 +631,6 @@ const TablePreview = ({
                       type: 'outcome'
                     } as any,
                     type: 'create',
-                    button: 'outcome'
                   });
                 }}
                 title="Adicionar despesa"
@@ -753,9 +755,13 @@ const TablePreview = ({
               <ModalCreate
                 openModal={openModal}
                 setOpenModal={setOpenModal}
+                handleCreateRecurringTransaction={
+                  handleCreateRecurringTransaction
+                }
                 handleCreateCompleteTransaction={
                   handleCreateCompleteTransaction
                 }
+                creditCards={creditCards}
                 currentMonth={currentMonth}
                 setCurrentMonth={setCurrentMonth}
                 categories={categories}

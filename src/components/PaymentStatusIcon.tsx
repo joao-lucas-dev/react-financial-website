@@ -6,6 +6,7 @@ interface PaymentStatusIconProps {
   isAnimating: boolean
   onClick: () => void
   className?: string
+  title?: string
 }
 
 const PaymentStatusIcon: React.FC<PaymentStatusIconProps> = ({
@@ -13,6 +14,7 @@ const PaymentStatusIcon: React.FC<PaymentStatusIconProps> = ({
   isAnimating,
   onClick,
   className = '',
+  title = ''
 }) => {
   return (
     <button
@@ -23,7 +25,7 @@ const PaymentStatusIcon: React.FC<PaymentStatusIconProps> = ({
           ? 'bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50'
           : 'bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50'
       } cursor-pointer hover:scale-105 ${isAnimating ? 'animate-tada' : ''}`}
-      title={`${isPaid ? 'Transação paga' : 'Transação não paga'} (clique para alterar)`}
+      title={title ? title : `${isPaid ? 'Transação paga' : 'Transação não paga'} (clique para alterar)`}
     >
       {isPaid ? (
         <ThumbsUp size={18} className="text-green-600 dark:text-green-400" />

@@ -199,9 +199,11 @@ const Settings: React.FC = () => {
     };
 
     const deleteCategory = (categoryId: number) => {
-        if (window.confirm('Tem certeza que deseja excluir esta categoria?')) {
-            setCategories(prev => prev.filter(cat => cat.id !== categoryId));
-        }
+        setOpenModal({
+            isOpen: true,
+            transaction: { id: categoryId.toString() } as ITransaction,
+            type: 'delete-category',
+        });
     };
 
     const colorOptions = [
