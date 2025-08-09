@@ -5,6 +5,7 @@ export type IType = {
   total: number
   type: 'income' | 'outcome' | 'remaining'
   percentage: number
+  isPositive: boolean
 }
 
 export interface IOverview {
@@ -56,8 +57,12 @@ export type ITransaction = {
   transaction_day: string
   type?: 'income' | 'outcome'
   card_id?: string
+  fromCreditCard?: boolean
+  installment_info?: string
+  installments?: number
   is_paid?: boolean
   paid_date?: string
+  is_recurring?: boolean
   recurrence_pattern?: RecurrenceType
   recurrence_interval?: number
   end_date?: string
@@ -101,9 +106,10 @@ export type IHandleCreateTransaction = (
 export type IHandleCreateCompleteTransaction = (
   createTransaction: ITransaction,
   currentMonth: number,
-  setCurrentMonth: React.Dispatch<
+  setCurrentMonth?: React.Dispatch<
     React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
   >,
+  from?: string,
 ) => Promise<void>
 
 export type IHandleUpdateTransaction = (
@@ -118,6 +124,28 @@ export type IHandleUpdateTransaction = (
 export type IHandleDeleteTransaction = (
   id?: string | undefined,
   // @ts-expect-error TS1016
+  currentMonth: number,
+  setCurrentMonth: React.Dispatch<
+    React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
+  >,
+  from: string,
+) => Promise<void>
+
+export type EditMode = 'instance_only' | 'instance_and_future' | 'all_instances'
+
+export type IHandleUpdateRecurringTransaction = (
+  updateTransaction: ITransaction,
+  editMode: EditMode,
+  currentMonth: number,
+  setCurrentMonth: React.Dispatch<
+    React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
+  >,
+  from: string,
+) => Promise<void>
+
+export type IHandleDeleteRecurringTransaction = (
+  id: string,
+  editMode: EditMode,
   currentMonth: number,
   setCurrentMonth: React.Dispatch<
     React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>

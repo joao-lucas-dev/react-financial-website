@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import 'react-loading-skeleton/dist/skeleton.css'
 import CategoryIcon from '../CategoryIcon'
-import { EllipsisVertical, Search, MessageCircleQuestion, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { EllipsisVertical, Search, MessageCircleQuestion, CheckCircle, XCircle, Clock, CreditCard } from 'lucide-react'
 import './styles.css'
 import { DateTime } from 'luxon'
 import { typeMap } from '../../common/constants'
@@ -27,6 +27,8 @@ interface TableRecentTransactionsProps {
   }>>
   handleUpdateTransaction: any
   handleDeleteTransaction: any
+  handleUpdateRecurringTransaction?: any
+  handleDeleteRecurringTransaction?: any
   handleDeleteMultipleTransactions: any
   currentMonth: number
   setCurrentMonth: any
@@ -34,11 +36,12 @@ interface TableRecentTransactionsProps {
   creditCards: ICreditCard[]
   from: string
   searchTerm?: string
+  retryCategories?: () => void
 }
 
 const ITEMS_PER_PAGE = 10;
 
-const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder, openModal, setOpenModal, handleUpdateTransaction, handleDeleteTransaction, handleDeleteMultipleTransactions, currentMonth, setCurrentMonth, categories, creditCards, from, searchTerm = '' }: TableRecentTransactionsProps) => {
+const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder, openModal, setOpenModal, handleUpdateTransaction, handleDeleteTransaction, handleUpdateRecurringTransaction, handleDeleteRecurringTransaction, handleDeleteMultipleTransactions, currentMonth, setCurrentMonth, categories, creditCards, from, searchTerm = '', retryCategories }: TableRecentTransactionsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
@@ -206,8 +209,23 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
               </div>
             </td>
             <td className="w-60 p-4 text-center text-sm h-16 border-b border-zinc-100 dark:border-zinc-700">
-              <div className="text-zinc-700 dark:text-zinc-200 font-medium truncate">
-                {recentTransaction.description}
+              <div className="flex items-center justify-center gap-2">
+                {(recentTransaction.fromCreditCard || recentTransaction.card_id) && (
+                  <CreditCard className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                )}
+                <div className="text-zinc-700 dark:text-zinc-200 font-medium truncate">
+                  {recentTransaction.description}
+                  {(recentTransaction.installment_info || recentTransaction.installments) && (
+                    <span className="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs rounded-full">
+                      {recentTransaction.installment_info || `${recentTransaction.installments}x parcelas`}
+                    </span>
+                  )}
+                  {recentTransaction.is_recurring && (
+                    <span className="ml-2 px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 text-xs rounded-full">
+                      ↻
+                    </span>
+                  )}
+                </div>
               </div>
             </td>
             <td className="p-4 text-center text-sm h-16 border-b border-zinc-100 dark:border-zinc-700">
@@ -424,11 +442,13 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
           openModal={openModal}
           setOpenModal={setOpenModal}
           handleUpdateTransaction={handleUpdateTransaction}
+          handleUpdateRecurringTransaction={handleUpdateRecurringTransaction}
           currentMonth={currentMonth}
           setCurrentMonth={setCurrentMonth}
           categories={categories}
           creditCards={creditCards}
           from={from}
+          retryCategories={retryCategories}
         />
       )}
       {openModal.isOpen && openModal.type === 'delete' && (
@@ -436,6 +456,7 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
           openModal={openModal}
           setOpenModal={setOpenModal}
           handleDeleteTransaction={handleDeleteTransaction}
+          handleDeleteRecurringTransaction={handleDeleteRecurringTransaction}
           currentMonth={currentMonth}
           setCurrentMonth={setCurrentMonth}
           from={from}

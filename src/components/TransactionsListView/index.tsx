@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Plus, TrendingUp, TrendingDown, Calendar, BarChart3, Eye, PieChart, Target } from 'lucide-react'
+import { Plus, TrendingUp, TrendingDown, Calendar, BarChart3, Eye, PieChart, Target, CreditCard } from 'lucide-react'
 import CategoryIcon from '../CategoryIcon'
 import { IRow, ITransaction, ISetOpenModal } from '../../types/transactions'
 
@@ -312,9 +312,24 @@ const TransactionsListView: React.FC<TransactionsListViewProps> = ({
                     </div>
 
                     <div>
-                      <h4 className="font-medium text-zinc-900 dark:text-zinc-100">
-                        {transaction.description}
-                      </h4>
+                      <div className="flex items-center gap-2">
+                        {(transaction.fromCreditCard || transaction.card_id) && (
+                          <CreditCard className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                        )}
+                        <h4 className="font-medium text-zinc-900 dark:text-zinc-100">
+                          {transaction.description}
+                        </h4>
+                        {(transaction.installment_info || transaction.installments) && (
+                          <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs rounded-full">
+                            {transaction.installment_info || `${transaction.installments}x parcelas`}
+                          </span>
+                        )}
+                        {transaction.is_recurring && (
+                          <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 text-xs rounded-full">
+                            ↻ Recorrente
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xs px-2 py-1 rounded-full bg-zinc-200 dark:bg-zinc-600 text-zinc-600 dark:text-zinc-400">
                           {transaction.category?.name || 'Sem categoria'}

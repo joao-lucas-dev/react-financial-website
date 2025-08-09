@@ -11,6 +11,8 @@ import Input from './Input.tsx'
 import ModernDatePicker from './ModernDatePicker.tsx'
 import ModernSelect, { SelectOption } from './ModernSelectRadix.tsx'
 import RecurrenceOptions, { RecurrenceConfig } from './RecurrenceOptions.tsx'
+import RecurringTransactionOptions from './RecurringTransactionOptions.tsx'
+import { EditMode } from '../types/transactions.ts'
 import PaymentStatusIcon from './PaymentStatusIcon.tsx'
 import CategoryIcon from './CategoryIcon/index.tsx'
 import { X, Edit3 } from 'lucide-react'
@@ -24,11 +26,19 @@ interface IParams {
   openModal: IOpenModal
   setOpenModal: ISetOpenModal
   handleUpdateTransaction: IHandleUpdateTransaction
+  handleUpdateRecurringTransaction?: (
+    updateTransaction: ITransaction,
+    editMode: EditMode,
+    currentMonth: number,
+    setCurrentMonth: ISetCurrentMonth,
+    from: string,
+  ) => Promise<void>
   currentMonth: number
   setCurrentMonth: ISetCurrentMonth
   categories: ICategory[]
   creditCards: ICreditCard[]
   from: string
+  retryCategories?: () => void
 }
 
 const modalEditSchema = z.object({
@@ -46,6 +56,7 @@ const modalEditSchema = z.object({
     installmentPeriod: z.enum(['months', 'years']).optional(),
   }).optional(),
   is_paid: z.boolean(),
+  edit_mode: z.enum(['instance_only', 'instance_and_future', 'all_instances']).optional(),
 })
 
 type ModalEditData = z.infer<typeof modalEditSchema>
@@ -54,14 +65,19 @@ const ModalEdit = ({
   openModal,
   setOpenModal,
   handleUpdateTransaction,
+  handleUpdateRecurringTransaction,
   currentMonth,
   setCurrentMonth,
   categories,
   creditCards,
   from,
+  retryCategories,
 }: IParams) => {
   const [isAnimating, setIsAnimating] = useState(false)
   const [isPaidManuallyOverridden, setIsPaidManuallyOverridden] = useState(false)
+  const [showRecurringModal, setShowRecurringModal] = useState(false)
+  const [pendingUpdateData, setPendingUpdateData] = useState<ModalEditData | null>(null)
+  const [selectedEditMode, setSelectedEditMode] = useState<EditMode>('instance_only')
 
   const { 
     register, 
@@ -76,6 +92,21 @@ const ModalEdit = ({
 
   const transactionDay = watch('transaction_day')
   const isPaid = watch('is_paid')
+  const editMode = watch('edit_mode')
+  const cardId = watch('card_id')
+  const price = watch('price')
+
+  // Converter preço formatado para número
+  const getTotalAmount = () => {
+    if (!price) return 0
+    return Number(price.replace(/\D/g, '')) / 100
+  }
+
+  const isRecurringTransaction = openModal.transaction.is_recurring === true ||
+                                (openModal.transaction.recurrence_pattern && 
+                                openModal.transaction.recurrence_pattern !== null && 
+                                openModal.transaction.recurrence_pattern !== undefined &&
+                                openModal.transaction.recurrence_pattern !== '')
 
   useEffect(() => {
     setValue('description', openModal.transaction.description || '')
@@ -100,15 +131,39 @@ const ModalEdit = ({
 
     setValue('category', openModal.transaction.category?.id ? String(openModal.transaction.category.id) : '')
     setValue('card_id', openModal.transaction.card_id || 'account')
-    setValue('is_paid', openModal.transaction.is_paid || false)
+    // Definir is_paid: se existe valor na transação, usar ele; senão usar lógica de data
+    const transactionIsPaid = openModal.transaction.is_paid
+    if (transactionIsPaid !== undefined && transactionIsPaid !== null) {
+      // Existe um valor definido na transação, usar ele
+      setValue('is_paid', transactionIsPaid)
+      setIsPaidManuallyOverridden(true) // Marcar como manual para não ser sobrescrito
+    } else {
+      // Não existe valor, usar lógica de data
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const transactionDate = new Date(transactionDateStr)
+      transactionDate.setHours(0, 0, 0, 0)
+      const initialIsPaid = transactionDate <= today
+      setValue('is_paid', initialIsPaid)
+      setIsPaidManuallyOverridden(false) // Permitir mudança automática
+    }
 
     const recurrenceConfig = {
       mode: openModal.transaction.recurrence_pattern ? 'fixed' as const : 'single' as const,
-      frequency: openModal.transaction.recurrence_pattern,
+      frequency: openModal.transaction.recurrence_pattern as RecurrenceType,
     }
     setValue('recurrence_config', recurrenceConfig)
 
-  }, [openModal.transaction, setValue])
+    if (isRecurringTransaction) {
+      setValue('edit_mode', 'instance_only')
+    }
+
+    // Reset recurring modal state when modal opens
+    setShowRecurringModal(false)
+    setPendingUpdateData(null)
+    setSelectedEditMode('instance_only')
+
+  }, [openModal.transaction, setValue, isRecurringTransaction, setIsPaidManuallyOverridden])
 
   useEffect(() => {
     if (!isPaidManuallyOverridden) {
@@ -154,6 +209,12 @@ const ModalEdit = ({
   const handleUpdate = useCallback(
     async (data: ModalEditData) => {
       try {
+        if (isRecurringTransaction) {
+          setPendingUpdateData(data)
+          setShowRecurringModal(true)
+          return
+        }
+
         const recurrenceConfig = data.recurrence_config || { mode: 'single' }
         let recurrenceType: RecurrenceType | undefined = undefined
 
@@ -168,6 +229,7 @@ const ModalEdit = ({
           category_id: Number(data.category),
           transaction_day: new Date(`${data.transaction_day}T00:00:00`),
           recurrence_pattern: recurrenceType,
+          installments: recurrenceConfig.mode === 'installment' ? recurrenceConfig.installmentCount : undefined,
           is_paid: data.is_paid,
           card_id: data.card_id === 'account' ? null : data.card_id,
         } as unknown as ITransaction
@@ -195,23 +257,83 @@ const ModalEdit = ({
       currentMonth,
       setCurrentMonth,
       from,
+      isRecurringTransaction,
     ],
   )
 
-  const categoryOptions: SelectOption[] = categories
-    .filter((cat) => {
-      if (openModal.transaction.type === 'income') {
-        return cat.type === 'income' || cat.type === 'both'
-      } else if (openModal.transaction.type === 'outcome') {
-        return cat.type === 'outcome' || cat.type === 'both'
+  const handleRecurringUpdate = useCallback(
+    async () => {
+      if (!pendingUpdateData || !handleUpdateRecurringTransaction) return
+
+      try {
+        const data = pendingUpdateData
+        const recurrenceConfig = data.recurrence_config || { mode: 'single' }
+        let recurrenceType: RecurrenceType | undefined = undefined
+
+        if (recurrenceConfig.mode === 'fixed' && recurrenceConfig.frequency) {
+          recurrenceType = recurrenceConfig.frequency as RecurrenceType
+        }
+
+        const updatedTransaction = {
+          ...openModal.transaction,
+          description: data.description,
+          price: Number(data.price.replace(/\D/g, '')) / 100,
+          category_id: Number(data.category),
+          transaction_day: new Date(`${data.transaction_day}T00:00:00`),
+          recurrence_pattern: recurrenceType,
+          installments: recurrenceConfig.mode === 'installment' ? recurrenceConfig.installmentCount : undefined,
+          is_paid: data.is_paid,
+          card_id: data.card_id === 'account' ? null : data.card_id,
+        } as unknown as ITransaction
+
+        await handleUpdateRecurringTransaction(
+          updatedTransaction,
+          selectedEditMode,
+          currentMonth,
+          setCurrentMonth,
+          from,
+        )
+
+        setShowRecurringModal(false)
+        setPendingUpdateData(null)
+        setSelectedEditMode('instance_only')
+        setOpenModal({
+          isOpen: false,
+          transaction: {} as ITransaction,
+          type: '',
+        })
+      } catch (err) {
+        console.error(err)
       }
-      return true
-    })
-    .map((cat) => ({
-      value: String(cat.id),
-      label: cat.name,
-      icon: <CategoryIcon size="small" category={cat} />,
-    }))
+    },
+    [
+      pendingUpdateData,
+      handleUpdateRecurringTransaction,
+      openModal.transaction,
+      currentMonth,
+      setCurrentMonth,
+      from,
+      setOpenModal,
+      selectedEditMode,
+    ],
+  )
+
+  const categoryOptions: SelectOption[] = categories && categories.length > 0 
+    ? categories
+        .filter((cat) => {
+          if (openModal.transaction.type === 'income') {
+            return cat.type === 'income' || cat.type === 'both'
+          } else if (openModal.transaction.type === 'outcome') {
+            return cat.type === 'outcome' || cat.type === 'both'
+          }
+          return true
+        })
+        .map((cat) => ({
+          value: String(cat.id),
+          label: cat.name,
+          icon: <CategoryIcon size="small" category={cat} />,
+        }))
+    : []
 
   const paymentMethodOptions: SelectOption[] = [
     { value: 'account', label: 'Conta Principal' },
@@ -333,7 +455,7 @@ const ModalEdit = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {categoryOptions.length > 0 && (
+              <div>
                 <Controller
                   name="category"
                   control={control}
@@ -349,11 +471,25 @@ const ModalEdit = ({
                           ? 'Selecione uma categoria'
                           : errors.category?.message
                       }
-                      placeholder="Selecione uma categoria..."
+                      placeholder={
+                        categories.length === 0 
+                          ? "Carregando categorias..." 
+                          : "Selecione uma categoria..."
+                      }
+                      disabled={categories.length === 0}
                     />
                   )}
                 />
-              )}
+                {categories.length === 0 && retryCategories && (
+                  <button
+                    type="button"
+                    onClick={retryCategories}
+                    className="mt-2 text-sm text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 underline"
+                  >
+                    Tentar carregar categorias novamente
+                  </button>
+                )}
+              </div>
               <Controller
                 name="card_id"
                 control={control}
@@ -377,9 +513,14 @@ const ModalEdit = ({
                   value={field.value as RecurrenceConfig}
                   onChange={(config) => field.onChange(config)}
                   error={errors.recurrence_config?.message}
+                  hideFixedOption={cardId !== 'account'}
+                  totalAmount={getTotalAmount()}
+                  selectedCardId={cardId}
+                  creditCards={creditCards}
                 />
               )}
             />
+
           </div>
 
           <div className="flex gap-4 pt-6 border-t border-zinc-200 dark:border-zinc-700 mt-6">
@@ -405,6 +546,42 @@ const ModalEdit = ({
           </div>
         </form>
       </div>
+
+      {/* Modal separado para opções de transação recorrente */}
+      {showRecurringModal && (
+        <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-[60]">
+          <div className="bg-white dark:bg-zinc-800 w-[600px] max-w-[90vw] rounded-2xl shadow-2xl p-8 relative transition-colors">
+            <h2 className="text-xl font-bold mb-6 text-center text-zinc-700 dark:text-zinc-200">
+              Como deseja editar esta transação recorrente?
+            </h2>
+            
+            <RecurringTransactionOptions
+              value={selectedEditMode}
+              onChange={setSelectedEditMode}
+              action="edit"
+            />
+
+            <div className="flex justify-center gap-4 mt-6">
+              <button
+                onClick={() => {
+                  setShowRecurringModal(false)
+                  setPendingUpdateData(null)
+                  setSelectedEditMode('instance_only')
+                }}
+                className="px-6 py-3 border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors font-medium"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleRecurringUpdate}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-lg text-white font-medium transition-colors"
+              >
+                Confirmar Atualização
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

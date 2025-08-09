@@ -1,5 +1,5 @@
+import { ArrowRight, Car, PiggyBank, Plane, Target } from 'lucide-react'
 import React from 'react'
-import { Target, ArrowRight, PiggyBank, Car, Plane } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 interface SavingsGoal {
@@ -12,32 +12,32 @@ interface SavingsGoal {
 }
 
 const SavingsGoalsSimple: React.FC = () => {
-  const goals: SavingsGoal[] = []
-  //   {
-  //     id: '1',
-  //     name: 'Carro Novo',
-  //     targetAmount: 45000,
-  //     currentAmount: 12500,
-  //     icon: 'car',
-  //     color: 'from-blue-500 to-blue-700'
-  //   },
-  //   {
-  //     id: '2',
-  //     name: 'Viagem Europa',
-  //     targetAmount: 15000,
-  //     currentAmount: 8750,
-  //     icon: 'plane',
-  //     color: 'from-green-500 to-green-700'
-  //   },
-  //   {
-  //     id: '3',
-  //     name: 'Emergência',
-  //     targetAmount: 20000,
-  //     currentAmount: 5200,
-  //     icon: 'piggybank',
-  //     color: 'from-purple-500 to-purple-700'
-  //   }
-  // ]
+  const goals: SavingsGoal[] = [
+    {
+      id: '1',
+      name: 'Carro Novo',
+      targetAmount: 45000,
+      currentAmount: 12500,
+      icon: 'car',
+      color: 'from-blue-500 to-blue-700'
+    },
+    {
+      id: '2',
+      name: 'Viagem Europa',
+      targetAmount: 15000,
+      currentAmount: 8750,
+      icon: 'plane',
+      color: 'from-green-500 to-green-700'
+    },
+    {
+      id: '3',
+      name: 'Emergência',
+      targetAmount: 20000,
+      currentAmount: 5200,
+      icon: 'piggybank',
+      color: 'from-purple-500 to-purple-700'
+    }
+  ]
 
   const formatCurrency = (amount: number) => {
     return amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

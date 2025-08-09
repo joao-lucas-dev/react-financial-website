@@ -7,6 +7,8 @@ import useAxiosPrivate from './useAxiosPrivate.tsx'
 export default function useCategories() {
   const axiosPrivate = useAxiosPrivate()
   const [categories, setCategories] = useState<ICategory[]>([])
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true)
+  const [categoriesError, setCategoriesError] = useState<string | null>(null)
 
   const [chartCategories, setChartCategories] = useState({
     notIncome: {
@@ -113,18 +115,36 @@ export default function useCategories() {
     [axiosPrivate],
   )
 
-  const getCategories = useCallback(async () => {
-    const { data } = await axiosPrivate.get('/categories')
-    setCategories(data)
-  }, [setCategories, axiosPrivate])
+  const getCategories = useCallback(async (retryCount = 0) => {
+    try {
+      setIsLoadingCategories(true)
+      setCategoriesError(null)
+      const { data } = await axiosPrivate.get('/categories')
+      setCategories(data)
+    } catch (err) {
+      console.error('Error loading categories:', err)
+      setCategoriesError('Erro ao carregar categorias')
+      // Retry once after 1 second, max 2 retries
+      if (retryCount < 2) {
+        setTimeout(() => {
+          getCategories(retryCount + 1)
+        }, 1000)
+      }
+    } finally {
+      setIsLoadingCategories(false)
+    }
+  }, [axiosPrivate])
 
   useEffect(() => {
     getCategories()
-  }, [])
+  }, [getCategories])
 
   return {
     chartCategories,
     handleGetChartCategories,
     categories,
+    isLoadingCategories,
+    categoriesError,
+    retryCategories: getCategories,
   }
 }

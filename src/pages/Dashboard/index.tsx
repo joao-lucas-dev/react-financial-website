@@ -6,7 +6,6 @@ import {
   ArrowRight,
   ChevronUp,
   ChevronDown,
-  Filter as FilterIcon,
   Edit3,
   Trash2,
   MoreHorizontal,
@@ -14,6 +13,7 @@ import {
   CheckCircle2,
   Clock,
   SlidersHorizontal,
+  CreditCard,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -34,8 +34,6 @@ import useCategories from "../../hooks/useCategories.ts";
 import { useState, useRef, useEffect } from "react";
 import { ITransaction } from "../../types/transactions.ts";
 import useCreditCards from "../../hooks/useCreditCards";
-import TableTransactions from "../../components/TableTransactions";
-import { Filter } from "../../components/Filter";
 import ModernDonutChart from "../../components/ModernDonutChart.tsx";
 import CategoryIcon from "../../components/CategoryIcon/index.tsx";
 import PaymentStatusIcon from "../../components/PaymentStatusIcon.tsx";
@@ -57,13 +55,14 @@ export default function Dashboard() {
     fetchCreditCardSummary
   } = useCreditCards();
 
-  const { chartCategories, handleGetChartCategories, categories } =
+  const { chartCategories, handleGetChartCategories, categories, isLoadingCategories, categoriesError, retryCategories } =
     useCategories();
 
   const {
     rows,
     handleCreateTransaction,
     handleCreateCompleteTransaction,
+    handleCreateInstallmentTransaction,
     handleCreateRecurringTransaction,
     handleDeleteTransaction,
     handleUpdateTransaction,
@@ -74,9 +73,10 @@ export default function Dashboard() {
     handleGetPreviewTransactions,
     handleGetRecentTransactions,
     recentTransactions,
-    handleDeleteMultipleTransactions,
     handleGetPeriodsSummary,
     periodsSummary,
+    handleUpdateRecurringTransaction,
+    handleDeleteRecurringTransaction,
   } = useTransactions(handleGetChartCategories);
   const { getGreeting, currentMonth, setCurrentMonth } = useDashboard(
     rows,
@@ -88,15 +88,10 @@ export default function Dashboard() {
     handleGetPeriodsSummary,
   );
 
-  const [sortBy, setSortBy] = useState("updated_at");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(
-    "desc",
-  );
   const [filter, setFilter] = useState<"before" | "after" | "both">("both");
   const [typeFilter, setTypeFilter] = useState<"income" | "outcome" | "all">(
     "all",
   );
-  const [searchTerm, setSearchTerm] = useState("");
   
   // Recent Transactions Filters
   const [recentSearchTerm, setRecentSearchTerm] = useState("");
@@ -115,15 +110,9 @@ export default function Dashboard() {
   const [itemsToShow, setItemsToShow] = useState(5);
   const itemsPerLoad = 5;
 
-  const handleSort = (field: string, order: "asc" | "desc") => {
-    setSortBy(field);
-    setSortOrder(order);
-    handleGetRecentTransactions(filter, field, order, typeFilter);
-  };
-
   // Função para determinar se uma transação está paga
   const isTransactionPaid = (transaction: any) => {
-    // Se tem campo is_paid, usar ele
+    // Se tem campo is_paid, usar ele (tem prioridade)
     if (transaction.is_paid !== undefined) {
       return transaction.is_paid;
     }
@@ -131,10 +120,9 @@ export default function Dashboard() {
     if (transaction.payment_status) {
       return transaction.payment_status === 'paid';
     }
-    // Fallback: considerar pago se a data da transação já passou
-    const transactionDate = new Date(transaction.transaction_day);
-    const today = new Date();
-    return transactionDate <= today;
+    // Para transações sem status específico, considerar não paga por padrão
+    // (não usar fallback de data para evitar marcação incorreta)
+    return false;
   };
 
   // Função para filtrar transações recentes
@@ -190,10 +178,10 @@ export default function Dashboard() {
     setActiveMenuId(null);
   };
 
-  const handleDeleteRecentTransaction = (transactionId: string) => {
+  const handleDeleteRecentTransaction = (transaction: any) => {
     setOpenModal({
       isOpen: true,
-      transaction: { id: transactionId } as ITransaction,
+      transaction: { ...transaction } as ITransaction,
       type: 'delete',
     });
     setActiveMenuId(null);
@@ -214,18 +202,7 @@ export default function Dashboard() {
     fetchCreditCards();
     fetchCreditCardSummary();
   }, [fetchCreditCards, fetchCreditCardSummary]);
-
-  const handleFilterChange = (
-    newFilter: "before" | "after" | "both",
-    newType: "income" | "outcome" | "all",
-  ) => {
-    setFilter(newFilter);
-    setTypeFilter(newType);
-    setSortBy("updated_at");
-    setSortOrder("desc");
-    handleGetRecentTransactions(newFilter, "updated_at", "desc", newType);
-  };
-
+  
   // Credit Card Handlers
   const handleCardClick = (card: any) => {
     console.log("Cartão clicado:", card);
@@ -429,14 +406,16 @@ export default function Dashboard() {
                     handleCreateCompleteTransaction={
                       handleCreateCompleteTransaction
                     }
-                    handleCreateRecurringTransaction={
-                      handleCreateRecurringTransaction
+                    handleCreateInstallmentTransaction={
+                      handleCreateInstallmentTransaction
                     }
                     handleCreateRecurringTransaction={
                       handleCreateRecurringTransaction
                     }
                     handleDeleteTransaction={handleDeleteTransaction}
                     handleUpdateTransaction={handleUpdateTransaction}
+                    handleUpdateRecurringTransaction={handleUpdateRecurringTransaction}
+                    handleDeleteRecurringTransaction={handleDeleteRecurringTransaction}
                     currentMonth={currentMonth}
                     setCurrentMonth={setCurrentMonth}
                     openModal={openModal}
@@ -447,6 +426,7 @@ export default function Dashboard() {
                     maxDays={2}
                     showViewAllButton={true}
                     variant="vertical"
+                    retryCategories={retryCategories}
                   />
                 </div>
               </div>
@@ -669,8 +649,8 @@ export default function Dashboard() {
                         <div className="flex gap-2">
                           {[
                             { value: 'all', label: 'Todos', icon: null },
-                            { value: 'paid', label: 'Pagas', icon: CheckCircle2 },
-                            { value: 'unpaid', label: 'Pendentes', icon: Clock }
+                            { value: 'paid', label: 'Pagas/Recebidas', icon: CheckCircle2 },
+                            { value: 'unpaid', label: 'Não Pagas/Não Recebidas', icon: Clock }
                           ].map(({ value, label, icon: Icon }) => (
                             <button
                               key={value}
@@ -721,7 +701,7 @@ export default function Dashboard() {
                   {paymentStatusFilter !== "all" && (
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-sm rounded-full">
                       {paymentStatusFilter === 'paid' ? <CheckCircle2 size={12} /> : <Clock size={12} />}
-                      <span>{paymentStatusFilter === 'paid' ? 'Pagas' : 'Pendentes'}</span>
+                      <span>{paymentStatusFilter === 'paid' ? 'Pagas/Recebidas' : 'Não Pagas/Não Recebidas'}</span>
                       <button
                         onClick={() => setPaymentStatusFilter("all")}
                         className="hover:bg-orange-200 dark:hover:bg-orange-800 rounded-full p-0.5 transition-all"
@@ -766,9 +746,19 @@ export default function Dashboard() {
                             )}
                           </div>
                           <div>
-                            <h4 className="font-medium text-sm text-zinc-700 dark:text-zinc-200">
-                              {transaction.description}
-                            </h4>
+                            <div className="flex items-center gap-2">
+                              {(transaction.fromCreditCard || transaction.card_id) && (
+                                <CreditCard className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                              )}
+                              <h4 className="font-medium text-sm text-zinc-700 dark:text-zinc-200">
+                                {transaction.description}
+                              </h4>
+                              {(transaction.installment_info || transaction.installments) && (
+                                <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs rounded-full">
+                                  {transaction.installment_info || `${transaction.installments}x parcelas`}
+                                </span>
+                              )}
+                            </div>
                             <div className="flex items-center gap-2 mt-1">
                               <span className={`text-xs px-2 py-1 rounded-full ${transaction.category.color} text-white`}>
                                 {transaction.category?.name}
@@ -793,7 +783,10 @@ export default function Dashboard() {
                                 isPaid={isTransactionPaid(transaction)}
                                 isAnimating={false}
                                 onClick={() => {}}
-                                title={isTransactionPaid(transaction) ? 'Pago' : 'Não Pago'}
+                                title={isTransactionPaid(transaction) ? 
+                                  (transaction.type === 'income' ? 'Recebido' : 'Pago') : 
+                                  (transaction.type === 'income' ? 'Não Recebido' : 'Não Pago')
+                                }
                               />
                             </div>
                           </div>
@@ -819,7 +812,7 @@ export default function Dashboard() {
                                   Editar Transação
                                 </button>
                                 <button
-                                  onClick={() => handleDeleteRecentTransaction(transaction.id)}
+                                  onClick={() => handleDeleteRecentTransaction(transaction)}
                                   className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                                 >
                                   <Trash2 size={14} />

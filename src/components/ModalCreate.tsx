@@ -25,11 +25,14 @@ interface IParams {
   openModal: IOpenModal
   setOpenModal: ISetOpenModal
   handleCreateCompleteTransaction: IHandleCreateCompleteTransaction
-  handleCreateRecurringTransaction: (transaction: ITransaction, currentMonth: number) => Promise<void>;
+  handleCreateInstallmentTransaction: (transaction: ITransaction, currentMonth: number, setCurrentMonth?: any, from?: string) => Promise<void>;
+  handleCreateRecurringTransaction: (transaction: ITransaction, currentMonth: number, setCurrentMonth?: any, from?: string) => Promise<void>;
   currentMonth: number
   setCurrentMonth: ISetCurrentMonth
   categories: ICategory[]
   creditCards: ICreditCard[]
+  from?: string
+  retryCategories?: () => void
 }
 
 const modalCreateSchema = z.object({
@@ -55,11 +58,14 @@ const ModalCreate = ({
   openModal,
   setOpenModal,
   handleCreateCompleteTransaction,
+  handleCreateInstallmentTransaction,
   handleCreateRecurringTransaction,
   currentMonth,
   setCurrentMonth,
   categories,
   creditCards,
+  from = 'transactions',
+  retryCategories,
 }: IParams) => {
   const [isAnimating, setIsAnimating] = useState(false)
   const [isPaidManuallyOverridden, setIsPaidManuallyOverridden] = useState(false)
@@ -82,6 +88,14 @@ const ModalCreate = ({
 
   const transactionDay = watch('transaction_day')
   const isPaid = watch('is_paid')
+  const cardId = watch('card_id')
+  const price = watch('price')
+
+  // Converter preço formatado para número
+  const getTotalAmount = () => {
+    if (!price) return 0
+    return Number(price.replace(/\D/g, '')) / 100
+  }
 
   useEffect(() => {
     const transactionDate = openModal.transaction?.transaction_day
@@ -169,36 +183,38 @@ const ModalCreate = ({
         const recurrenceConfig = data.recurrence_config || { mode: 'single' }
         console.log('🔍 ModalCreate - Recurrence config:', recurrenceConfig)
 
-        if (recurrenceConfig.mode === 'fixed' || recurrenceConfig.mode === 'installment') {
+        if (recurrenceConfig.mode === 'installment') {
+          console.log('💳 ModalCreate - Using installment transaction path');
+          const createInstallmentTransaction = {
+            type: openModal.button,
+            description: data.description,
+            price: Number(data.price.replace(/\D/g, '')) / 100,
+            category_id: Number(data.category),
+            transaction_day: transactionDate,
+            shared_id: null,
+            installments: recurrenceConfig.installmentCount,
+            is_paid: data.is_paid,
+            card_id: data.card_id === 'account' ? null : data.card_id,
+            fromCreditCard: data.card_id !== 'account',
+          } as unknown as ITransaction
+
+          console.log('💳 ModalCreate - Final installment transaction object:', createInstallmentTransaction);
+          console.log('💰 ModalCreate - is_paid value:', data.is_paid);
+          console.log('🔄 ModalCreate - isPaidManuallyOverridden:', isPaidManuallyOverridden);
+
+          await handleCreateInstallmentTransaction(
+            createInstallmentTransaction,
+            currentMonth,
+            setCurrentMonth,
+            from,
+          )
+        } else if (recurrenceConfig.mode === 'fixed') {
           console.log('🚀 ModalCreate - Using recurring transaction path');
           let recurrencePattern: RecurrenceType = 'monthly'
           let endDate: Date | undefined = undefined
           let adjustedPrice = Number(data.price.replace(/\D/g, '')) / 100
 
-          if (recurrenceConfig.mode === 'fixed') {
-            recurrencePattern = recurrenceConfig.frequency as RecurrenceType
-          } else if (recurrenceConfig.mode === 'installment') {
-            console.log('💳 ModalCreate - Processing installment mode');
-            // Para parcelamento, sempre usar frequência mensal
-            recurrencePattern = recurrenceConfig.installmentPeriod === 'years' ? 'annual' : 'monthly'
-            
-            // Calcular data final baseada no número de parcelas
-            if (recurrenceConfig.installmentCount && recurrenceConfig.installmentPeriod) {
-              endDate = calculateEndDate(transactionDate, recurrenceConfig.installmentCount, recurrenceConfig.installmentPeriod)
-              
-              // Para parcelamento, dividir o valor pelo número de parcelas
-              adjustedPrice = adjustedPrice / recurrenceConfig.installmentCount
-              
-              console.log('💳 ModalCreate - Installment details:', {
-                installmentCount: recurrenceConfig.installmentCount,
-                installmentPeriod: recurrenceConfig.installmentPeriod,
-                originalPrice: Number(data.price.replace(/\D/g, '')) / 100,
-                adjustedPrice,
-                endDate,
-                recurrencePattern
-              });
-            }
-          }
+          recurrencePattern = recurrenceConfig.frequency as RecurrenceType
 
           const createRecurringTransaction = {
             type: openModal.button,
@@ -213,6 +229,7 @@ const ModalCreate = ({
             end_date: endDate,
             is_paid: data.is_paid,
             card_id: data.card_id === 'account' ? null : data.card_id,
+            fromCreditCard: data.card_id !== 'account',
           } as unknown as ITransaction
 
           console.log('🚀 ModalCreate - Final recurring transaction object:', createRecurringTransaction);
@@ -222,6 +239,8 @@ const ModalCreate = ({
           await handleCreateRecurringTransaction(
             createRecurringTransaction,
             currentMonth,
+            setCurrentMonth,
+            from,
           )
         } else {
           console.log('📝 ModalCreate - Using single transaction path');
@@ -235,6 +254,7 @@ const ModalCreate = ({
             is_recurring: recurrenceConfig.mode !== 'single',
             is_paid: data.is_paid,
             card_id: data.card_id === 'account' ? null : data.card_id,
+            fromCreditCard: data.card_id !== 'account',
           } as unknown as ITransaction
 
           console.log('📝 ModalCreate - Single transaction is_paid value:', data.is_paid);
@@ -244,6 +264,7 @@ const ModalCreate = ({
             createTransaction,
             currentMonth,
             setCurrentMonth,
+            from,
           )
         }
 
@@ -258,6 +279,7 @@ const ModalCreate = ({
     },
     [
       handleCreateCompleteTransaction,
+      handleCreateInstallmentTransaction,
       handleCreateRecurringTransaction,
       openModal.button,
       setOpenModal,
@@ -266,18 +288,20 @@ const ModalCreate = ({
     ],
   )
 
-  const categoryOptions: SelectOption[] = categories
-    .filter((cat) => {
-      if (openModal.button === 'income') {
-        return cat.type === 'income' || cat.type === 'both'
-      }
-      return cat.type !== 'income'
-    })
-    .map((cat) => ({
-      value: String(cat.id),
-      label: cat.name,
-      icon: <CategoryIcon size="small" category={cat} />,
-    }))
+  const categoryOptions: SelectOption[] = categories && categories.length > 0 
+    ? categories
+        .filter((cat) => {
+          if (openModal.button === 'income') {
+            return cat.type === 'income' || cat.type === 'both'
+          }
+          return cat.type !== 'income'
+        })
+        .map((cat) => ({
+          value: String(cat.id),
+          label: cat.name,
+          icon: <CategoryIcon size="small" category={cat} />,
+        }))
+    : []
 
   const paymentMethodOptions: SelectOption[] = [
     { value: 'account', label: 'Conta Principal' },
@@ -410,25 +434,41 @@ const ModalCreate = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Controller
-                name="category"
-                control={control}
-                render={({ field }) => (
-                  <ModernSelect
-                    label="Categoria"
-                    options={categoryOptions}
-                    value={field.value}
-                    onChange={field.onChange}
-                    required={true}
-                    error={
-                      errors.category?.message === 'Required'
-                        ? 'Selecione uma categoria'
-                        : errors.category?.message
-                    }
-                    placeholder="Selecione uma categoria..."
-                  />
+              <div>
+                <Controller
+                  name="category"
+                  control={control}
+                  render={({ field }) => (
+                    <ModernSelect
+                      label="Categoria"
+                      options={categoryOptions}
+                      value={field.value}
+                      onChange={field.onChange}
+                      required={true}
+                      error={
+                        errors.category?.message === 'Required'
+                          ? 'Selecione uma categoria'
+                          : errors.category?.message
+                      }
+                      placeholder={
+                        categories.length === 0 
+                          ? "Carregando categorias..." 
+                          : "Selecione uma categoria..."
+                      }
+                      disabled={categories.length === 0}
+                    />
+                  )}
+                />
+                {categories.length === 0 && retryCategories && (
+                  <button
+                    type="button"
+                    onClick={retryCategories}
+                    className="mt-2 text-sm text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 underline"
+                  >
+                    Tentar carregar categorias novamente
+                  </button>
                 )}
-              />
+              </div>
               <Controller
                 name="card_id"
                 control={control}
@@ -452,6 +492,10 @@ const ModalCreate = ({
                   value={field.value as RecurrenceConfig}
                   onChange={(config) => field.onChange(config)}
                   error={errors.recurrence_config?.message}
+                  hideFixedOption={cardId !== 'account'}
+                  totalAmount={getTotalAmount()}
+                  selectedCardId={cardId}
+                  creditCards={creditCards}
                 />
               )}
             />

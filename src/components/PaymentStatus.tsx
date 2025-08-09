@@ -9,6 +9,7 @@ interface PaymentStatusProps {
   transactionDate?: string
   disabled?: boolean
   showAutoLogic?: boolean
+  transactionType?: 'income' | 'outcome'
 }
 
 const PaymentStatus: React.FC<PaymentStatusProps> = ({
@@ -17,7 +18,8 @@ const PaymentStatus: React.FC<PaymentStatusProps> = ({
   onChange,
   transactionDate,
   disabled = false,
-  showAutoLogic = true
+  showAutoLogic = true,
+  transactionType = 'outcome'
 }) => {
   // Converter boolean para PaymentStatusType se necessário (backward compatibility)
   const currentStatus: PaymentStatusType = 
@@ -50,11 +52,13 @@ const PaymentStatus: React.FC<PaymentStatusProps> = ({
   }
 
   const getStatusConfig = (status: PaymentStatusType) => {
+    const isIncome = transactionType === 'income'
+    
     switch (status) {
       case 'paid':
         return {
           icon: <Check size={16} />,
-          label: 'Pago',
+          label: isIncome ? 'Recebido' : 'Pago',
           color: 'text-green-600 dark:text-green-400',
           bgColor: 'bg-green-100 dark:bg-green-900/30',
           borderColor: 'border-green-500',
@@ -73,7 +77,7 @@ const PaymentStatus: React.FC<PaymentStatusProps> = ({
       default:
         return {
           icon: <X size={16} />,
-          label: 'Não Pago',
+          label: isIncome ? 'Não Recebido' : 'Não Pago',
           color: 'text-red-600 dark:text-red-400',
           bgColor: 'bg-red-100 dark:bg-red-900/30',
           borderColor: 'border-red-500',
@@ -141,8 +145,8 @@ const PaymentStatus: React.FC<PaymentStatusProps> = ({
                 Sugestão automática: <span className="capitalize">{getStatusConfig(autoStatus).label}</span>
               </p>
               <p className="text-blue-600 dark:text-blue-400 text-xs mt-1">
-                {autoStatus === 'paid' && 'Datas passadas são marcadas como pagas por padrão'}
-                {autoStatus === 'unpaid' && 'Datas futuras são marcadas como não pagas por padrão'}
+                {autoStatus === 'paid' && `Datas passadas são marcadas como ${transactionType === 'income' ? 'recebidas' : 'pagas'} por padrão`}
+                {autoStatus === 'unpaid' && `Datas futuras são marcadas como não ${transactionType === 'income' ? 'recebidas' : 'pagas'} por padrão`}
                 {autoStatus === 'pending' && 'Transações de hoje ficam pendentes por padrão'}
               </p>
             </div>

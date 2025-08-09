@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Calendar, Calculator } from 'lucide-react'
 import ModernSelect, { SelectOption } from './ModernSelectRadix'
 
@@ -20,6 +20,10 @@ interface RecurrenceOptionsProps {
   disabled?: boolean
   required?: boolean
   error?: string
+  hideFixedOption?: boolean
+  totalAmount?: number
+  selectedCardId?: string
+  creditCards?: Array<{id: string, name: string, closingDay: number, dueDay: number}>
 }
 
 const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
@@ -28,14 +32,53 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
   onChange,
   disabled = false,
   required = false,
-  error
+  error,
+  hideFixedOption = false,
+  totalAmount = 0,
+  selectedCardId,
+  creditCards = []
 }) => {
   const [selectedMode, setSelectedMode] = useState<RecurrenceMode>(value.mode)
   const [frequency, setFrequency] = useState<RecurrenceFrequency>(value.frequency || 'monthly')
   const [installmentCount, setInstallmentCount] = useState<number>(value.installmentCount || 2)
   const [installmentPeriod, setInstallmentPeriod] = useState<InstallmentPeriod>(value.installmentPeriod || 'months')
 
-  // Opções de frequência para despesa fixa
+  // Sincronizar com o valor externo quando ele mudar
+  useEffect(() => {
+    setSelectedMode(value.mode)
+    if (value.frequency) setFrequency(value.frequency)
+    if (value.installmentCount) setInstallmentCount(value.installmentCount)
+    if (value.installmentPeriod) setInstallmentPeriod(value.installmentPeriod)
+  }, [value])
+
+  // Reset to 'single' if 'fixed' is selected but hidden
+  useEffect(() => {
+    if (hideFixedOption && selectedMode === 'fixed') {
+      setSelectedMode('single')
+      onChange?.({ mode: 'single' })
+    }
+  }, [hideFixedOption, selectedMode, onChange])
+
+  // Função para calcular prévia do parcelamento
+  const calculateInstallmentPreview = () => {
+    if (!totalAmount || selectedMode !== 'installment' || !selectedCardId || selectedCardId === 'account') {
+      return null
+    }
+
+    const selectedCard = creditCards.find(card => card.id === selectedCardId)
+    if (!selectedCard) return null
+
+    const monthlyAmount = totalAmount / installmentCount
+    
+    return {
+      monthlyAmount,
+      selectedCard
+    }
+  }
+
+  const installmentPreview = calculateInstallmentPreview()
+
+  // Opções de frequência para transação fixa
   const frequencyOptions: SelectOption[] = [
     {
       value: 'daily',
@@ -159,20 +202,22 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
           </span>
         </label>
 
-        {/* Despesa fixa */}
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="radio"
-            name="recurrence-mode"
-            value="fixed"
-            checked={selectedMode === 'fixed'}
-            onChange={() => handleModeChange('fixed')}
-            className="w-4 h-4 text-teal-600 border-zinc-300 dark:border-zinc-600 focus:ring-teal-500 focus:ring-2"
-          />
-          <span className="text-sm text-zinc-700 dark:text-zinc-300">
-            Despesa fixa
-          </span>
-        </label>
+        {/* Transação fixa - apenas quando não é cartão */}
+        {!hideFixedOption && (
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="radio"
+              name="recurrence-mode"
+              value="fixed"
+              checked={selectedMode === 'fixed'}
+              onChange={() => handleModeChange('fixed')}
+              className="w-4 h-4 text-teal-600 border-zinc-300 dark:border-zinc-600 focus:ring-teal-500 focus:ring-2"
+            />
+            <span className="text-sm text-zinc-700 dark:text-zinc-300">
+              Transação fixa
+            </span>
+          </label>
+        )}
 
         {/* Parcelado */}
         <label className="flex items-center gap-3 cursor-pointer">
@@ -240,14 +285,62 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
           </div>
           
           {/* Preview do parcelamento */}
-          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <div className="flex items-center gap-2">
-              <Calculator size={16} className="text-blue-600 dark:text-blue-400" />
-              <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                Dividir em {installmentCount} parcelas {installmentPeriod === 'months' ? 'mensais' : 'anuais'}
-              </span>
+          {installmentPreview ? (
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="flex items-center gap-2 mb-3">
+                <Calculator size={16} className="text-blue-600 dark:text-blue-400" />
+                <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">
+                  Prévia do Parcelamento
+                </span>
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-zinc-600 dark:text-zinc-400">Valor total:</span>
+                  <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                    {totalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-600 dark:text-zinc-400">Valor por parcela:</span>
+                  <span className="font-medium text-blue-700 dark:text-blue-300">
+                    {installmentPreview.monthlyAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-600 dark:text-zinc-400">Cartão:</span>
+                  <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                    {installmentPreview.selectedCard.name}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-600 dark:text-zinc-400">Parcelas:</span>
+                  <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                    {installmentCount}x {installmentPeriod === 'months' ? 'mensais' : 'anuais'}
+                  </span>
+                </div>
+                <div className="pt-2 border-t border-blue-200 dark:border-blue-700">
+                  <div className="text-xs text-blue-600 dark:text-blue-400">
+                    Fechamento: dia {installmentPreview.selectedCard.closingDay} | Vencimento: dia {installmentPreview.selectedCard.dueDay}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          ) : totalAmount > 0 && selectedMode === 'installment' && (selectedCardId === 'account' || !selectedCardId) ? (
+            <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <div className="text-sm text-amber-700 dark:text-amber-300">
+                Selecione um cartão de crédito para ver a prévia do parcelamento
+              </div>
+            </div>
+          ) : (
+            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Calculator size={16} className="text-blue-600 dark:text-blue-400" />
+                <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">
+                  Dividir em {installmentCount} parcelas {installmentPeriod === 'months' ? 'mensais' : 'anuais'}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       )}
       

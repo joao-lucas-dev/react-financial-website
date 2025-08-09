@@ -7,6 +7,7 @@ import {
   Eye,
   BarChart3,
   ArrowRight,
+  CreditCard,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -35,9 +36,24 @@ interface IParams {
   rows: IRow[];
   handleCreateTransaction: IHandleCreateTransaction;
   handleCreateCompleteTransaction: IHandleCreateCompleteTransaction;
-  handleCreateRecurringTransaction: (transaction: ITransaction, currentMonth: number) => Promise<void>;
+  handleCreateInstallmentTransaction: (transaction: ITransaction, currentMonth: number, setCurrentMonth?: any, from?: string) => Promise<void>;
+  handleCreateRecurringTransaction: (transaction: ITransaction, currentMonth: number, setCurrentMonth?: any, from?: string) => Promise<void>;
   handleUpdateTransaction: IHandleUpdateTransaction;
   handleDeleteTransaction: IHandleDeleteTransaction;
+  handleUpdateRecurringTransaction?: (
+    updateTransaction: ITransaction,
+    editMode: 'instance_only' | 'instance_and_future' | 'all_instances',
+    currentMonth: number,
+    setCurrentMonth: ISetCurrentMonth,
+    from: string,
+  ) => Promise<void>;
+  handleDeleteRecurringTransaction?: (
+    id: string,
+    editMode: 'instance_only' | 'instance_and_future' | 'all_instances',
+    currentMonth: number,
+    setCurrentMonth: ISetCurrentMonth,
+    from: string,
+  ) => Promise<void>;
   currentMonth: number;
   setCurrentMonth: ISetCurrentMonth;
   openModal: IOpenModal;
@@ -49,15 +65,19 @@ interface IParams {
   maxDays?: number;
   showViewAllButton?: boolean;
   variant?: "horizontal" | "vertical";
+  retryCategories?: () => void;
 }
 
 const TablePreview = ({
   rows,
   handleCreateTransaction,
   handleCreateCompleteTransaction,
+  handleCreateInstallmentTransaction,
   handleCreateRecurringTransaction,
   handleDeleteTransaction,
   handleUpdateTransaction,
+  handleUpdateRecurringTransaction,
+  handleDeleteRecurringTransaction,
   currentMonth,
   setCurrentMonth,
   openModal,
@@ -69,6 +89,7 @@ const TablePreview = ({
   maxDays = undefined,
   showViewAllButton = false,
   variant = "horizontal",
+  retryCategories,
 }: IParams) => {
   const targetRowRef = useRef<HTMLDivElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -396,8 +417,21 @@ const TablePreview = ({
                                 {transaction.type === 'income' ? '+' : '-'}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="text-xs font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                                  {transaction.description}
+                                <div className="flex items-center gap-1 text-xs font-medium text-zinc-900 dark:text-zinc-100">
+                                  {(transaction.fromCreditCard || transaction.card_id) && (
+                                    <CreditCard className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+                                  )}
+                                  <span className="truncate">{transaction.description}</span>
+                                  {(transaction.installment_info || transaction.installments) && (
+                                    <span className="ml-1 px-1 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs rounded-full whitespace-nowrap">
+                                      {transaction.installment_info || `${transaction.installments}x`}
+                                    </span>
+                                  )}
+                                  {transaction.is_recurring && (
+                                    <span className="ml-1 px-1 py-0.5 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 text-xs rounded-full whitespace-nowrap">
+                                      ↻
+                                    </span>
+                                  )}
                                 </div>
                                 <div className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
                                   {transaction.category?.name || 'Sem categoria'}
@@ -737,17 +771,20 @@ const TablePreview = ({
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 handleUpdateTransaction={handleUpdateTransaction}
+                handleUpdateRecurringTransaction={handleUpdateRecurringTransaction}
                 currentMonth={currentMonth}
                 setCurrentMonth={setCurrentMonth}
                 categories={categories}
                 creditCards={creditCards}
                 from={from}
+                retryCategories={retryCategories}
               />
             ) : openModal.type === "delete" ? (
               <ModalDelete
                 setOpenModal={setOpenModal}
                 openModal={openModal}
                 handleDeleteTransaction={handleDeleteTransaction}
+                handleDeleteRecurringTransaction={handleDeleteRecurringTransaction}
                 currentMonth={currentMonth}
                 setCurrentMonth={setCurrentMonth}
                 from={from}
@@ -759,6 +796,9 @@ const TablePreview = ({
                 handleCreateRecurringTransaction={
                   handleCreateRecurringTransaction
                 }
+                handleCreateInstallmentTransaction={
+                  handleCreateInstallmentTransaction
+                }
                 handleCreateCompleteTransaction={
                   handleCreateCompleteTransaction
                 }
@@ -766,6 +806,8 @@ const TablePreview = ({
                 currentMonth={currentMonth}
                 setCurrentMonth={setCurrentMonth}
                 categories={categories}
+                from={from}
+                retryCategories={retryCategories}
               />
             )}
           </div>

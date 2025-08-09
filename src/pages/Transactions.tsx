@@ -9,6 +9,7 @@ import { ITransaction } from "../types/transactions.ts";
 import useCategories from "../hooks/useCategories.ts";
 import useTransactions from "../hooks/useTransactions.ts";
 import useDashboard from "../hooks/useDashboard.ts";
+import useCreditCards from "../hooks/useCreditCards";
 
 const Transactions = () => {
   const [openModal, setOpenModal] = useState({
@@ -19,14 +20,19 @@ const Transactions = () => {
   const [resetScroll, setResetScroll] = useState(false);
   const [viewMode, setViewMode] = useState<'table' | 'list'>('table');
 
-  const { handleGetChartCategories, categories } = useCategories();
+  const { handleGetChartCategories, categories, retryCategories } = useCategories();
+  const { creditCards } = useCreditCards();
 
   const {
     rows,
     handleCreateTransaction,
     handleCreateCompleteTransaction,
+    handleCreateInstallmentTransaction,
+    handleCreateRecurringTransaction,
     handleDeleteTransaction,
     handleUpdateTransaction,
+    handleUpdateRecurringTransaction,
+    handleDeleteRecurringTransaction,
     handleGetOverviewTransactions,
     handleGetBalance,
     handleGetTransactionsMonth,
@@ -229,15 +235,21 @@ const Transactions = () => {
                 rows={rows}
                 handleCreateTransaction={handleCreateTransaction}
                 handleCreateCompleteTransaction={handleCreateCompleteTransaction}
+                handleCreateInstallmentTransaction={handleCreateInstallmentTransaction}
+                handleCreateRecurringTransaction={handleCreateRecurringTransaction}
                 handleDeleteTransaction={handleDeleteTransaction}
                 handleUpdateTransaction={handleUpdateTransaction}
+                handleUpdateRecurringTransaction={handleUpdateRecurringTransaction}
+                handleDeleteRecurringTransaction={handleDeleteRecurringTransaction}
                 currentMonth={currentMonth}
                 setCurrentMonth={setCurrentMonth}
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 categories={categories}
+                creditCards={creditCards}
                 from="transacoes"
                 resetScroll={resetScroll}
+                retryCategories={retryCategories}
               />
             </div>
           ) : (

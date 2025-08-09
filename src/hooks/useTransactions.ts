@@ -42,8 +42,15 @@ export default function useTransactions(
       sort: string = 'updated_at',
       direction: 'asc' | 'desc' = 'desc',
       type: 'income' | 'outcome' | 'all' = 'all',
+      forceRefresh: boolean = false,
     ) => {
       const key = `recent-${filter}-${sort}-${direction}-${type}`;
+      
+      // Se forceRefresh é true, limpa o cache antes de verificar
+      if (forceRefresh) {
+        loadingRef.current[key] = false;
+      }
+      
       if (loadingRef.current[key]) return;
       
       loadingRef.current[key] = true;
@@ -179,23 +186,31 @@ export default function useTransactions(
           transaction_day: transactionDay,
         })
 
-        const newDate = DateTime.fromISO(rows[3].date) as DateTime
-
         const promises = []
 
         if (from === 'dashboard') {
-          promises.push(handleGetPreviewTransactions(newDate))
-        } else {
-          promises.push(handleGetTransactionsMonth(newDate))
-        }
-
-        if (newDate.month === currentMonth) {
-          promises.push(handleGetChartCategories(newDate))
+          // Para dashboard, sempre recarregue tudo com data atual
+          const currentDate = DateTime.now()
+          promises.push(handleGetPreviewTransactions(currentDate))
+          promises.push(handleGetChartCategories(currentDate))
           promises.push(handleGetBalance())
-          promises.push(handleGetOverviewTransactions(newDate))
+          promises.push(handleGetOverviewTransactions(currentDate))
           promises.push(handleGetRecentTransactions())
-          // @ts-expect-error TS2345
-          setCurrentMonth(newDate.month)
+          promises.push(handleGetPeriodsSummary())
+        } else {
+          // Para outras páginas, use a lógica original
+          const newDate = DateTime.fromISO(rows[3]?.date || DateTime.now().toISODate()) as DateTime
+          promises.push(handleGetTransactionsMonth(newDate))
+          
+          if (newDate.month === currentMonth) {
+            promises.push(handleGetChartCategories(newDate))
+            promises.push(handleGetBalance())
+            promises.push(handleGetOverviewTransactions(newDate))
+            promises.push(handleGetRecentTransactions())
+            promises.push(handleGetPeriodsSummary())
+            // @ts-expect-error TS2345
+            setCurrentMonth(newDate.month)
+          }
         }
 
         await Promise.all(promises)
@@ -217,11 +232,68 @@ export default function useTransactions(
       axiosPrivate,
       handleGetPreviewTransactions,
       handleGetRecentTransactions,
+      handleGetPeriodsSummary,
+    ],
+  )
+
+  const handleCreateInstallmentTransaction = useCallback(
+    async (createTransaction: ITransaction, currentMonth: number, setCurrentMonth?: any, from: string = 'transactions') => {
+      try {
+        await axiosPrivate.post('/transactions/create', {
+          type: createTransaction.type,
+          description: createTransaction.description,
+          price: createTransaction.price,
+          category_id: createTransaction.category_id,
+          transaction_day: createTransaction.transaction_day,
+          shared_id: null,
+          installments: createTransaction.installments,
+          is_paid: createTransaction.is_paid,
+          card_id: createTransaction.card_id,
+        })
+
+        const promises = []
+
+        if (from === 'dashboard') {
+          // Para dashboard, sempre recarregue tudo com data atual
+          const currentDate = DateTime.now()
+          promises.push(handleGetPreviewTransactions(currentDate))
+          promises.push(handleGetChartCategories(currentDate))
+          promises.push(handleGetBalance())
+          promises.push(handleGetOverviewTransactions(currentDate))
+          promises.push(handleGetRecentTransactions('both', 'updated_at', 'desc', 'all', true))
+          promises.push(handleGetPeriodsSummary())
+        } else {
+          // Para outras páginas, use a lógica original
+          const newDate = DateTime.fromISO(createTransaction.transaction_day) as DateTime
+          
+          if (newDate.month === currentMonth) {
+            promises.push(handleGetTransactionsMonth(newDate))
+            promises.push(handleGetChartCategories(newDate))
+            promises.push(handleGetBalance())
+            promises.push(handleGetOverviewTransactions(newDate))
+            promises.push(handleGetRecentTransactions('both', 'updated_at', 'desc', 'all', true))
+            promises.push(handleGetPeriodsSummary())
+          }
+        }
+
+        await Promise.all(promises)
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [
+      handleGetTransactionsMonth,
+      handleGetChartCategories,
+      handleGetBalance,
+      handleGetOverviewTransactions,
+      axiosPrivate,
+      handleGetRecentTransactions,
+      handleGetPeriodsSummary,
     ],
   )
 
   const handleCreateCompleteTransaction = useCallback(
-    async (createTransaction: ITransaction, currentMonth: number) => {
+    async (createTransaction: ITransaction, currentMonth: number, setCurrentMonth?: any, from: string = 'transactions') => {
       try {
         await axiosPrivate.post('/transactions/create', {
           type: createTransaction.type,
@@ -234,21 +306,32 @@ export default function useTransactions(
           card_id: createTransaction.card_id,
         })
 
-        const newDate = DateTime.fromISO(
-          createTransaction.transaction_day,
-        ) as DateTime
-
         const promises = []
 
-        if (newDate.month === currentMonth) {
-          promises.push(handleGetTransactionsMonth(newDate))
-          promises.push(handleGetChartCategories(newDate))
+        if (from === 'dashboard') {
+          // Para dashboard, sempre recarregue tudo com data atual
+          const currentDate = DateTime.now()
+          promises.push(handleGetPreviewTransactions(currentDate))
+          promises.push(handleGetChartCategories(currentDate))
           promises.push(handleGetBalance())
-          promises.push(handleGetOverviewTransactions(newDate))
-          promises.push(handleGetRecentTransactions())
-
-          await Promise.all(promises)
+          promises.push(handleGetOverviewTransactions(currentDate))
+          promises.push(handleGetRecentTransactions('both', 'updated_at', 'desc', 'all', true))
+          promises.push(handleGetPeriodsSummary())
+        } else {
+          // Para outras páginas, use a lógica original
+          const newDate = DateTime.fromISO(createTransaction.transaction_day) as DateTime
+          
+          if (newDate.month === currentMonth) {
+            promises.push(handleGetTransactionsMonth(newDate))
+            promises.push(handleGetChartCategories(newDate))
+            promises.push(handleGetBalance())
+            promises.push(handleGetOverviewTransactions(newDate))
+            promises.push(handleGetRecentTransactions('both', 'updated_at', 'desc', 'all', true))
+            promises.push(handleGetPeriodsSummary())
+          }
         }
+
+        await Promise.all(promises)
       } catch (err) {
         console.log(err)
       }
@@ -260,6 +343,7 @@ export default function useTransactions(
       handleGetOverviewTransactions,
       axiosPrivate,
       handleGetRecentTransactions,
+      handleGetPeriodsSummary,
     ],
   )
 
@@ -276,23 +360,31 @@ export default function useTransactions(
       try {
         await axiosPrivate.delete(`/transactions/delete/${id}`)
 
-        const newDate = DateTime.fromISO(rows[3].date) as DateTime
-
         const promises = []
 
         if (from === 'dashboard') {
-          promises.push(handleGetPreviewTransactions(newDate))
-        } else {
-          promises.push(handleGetTransactionsMonth(newDate))
-        }
-
-        if (newDate.month === currentMonth) {
-          promises.push(handleGetChartCategories(newDate))
-          promises.push(handleGetOverviewTransactions(newDate))
+          // Para dashboard, sempre recarregue tudo com data atual
+          const currentDate = DateTime.now()
+          promises.push(handleGetPreviewTransactions(currentDate))
+          promises.push(handleGetChartCategories(currentDate))
           promises.push(handleGetBalance())
+          promises.push(handleGetOverviewTransactions(currentDate))
           promises.push(handleGetRecentTransactions())
-          // @ts-expect-error TS2345
-          setCurrentMonth(newDate.month)
+          promises.push(handleGetPeriodsSummary())
+        } else {
+          // Para outras páginas, use a lógica original
+          const newDate = DateTime.fromISO(rows[3]?.date || DateTime.now().toISODate()) as DateTime
+          promises.push(handleGetTransactionsMonth(newDate))
+          
+          if (newDate.month === currentMonth) {
+            promises.push(handleGetChartCategories(newDate))
+            promises.push(handleGetOverviewTransactions(newDate))
+            promises.push(handleGetBalance())
+            promises.push(handleGetRecentTransactions())
+            promises.push(handleGetPeriodsSummary())
+            // @ts-expect-error TS2345
+            setCurrentMonth(newDate.month)
+          }
         }
 
         await Promise.all(promises)
@@ -309,6 +401,7 @@ export default function useTransactions(
       axiosPrivate,
       handleGetPreviewTransactions,
       handleGetRecentTransactions,
+      handleGetPeriodsSummary,
     ],
   )
 
@@ -327,23 +420,31 @@ export default function useTransactions(
           updateTransaction,
         )
 
-        const newDate = DateTime.fromISO(rows[3].date) as DateTime
-
         const promises = []
 
         if (from === 'dashboard') {
-          promises.push(handleGetPreviewTransactions(newDate))
-        } else {
-          promises.push(handleGetTransactionsMonth(newDate))
-        }
-
-        if (newDate.month === currentMonth) {
-          promises.push(handleGetChartCategories(newDate))
+          // Para dashboard, sempre recarregue tudo com data atual
+          const currentDate = DateTime.now()
+          promises.push(handleGetPreviewTransactions(currentDate))
+          promises.push(handleGetChartCategories(currentDate))
           promises.push(handleGetBalance())
-          promises.push(handleGetOverviewTransactions(newDate))
+          promises.push(handleGetOverviewTransactions(currentDate))
           promises.push(handleGetRecentTransactions())
-          // @ts-expect-error TS2345
-          setCurrentMonth(newDate.month)
+          promises.push(handleGetPeriodsSummary())
+        } else {
+          // Para outras páginas, use a lógica original
+          const newDate = DateTime.fromISO(rows[3]?.date || DateTime.now().toISODate()) as DateTime
+          promises.push(handleGetTransactionsMonth(newDate))
+          
+          if (newDate.month === currentMonth) {
+            promises.push(handleGetChartCategories(newDate))
+            promises.push(handleGetBalance())
+            promises.push(handleGetOverviewTransactions(newDate))
+            promises.push(handleGetRecentTransactions())
+            promises.push(handleGetPeriodsSummary())
+            // @ts-expect-error TS2345
+            setCurrentMonth(newDate.month)
+          }
         }
 
         await Promise.all(promises)
@@ -360,6 +461,7 @@ export default function useTransactions(
       axiosPrivate,
       handleGetPreviewTransactions,
       handleGetRecentTransactions,
+      handleGetPeriodsSummary,
     ],
   )
 
@@ -375,23 +477,31 @@ export default function useTransactions(
       try {
         await axiosPrivate.delete('/transactions/delete-multiple', { data: { ids } })
 
-        const newDate = DateTime.fromISO(rows[3].date) as DateTime
-
         const promises = []
 
         if (from === 'dashboard') {
-          promises.push(handleGetPreviewTransactions(newDate))
-        } else {
-          promises.push(handleGetTransactionsMonth(newDate))
-        }
-
-        if (newDate.month === currentMonth) {
-          promises.push(handleGetChartCategories(newDate))
-          promises.push(handleGetOverviewTransactions(newDate))
+          // Para dashboard, sempre recarregue tudo com data atual
+          const currentDate = DateTime.now()
+          promises.push(handleGetPreviewTransactions(currentDate))
+          promises.push(handleGetChartCategories(currentDate))
           promises.push(handleGetBalance())
+          promises.push(handleGetOverviewTransactions(currentDate))
           promises.push(handleGetRecentTransactions())
-          // @ts-expect-error TS2345
-          setCurrentMonth(newDate.month)
+          promises.push(handleGetPeriodsSummary())
+        } else {
+          // Para outras páginas, use a lógica original
+          const newDate = DateTime.fromISO(rows[3]?.date || DateTime.now().toISODate()) as DateTime
+          promises.push(handleGetTransactionsMonth(newDate))
+          
+          if (newDate.month === currentMonth) {
+            promises.push(handleGetChartCategories(newDate))
+            promises.push(handleGetOverviewTransactions(newDate))
+            promises.push(handleGetBalance())
+            promises.push(handleGetRecentTransactions())
+            promises.push(handleGetPeriodsSummary())
+            // @ts-expect-error TS2345
+            setCurrentMonth(newDate.month)
+          }
         }
 
         await Promise.all(promises)
@@ -408,14 +518,13 @@ export default function useTransactions(
       axiosPrivate,
       handleGetPreviewTransactions,
       handleGetRecentTransactions,
+      handleGetPeriodsSummary,
     ],
   )
 
   const handleCreateRecurringTransaction = useCallback(
-    async (createTransaction: ITransaction, currentMonth: number) => {
+    async (createTransaction: ITransaction, currentMonth: number, setCurrentMonth?: any, from: string = 'transactions') => {
       try {
-        console.log('🎯 useTransactions - handleCreateRecurringTransaction called');
-        console.log('🎯 useTransactions - Input transaction:', createTransaction);
         
         const payload = {
           description: createTransaction.description,
@@ -431,27 +540,44 @@ export default function useTransactions(
           is_paid: createTransaction.is_paid,
         }
         
-        console.log('🎯 useTransactions - Final payload to send:', payload);
-        console.log('🎯 useTransactions - Making POST to /transactions/recurring/create');
-        
         const response = await axiosPrivate.post('/transactions/recurring/create', payload)
-        console.log('🎯 useTransactions - Response:', response.data);
-
-        const newDate = DateTime.fromISO(
-          createTransaction.transaction_day,
-        ) as DateTime
 
         const promises = []
 
-        if (newDate.month === currentMonth) {
+        if (from === 'dashboard') {
+          // Para dashboard, sempre recarregue tudo com data atual
+          const currentDate = DateTime.now()
+          promises.push(handleGetPreviewTransactions(currentDate))
+          promises.push(handleGetChartCategories(currentDate))
+          promises.push(handleGetBalance())
+          promises.push(handleGetOverviewTransactions(currentDate))
+          promises.push(handleGetRecentTransactions('both', 'updated_at', 'desc', 'all', true))
+          promises.push(handleGetPeriodsSummary())
+        } else {
+          // Para outras páginas, use a lógica original
+          const transactionDay = typeof createTransaction.transaction_day === 'string' 
+            ? createTransaction.transaction_day 
+            : createTransaction.transaction_day.toISOString()
+          const newDate = DateTime.fromISO(transactionDay) as DateTime
+          
+          // Para transações recorrentes, sempre atualizamos os dados, pois podem afetar multiple meses
           promises.push(handleGetTransactionsMonth(newDate))
           promises.push(handleGetChartCategories(newDate))
           promises.push(handleGetBalance())
           promises.push(handleGetOverviewTransactions(newDate))
-          promises.push(handleGetRecentTransactions())
-
-          await Promise.all(promises)
+          promises.push(handleGetRecentTransactions('both', 'updated_at', 'desc', 'all', true))
+          promises.push(handleGetPeriodsSummary())
+          
+          // Se a transação está em um mês diferente, também atualize o mês atual
+          if (newDate.month !== currentMonth) {
+            const currentDate = DateTime.now()
+            promises.push(handleGetTransactionsMonth(currentDate))
+            promises.push(handleGetChartCategories(currentDate))
+            promises.push(handleGetOverviewTransactions(currentDate))
+          }
         }
+
+        await Promise.all(promises)
       } catch (err) {
         console.error('Error creating recurring transaction:', err)
         if (err.response) {
@@ -466,7 +592,135 @@ export default function useTransactions(
       handleGetBalance,
       handleGetOverviewTransactions,
       axiosPrivate,
+      handleGetPreviewTransactions,
       handleGetRecentTransactions,
+      handleGetPeriodsSummary,
+    ],
+  )
+
+  const handleUpdateRecurringTransaction = useCallback(
+    async (
+      updateTransaction: ITransaction,
+      editMode: 'instance_only' | 'instance_and_future' | 'all_instances',
+      currentMonth: number,
+      setCurrentMonth: Dispatch<
+        React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
+      >,
+      from: string,
+    ) => {
+      try {
+        const payload = {
+          ...updateTransaction,
+          edit_mode: editMode,
+        }
+
+        await axiosPrivate.put(
+          `/transactions/recurring/update/${updateTransaction.id}`,
+          payload,
+        )
+
+        const promises = []
+
+        if (from === 'dashboard') {
+          // Para dashboard, sempre recarregue tudo com data atual
+          const currentDate = DateTime.now()
+          promises.push(handleGetPreviewTransactions(currentDate))
+          promises.push(handleGetChartCategories(currentDate))
+          promises.push(handleGetBalance())
+          promises.push(handleGetOverviewTransactions(currentDate))
+          promises.push(handleGetRecentTransactions())
+          promises.push(handleGetPeriodsSummary())
+        } else {
+          // Para outras páginas, use a lógica original
+          const newDate = DateTime.fromISO(rows[3]?.date || DateTime.now().toISODate()) as DateTime
+          promises.push(handleGetTransactionsMonth(newDate))
+          
+          if (newDate.month === currentMonth) {
+            promises.push(handleGetChartCategories(newDate))
+            promises.push(handleGetBalance())
+            promises.push(handleGetOverviewTransactions(newDate))
+            promises.push(handleGetRecentTransactions())
+            promises.push(handleGetPeriodsSummary())
+            // @ts-expect-error TS2345
+            setCurrentMonth(newDate.month)
+          }
+        }
+
+        await Promise.all(promises)
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [
+      rows,
+      handleGetChartCategories,
+      handleGetOverviewTransactions,
+      handleGetBalance,
+      handleGetTransactionsMonth,
+      axiosPrivate,
+      handleGetPreviewTransactions,
+      handleGetRecentTransactions,
+      handleGetPeriodsSummary,
+    ],
+  )
+
+  const handleDeleteRecurringTransaction = useCallback(
+    async (
+      id: string,
+      editMode: 'instance_only' | 'instance_and_future' | 'all_instances',
+      currentMonth: number,
+      setCurrentMonth: Dispatch<
+        React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
+      >,
+      from: string,
+    ) => {
+      try {
+        await axiosPrivate.delete(`/transactions/recurring/delete/${id}`, {
+          data: { edit_mode: editMode }
+        })
+
+        const promises = []
+
+        if (from === 'dashboard') {
+          // Para dashboard, sempre recarregue tudo com data atual
+          const currentDate = DateTime.now()
+          promises.push(handleGetPreviewTransactions(currentDate))
+          promises.push(handleGetChartCategories(currentDate))
+          promises.push(handleGetBalance())
+          promises.push(handleGetOverviewTransactions(currentDate))
+          promises.push(handleGetRecentTransactions())
+          promises.push(handleGetPeriodsSummary())
+        } else {
+          // Para outras páginas, use a lógica original
+          const newDate = DateTime.fromISO(rows[3]?.date || DateTime.now().toISODate()) as DateTime
+          promises.push(handleGetTransactionsMonth(newDate))
+          
+          if (newDate.month === currentMonth) {
+            promises.push(handleGetChartCategories(newDate))
+            promises.push(handleGetOverviewTransactions(newDate))
+            promises.push(handleGetBalance())
+            promises.push(handleGetRecentTransactions())
+            promises.push(handleGetPeriodsSummary())
+            // @ts-expect-error TS2345
+            setCurrentMonth(newDate.month)
+          }
+        }
+
+        await Promise.all(promises)
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    [
+      rows,
+      handleGetChartCategories,
+      handleGetOverviewTransactions,
+      handleGetBalance,
+      handleGetTransactionsMonth,
+      axiosPrivate,
+      handleGetPreviewTransactions,
+      handleGetRecentTransactions,
+      handleGetPeriodsSummary,
     ],
   )
 
@@ -483,7 +737,10 @@ export default function useTransactions(
     handleGetTransactionsMonth,
     handleGetPreviewTransactions,
     handleCreateCompleteTransaction,
-    handleCreateRecurringTransaction, // Add this line
+    handleCreateInstallmentTransaction,
+    handleCreateRecurringTransaction,
+    handleUpdateRecurringTransaction,
+    handleDeleteRecurringTransaction,
     handleGetRecentTransactions,
     recentTransactions,
     handleDeleteMultipleTransactions,
