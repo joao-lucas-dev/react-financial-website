@@ -11,6 +11,7 @@ export default function useDashboard(
   handleGetPreviewTransactions: (date?: DateTime) => Promise<void>,
   handleGetRecentTransactions: () => Promise<void>,
   handleGetPeriodsSummary: () => Promise<void>,
+  handleGetTransactionsMonth?: (date?: DateTime) => Promise<void>,
 ) {
   const [currentDate, setCurrentDate] = useState(DateTime.now())
   const [isLoading, setIsLoading] = useState(false)
@@ -173,6 +174,53 @@ export default function useDashboard(
     }
   }, [currentDate, isLoading, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions]);
 
+  // New function to handle custom date ranges
+  const handleDateRangeChange = useCallback(async (startDate: string, endDate: string, periodType: 'week' | 'month' | 'custom') => {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const luxonStartDate = DateTime.fromISO(startDate);
+      const luxonEndDate = DateTime.fromISO(endDate);
+      
+      // Use the start date as reference for data fetching
+      const referenceDate = luxonStartDate;
+      
+      const promises = [];
+      
+      // Always include these core data fetches
+      promises.push(
+        handleGetChartCategories(referenceDate),
+        handleGetOverviewTransactions(referenceDate)
+      );
+      
+      if (periodType === 'week' || periodType === 'custom') {
+        // For week and custom periods, use preview transactions
+        promises.push(handleGetPreviewTransactions(referenceDate));
+      } else {
+        // For month, use month-specific functions if available
+        if (handleGetTransactionsMonth) {
+          promises.push(handleGetTransactionsMonth(referenceDate));
+        } else {
+          promises.push(handleGetPreviewTransactions(referenceDate));
+        }
+      }
+      
+      // Add additional data fetches that don't depend on date
+      promises.push(
+        handleGetBalance(),
+        handleGetRecentTransactions(),
+        handleGetPeriodsSummary()
+      );
+      
+      await Promise.all(promises);
+      setCurrentDate(referenceDate);
+      
+      console.log(`Data fetched for ${periodType} period:`, { startDate, endDate, referenceDate: referenceDate.toISODate() });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading, handleGetPreviewTransactions, handleGetChartCategories, handleGetOverviewTransactions, handleGetTransactionsMonth, handleGetBalance, handleGetRecentTransactions, handleGetPeriodsSummary]);
+
   return {
     getMonth,
     getNextMonth,
@@ -185,6 +233,7 @@ export default function useDashboard(
     currentYear,
     setCurrentMonth,
     setCurrentYear,
+    handleDateRangeChange,
     isLoading,
   }
 }

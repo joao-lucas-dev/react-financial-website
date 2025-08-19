@@ -1,20 +1,17 @@
-import { useMemo, useRef, useEffect, useState } from "react";
 import {
-  TrendingUp,
-  TrendingDown,
-  Calendar,
-  Plus,
-  Eye,
-  BarChart3,
   ArrowRight,
+  BarChart3,
+  Calendar,
   CreditCard,
+  Eye,
+  Plus,
+  TrendingDown,
+  TrendingUp,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "react-loading-skeleton/dist/skeleton.css";
-import "./styles.css";
-import CardSkeleton from "../CardSkeleton";
-import VerticalCardSkeleton from "../VerticalCardSkeleton";
-import ModalDelete from "../ModalDelete";
+import { Link } from "react-router-dom";
+import { ICreditCard } from "../../types/creditCards.ts";
 import {
   IHandleCreateCompleteTransaction,
   IHandleCreateTransaction,
@@ -26,11 +23,14 @@ import {
   ISetOpenModal,
   ITransaction,
 } from "../../types/transactions";
-import ModalEdit from "../ModalEdit";
-import ModalCreate from "../ModalCreate.tsx";
+import CardSkeleton from "../CardSkeleton";
 import DayDetailsModal from "../DayDetailsModal";
+import ModalCreate from "../ModalCreate.tsx";
+import ModalDelete from "../ModalDelete";
+import ModalEdit from "../ModalEdit";
 import QuickAddModal from "../QuickAddModal";
-import { ICreditCard } from "../../types/creditCards.ts";
+import VerticalCardSkeleton from "../VerticalCardSkeleton";
+import "./styles.css";
 
 interface IParams {
   rows: IRow[];
@@ -444,12 +444,7 @@ const TablePreview = ({
                                   ? 'text-green-600 dark:text-green-400'
                                   : 'text-red-600 dark:text-red-400'
                               }`}>
-                                {Math.abs(Number(transaction.price)).toLocaleString('pt-BR', {
-                                  style: 'currency',
-                                  currency: 'BRL',
-                                  minimumFractionDigits: 0,
-                                  maximumFractionDigits: 0
-                                })}
+                                {transaction.price}
                               </div>
                               <div className={`w-1.5 h-1.5 rounded-full mx-auto mt-1 ${
                                 (() => {

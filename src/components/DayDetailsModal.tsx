@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { X, TrendingUp, TrendingDown, Calendar, Plus, BarChart3, Eye, PieChart, Target, ArrowRight, CreditCard } from 'lucide-react'
+import { ArrowRight, BarChart3, Calendar, CreditCard, Eye, PieChart, Plus, TrendingDown, TrendingUp, X } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { IRow, ISetOpenModal, ITransaction } from '../types/transactions'
 import CategoryIcon from './CategoryIcon'
-import { IRow, ITransaction, ISetOpenModal } from '../types/transactions'
 
 interface DayDetailsModalProps {
   isOpen: boolean
@@ -98,9 +98,9 @@ const DayDetailsModal: React.FC<DayDetailsModalProps> = ({
   const paidTransactions = allTransactions.filter(t => getAutoPaymentStatus(t)).length
   const unpaidTransactions = totalTransactions - paidTransactions
 
-  const largestExpense = dayData.outcomes?.transactions?.reduce((max, t) => 
-    Math.abs(Number(t.price)) > Math.abs(Number(max.price)) ? t : max
-  , dayData.outcomes.transactions[0])
+  // const largestExpense = dayData.outcomes?.transactions?.reduce((max, t) => 
+  //   Math.abs(Number(t.price)) > Math.abs(Number(max.price)) ? t : max
+  // , dayData.outcomes.transactions[0])
 
   const mainCategory = (() => {
     const categoryMap = new Map<string, { count: number, total: number, name: string }>()
@@ -220,7 +220,7 @@ const DayDetailsModal: React.FC<DayDetailsModalProps> = ({
               </div>
 
               {/* Largest Expense */}
-              {largestExpense && (
+              {/* {largestExpense && (
                 <div className="p-4 bg-white/80 dark:bg-zinc-800/80 rounded-lg backdrop-blur-sm">
                   <div className="flex items-center gap-3 mb-3">
                     <Target size={16} className="text-red-600 dark:text-red-400" />
@@ -238,7 +238,7 @@ const DayDetailsModal: React.FC<DayDetailsModalProps> = ({
                     </div>
                   </div>
                 </div>
-              )}
+              )} */}
 
               {/* Main Category */}
               {mainCategory.name !== 'Nenhuma' && (
@@ -367,10 +367,7 @@ const DayDetailsModal: React.FC<DayDetailsModalProps> = ({
                               : 'text-red-600 dark:text-red-400'
                           }`}>
                             {transaction.type === 'income' ? '+' : '-'}
-                            {Math.abs(Number(transaction.price)).toLocaleString('pt-BR', {
-                              style: 'currency',
-                              currency: 'BRL'
-                            })}
+                            {transaction.price} 
                           </div>
                         </div>
 

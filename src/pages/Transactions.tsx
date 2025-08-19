@@ -4,6 +4,8 @@ import Skeleton from "react-loading-skeleton";
 import { BarChart3, Calendar, ChevronLeft, ChevronRight, List, Grid3X3 } from "lucide-react";
 import TablePreview from "../components/TablePreview";
 import TransactionsListView from "../components/TransactionsListView";
+import PeriodNavigator, { PeriodType } from "../components/PeriodNavigator";
+import CustomPeriodModal from "../components/CustomPeriodModal";
 import { useState } from "react";
 import { ITransaction } from "../types/transactions.ts";
 import useCategories from "../hooks/useCategories.ts";
@@ -19,6 +21,9 @@ const Transactions = () => {
   });
   const [resetScroll, setResetScroll] = useState(false);
   const [viewMode, setViewMode] = useState<'table' | 'list'>('table');
+  const [isCustomPeriodModalOpen, setIsCustomPeriodModalOpen] = useState(false);
+  const [currentPeriodType, setCurrentPeriodType] = useState<PeriodType>('month');
+  const [currentPeriodRange, setCurrentPeriodRange] = useState<{start: string, end: string} | null>(null);
 
   const { handleGetChartCategories, categories, retryCategories } = useCategories();
   const { creditCards } = useCreditCards();
@@ -37,6 +42,7 @@ const Transactions = () => {
     handleGetBalance,
     handleGetTransactionsMonth,
     handleGetRecentTransactions,
+    handleGetPeriodsSummary,
   } = useTransactions(handleGetChartCategories);
   const {
     getMonth,
@@ -47,6 +53,7 @@ const Transactions = () => {
     setCurrentMonth,
     setCurrentYear,
     getNextWeek,
+    handleDateRangeChange,
     isLoading,
   } = useDashboard(
     rows,
@@ -55,6 +62,7 @@ const Transactions = () => {
     handleGetBalance,
     handleGetTransactionsMonth,
     handleGetRecentTransactions,
+    handleGetPeriodsSummary,
   );
 
   const handleNextWeek = async (isBeforeWeek: boolean) => {
@@ -94,8 +102,44 @@ const Transactions = () => {
               Acompanhe suas transações mensais
             </p>
             
+            {/* Period Type Indicator */}
+            {currentPeriodType !== 'month' && (
+              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div className="flex items-center gap-2 text-sm">
+                  <div className={`w-2 h-2 rounded-full ${
+                    isLoading ? 'bg-orange-500 animate-pulse' : 'bg-blue-500'
+                  }`}></div>
+                  <span className="font-medium text-blue-700 dark:text-blue-300">
+                    Modo de visualização: {currentPeriodType === 'week' ? 'Semanal' : 'Período Customizado'}
+                  </span>
+                  {currentPeriodRange && (
+                    <span className="text-blue-600 dark:text-blue-400">
+                      ({new Date(currentPeriodRange.start).toLocaleDateString('pt-BR')} - {new Date(currentPeriodRange.end).toLocaleDateString('pt-BR')})
+                    </span>
+                  )}
+                  {isLoading && (
+                    <span className="text-orange-600 dark:text-orange-400 text-xs">
+                      Carregando dados...
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Loading Indicator for Data Fetch */}
+            {isLoading && (
+              <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-orange-700 dark:text-orange-300 font-medium">
+                    Carregando dados do período selecionado...
+                  </span>
+                </div>
+              </div>
+            )}
+            
             {/* Month Summary Stats */}
-            {rows.length > 0 && (
+            {rows.length > 0 && !isLoading && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
                   <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
@@ -146,45 +190,50 @@ const Transactions = () => {
           {/* Controls Header */}
           <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors mb-6">
             <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
-              {/* Month/Year Selectors */}
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                    Período:
-                  </label>
-                  <select
-                    value={currentMonth}
-                    onChange={(e) => setCurrentMonth(Number(e.target.value))}
-                    disabled={isLoading}
-                    className="px-3 py-2 border border-zinc-200 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 disabled:opacity-50"
-                  >
-                    {Array.from({ length: 12 }, (_, i) => {
-                      const month = i + 1;
-                      const monthName = new Date(2024, i).toLocaleDateString('pt-BR', { month: 'long' });
-                      return (
-                        <option key={month} value={month}>
-                          {monthName.charAt(0).toUpperCase() + monthName.slice(1)}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <select
-                    value={currentYear}
-                    onChange={(e) => setCurrentYear(Number(e.target.value))}
-                    disabled={isLoading}
-                    className="px-3 py-2 border border-zinc-200 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 disabled:opacity-50"
-                  >
-                    {Array.from({ length: 5 }, (_, i) => {
-                      const year = new Date().getFullYear() - 2 + i;
-                      return (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-              </div>
+              {/* Period Navigator */}
+              <PeriodNavigator
+                currentMonth={currentMonth}
+                currentYear={currentYear}
+                onMonthChange={setCurrentMonth}
+                onYearChange={setCurrentYear}
+                onQuickPeriod={(type) => {
+                  switch (type) {
+                    case 'today':
+                      handleToday();
+                      setCurrentPeriodType('month');
+                      setCurrentPeriodRange(null);
+                      break;
+                    case 'thisWeek':
+                      // This will be handled by onPeriodChange
+                      break;
+                    case 'thisMonth':
+                      const now = new Date();
+                      setCurrentMonth(now.getMonth() + 1);
+                      setCurrentYear(now.getFullYear());
+                      setCurrentPeriodType('month');
+                      setCurrentPeriodRange(null);
+                      break;
+                    case 'custom':
+                      setIsCustomPeriodModalOpen(true);
+                      break;
+                  }
+                }}
+                onPeriodChange={async (startDate, endDate, type) => {
+                  setCurrentPeriodType(type);
+                  setCurrentPeriodRange({ start: startDate, end: endDate });
+                  
+                  // Update the month/year for UI consistency
+                  const start = new Date(startDate);
+                  setCurrentMonth(start.getMonth() + 1);
+                  setCurrentYear(start.getFullYear());
+                  
+                  // Fetch data for the new date range
+                  await handleDateRangeChange(startDate, endDate, type);
+                  
+                  console.log(`Period changed to ${type}:`, { startDate, endDate });
+                }}
+                isLoading={isLoading}
+              />
 
               {/* Right side controls */}
               <div className="flex items-center gap-3">
@@ -264,6 +313,29 @@ const Transactions = () => {
               setCurrentMonth={setCurrentMonth}
             />
           )}
+          
+          {/* Custom Period Modal */}
+          <CustomPeriodModal
+            isOpen={isCustomPeriodModalOpen}
+            onClose={() => setIsCustomPeriodModalOpen(false)}
+            onApply={async (startDate, endDate) => {
+              // Set custom period
+              setCurrentPeriodType('custom');
+              setCurrentPeriodRange({ start: startDate, end: endDate });
+              
+              // Update month/year for UI consistency
+              const start = new Date(startDate);
+              setCurrentMonth(start.getMonth() + 1);
+              setCurrentYear(start.getFullYear());
+              
+              // Fetch data for the custom date range
+              await handleDateRangeChange(startDate, endDate, 'custom');
+              
+              console.log('Custom period selected:', { startDate, endDate });
+            }}
+            currentMonth={currentMonth}
+            currentYear={currentYear}
+          />
         </main>
       </div>
     </div>

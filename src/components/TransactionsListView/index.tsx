@@ -1,7 +1,7 @@
+import { BarChart3, CreditCard, Eye, PieChart, Plus, Target, TrendingDown, TrendingUp } from 'lucide-react'
 import React, { useState } from 'react'
-import { Plus, TrendingUp, TrendingDown, Calendar, BarChart3, Eye, PieChart, Target, CreditCard } from 'lucide-react'
+import { IRow, ISetOpenModal, ITransaction } from '../../types/transactions'
 import CategoryIcon from '../CategoryIcon'
-import { IRow, ITransaction, ISetOpenModal } from '../../types/transactions'
 
 interface TransactionsListViewProps {
   rows: IRow[]
@@ -336,7 +336,7 @@ const TransactionsListView: React.FC<TransactionsListViewProps> = ({
                         </span>
                         <span className="text-xs px-2 py-1 rounded-full bg-zinc-200 dark:bg-zinc-600 text-zinc-600 dark:text-zinc-400">
                           {transaction.transaction_day ? 
-                            new Date(`${transaction.transaction_day}T00:00:00`).toLocaleDateString('pt-BR') : 
+                            new Date(transaction.transaction_day).toLocaleDateString('pt-BR') : 
                             'Data inválida'
                           }
                         </span>
@@ -356,16 +356,7 @@ const TransactionsListView: React.FC<TransactionsListViewProps> = ({
                           : 'text-red-600 dark:text-red-400'
                       }`}>
                         {transaction.type === 'income' ? '+' : '-'}
-                        {(() => {
-                          const price = Number(transaction.price);
-                          if (isNaN(price) || transaction.price === undefined || transaction.price === null) {
-                            return 'R$ 0,00';
-                          }
-                          return Math.abs(price).toLocaleString('pt-BR', {
-                            style: 'currency',
-                            currency: 'BRL'
-                          });
-                        })()}
+                        {transaction.price}
                       </div>
                     </div>
 
