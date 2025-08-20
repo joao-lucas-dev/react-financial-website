@@ -29,6 +29,8 @@ interface TableRecentTransactionsProps {
   handleDeleteTransaction: any
   handleUpdateRecurringTransaction?: any
   handleDeleteRecurringTransaction?: any
+  handleUpdateInstallmentTransaction?: any
+  handleDeleteInstallmentTransaction?: any
   handleDeleteMultipleTransactions: any
   currentMonth: number
   setCurrentMonth: any
@@ -41,7 +43,7 @@ interface TableRecentTransactionsProps {
 
 const ITEMS_PER_PAGE = 10;
 
-const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder, openModal, setOpenModal, handleUpdateTransaction, handleDeleteTransaction, handleUpdateRecurringTransaction, handleDeleteRecurringTransaction, handleDeleteMultipleTransactions, currentMonth, setCurrentMonth, categories, creditCards, from, searchTerm = '', retryCategories }: TableRecentTransactionsProps) => {
+const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder, openModal, setOpenModal, handleUpdateTransaction, handleDeleteTransaction, handleUpdateRecurringTransaction, handleDeleteRecurringTransaction, handleUpdateInstallmentTransaction, handleDeleteInstallmentTransaction, handleDeleteMultipleTransactions, currentMonth, setCurrentMonth, categories, creditCards, from, searchTerm = '', retryCategories }: TableRecentTransactionsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
@@ -215,9 +217,9 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                 )}
                 <div className="text-zinc-700 dark:text-zinc-200 font-medium truncate">
                   {recentTransaction.description}
-                  {(recentTransaction.installment_info || recentTransaction.installments) && (
+                  {recentTransaction.parent_transaction_id && recentTransaction.installment_count && recentTransaction.installment_all && (
                     <span className="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs rounded-full">
-                      {recentTransaction.installment_info || `${recentTransaction.installments}x parcelas`}
+                      {recentTransaction.installment_count}/{recentTransaction.installment_all}
                     </span>
                   )}
                   {recentTransaction.is_recurring && (
@@ -443,6 +445,8 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
           setOpenModal={setOpenModal}
           handleUpdateTransaction={handleUpdateTransaction}
           handleUpdateRecurringTransaction={handleUpdateRecurringTransaction}
+          handleUpdateInstallmentTransaction={handleUpdateInstallmentTransaction}
+          handleDeleteInstallmentTransaction={handleDeleteInstallmentTransaction}
           currentMonth={currentMonth}
           setCurrentMonth={setCurrentMonth}
           categories={categories}
@@ -457,6 +461,7 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
           setOpenModal={setOpenModal}
           handleDeleteTransaction={handleDeleteTransaction}
           handleDeleteRecurringTransaction={handleDeleteRecurringTransaction}
+          handleDeleteInstallmentTransaction={handleDeleteInstallmentTransaction}
           currentMonth={currentMonth}
           setCurrentMonth={setCurrentMonth}
           from={from}

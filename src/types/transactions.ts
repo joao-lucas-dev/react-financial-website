@@ -66,6 +66,9 @@ export type ITransaction = {
   recurrence_pattern?: RecurrenceType
   recurrence_interval?: number
   end_date?: string
+  parent_transaction_id?: string
+  installment_count?: number
+  installment_all?: number
 }
 
 interface IColumn {
@@ -132,6 +135,7 @@ export type IHandleDeleteTransaction = (
 ) => Promise<void>
 
 export type EditMode = 'instance_only' | 'instance_and_future' | 'all_instances'
+export type InstallmentEditMode = 'installment_only' | 'installment_and_future' | 'all_installments'
 
 export type IHandleUpdateRecurringTransaction = (
   updateTransaction: ITransaction,
@@ -150,6 +154,22 @@ export type IHandleDeleteRecurringTransaction = (
   setCurrentMonth: React.Dispatch<
     React.SetStateAction<2 | 1 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12>
   >,
+  from: string,
+) => Promise<void>
+
+export type IHandleUpdateInstallmentTransaction = (
+  updateTransaction: ITransaction,
+  editMode: InstallmentEditMode,
+  currentMonth: number,
+  setCurrentMonth: ISetCurrentMonth,
+  from: string,
+) => Promise<void>
+
+export type IHandleDeleteInstallmentTransaction = (
+  id: string,
+  editMode: InstallmentEditMode,
+  currentMonth: number,
+  setCurrentMonth: ISetCurrentMonth,
   from: string,
 ) => Promise<void>
 

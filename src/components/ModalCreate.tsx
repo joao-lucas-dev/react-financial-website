@@ -492,7 +492,7 @@ const ModalCreate = ({
                   value={field.value as RecurrenceConfig}
                   onChange={(config) => field.onChange(config)}
                   error={errors.recurrence_config?.message}
-                  hideFixedOption={cardId !== 'account'}
+                  hideFixedOption={false}
                   totalAmount={getTotalAmount()}
                   selectedCardId={cardId}
                   creditCards={creditCards}

@@ -38,6 +38,8 @@ const Transactions = () => {
     handleUpdateTransaction,
     handleUpdateRecurringTransaction,
     handleDeleteRecurringTransaction,
+    handleUpdateInstallmentTransaction,
+    handleDeleteInstallmentTransaction,
     handleGetOverviewTransactions,
     handleGetBalance,
     handleGetTransactionsMonth,
@@ -290,6 +292,8 @@ const Transactions = () => {
                 handleUpdateTransaction={handleUpdateTransaction}
                 handleUpdateRecurringTransaction={handleUpdateRecurringTransaction}
                 handleDeleteRecurringTransaction={handleDeleteRecurringTransaction}
+                handleUpdateInstallmentTransaction={handleUpdateInstallmentTransaction}
+                handleDeleteInstallmentTransaction={handleDeleteInstallmentTransaction}
                 currentMonth={currentMonth}
                 setCurrentMonth={setCurrentMonth}
                 openModal={openModal}

@@ -1,42 +1,42 @@
 import {
-  Search,
-  TrendingUp,
-  TrendingDown,
-  BarChart3,
   ArrowRight,
-  ChevronUp,
-  ChevronDown,
-  Edit3,
-  Trash2,
-  MoreHorizontal,
-  X,
+  BarChart3,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   Clock,
-  SlidersHorizontal,
   CreditCard,
+  Edit3,
+  MoreHorizontal,
+  Search,
+  SlidersHorizontal,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+  X,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-import TablePreview from "../../components/TablePreview";
-import EmptyChartState from "../../components/EmptyChartState";
-import FloatingButton from "../../components/FloatingButton.tsx";
 import CreditCardCarousel from "../../components/CreditCardCarousel";
 import CreditCardEmptyState from "../../components/CreditCardEmptyState";
+import EmptyChartState from "../../components/EmptyChartState";
+import FloatingButton from "../../components/FloatingButton.tsx";
 import SavingsGoalsSimple from "../../components/SavingsGoalsSimple";
+import TablePreview from "../../components/TablePreview";
 
-import "./styles.css";
-import MenuAside from "../../components/MenuAside.tsx";
+import { useEffect, useRef, useState } from "react";
 import "react-loading-skeleton/dist/skeleton.css";
+import CategoryIcon from "../../components/CategoryIcon/index.tsx";
+import CountUp from "../../components/CountUp.tsx";
+import MenuAside from "../../components/MenuAside.tsx";
+import ModernDonutChart from "../../components/ModernDonutChart.tsx";
+import PaymentStatusIcon from "../../components/PaymentStatusIcon.tsx";
+import useCategories from "../../hooks/useCategories.ts";
+import useCreditCards from "../../hooks/useCreditCards";
 import useDashboard from "../../hooks/useDashboard.ts";
 import useTransactions from "../../hooks/useTransactions.ts";
-import CountUp from "../../components/CountUp.tsx";
-import useCategories from "../../hooks/useCategories.ts";
-import { useState, useRef, useEffect } from "react";
 import { ITransaction } from "../../types/transactions.ts";
-import useCreditCards from "../../hooks/useCreditCards";
-import ModernDonutChart from "../../components/ModernDonutChart.tsx";
-import CategoryIcon from "../../components/CategoryIcon/index.tsx";
-import PaymentStatusIcon from "../../components/PaymentStatusIcon.tsx";
+import "./styles.css";
 
 export default function Dashboard() {
   const [openModal, setOpenModal] = useState({
@@ -77,6 +77,8 @@ export default function Dashboard() {
     periodsSummary,
     handleUpdateRecurringTransaction,
     handleDeleteRecurringTransaction,
+    handleUpdateInstallmentTransaction,
+    handleDeleteInstallmentTransaction
   } = useTransactions(handleGetChartCategories);
   const { getGreeting, currentMonth, setCurrentMonth } = useDashboard(
     rows,
@@ -416,6 +418,8 @@ export default function Dashboard() {
                     handleUpdateTransaction={handleUpdateTransaction}
                     handleUpdateRecurringTransaction={handleUpdateRecurringTransaction}
                     handleDeleteRecurringTransaction={handleDeleteRecurringTransaction}
+                    handleUpdateInstallmentTransaction={handleUpdateInstallmentTransaction}
+                    handleDeleteInstallmentTransaction={handleDeleteInstallmentTransaction}
                     currentMonth={currentMonth}
                     setCurrentMonth={setCurrentMonth}
                     openModal={openModal}

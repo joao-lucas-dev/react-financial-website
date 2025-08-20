@@ -1,13 +1,16 @@
+import { useState } from 'react'
 import {
+  EditMode,
+  IHandleDeleteInstallmentTransaction,
   IHandleDeleteTransaction,
+  InstallmentEditMode,
   IOpenModal,
   ISetCurrentMonth,
   ISetOpenModal,
   ITransaction,
 } from '../types/transactions.ts'
+import InstallmentTransactionOptions from './InstallmentTransactionOptions.tsx'
 import RecurringTransactionOptions from './RecurringTransactionOptions.tsx'
-import { EditMode } from '../types/transactions.ts'
-import { useState } from 'react'
 
 interface IParams {
   openModal: IOpenModal
@@ -20,6 +23,7 @@ interface IParams {
     setCurrentMonth: ISetCurrentMonth,
     from: string,
   ) => Promise<void>
+  handleDeleteInstallmentTransaction?: IHandleDeleteInstallmentTransaction
   currentMonth: number
   setCurrentMonth: ISetCurrentMonth
   from: string
@@ -30,23 +34,36 @@ const ModalDelete = ({
   setOpenModal,
   handleDeleteTransaction,
   handleDeleteRecurringTransaction,
+  handleDeleteInstallmentTransaction,
   currentMonth,
   setCurrentMonth,
   from,
 }: IParams) => {
+  console.log(openModal.transaction)
   const [editMode, setEditMode] = useState<EditMode>('instance_only')
+  const [installmentEditMode, setInstallmentEditMode] = useState<InstallmentEditMode>('installment_only')
   
   const isRecurringTransaction = openModal.transaction.is_recurring === true ||
     (openModal.transaction.recurrence_pattern && 
     openModal.transaction.recurrence_pattern !== null && 
     openModal.transaction.recurrence_pattern !== undefined &&
     openModal.transaction.recurrence_pattern !== '')
+
+  const isInstallmentTransaction = openModal.transaction.isinstallment
                               
   const handleDelete = async () => {
     if (isRecurringTransaction && handleDeleteRecurringTransaction) {
       await handleDeleteRecurringTransaction(
         openModal.transaction.id,
         editMode,
+        currentMonth,
+        setCurrentMonth,
+        from,
+      )
+    } else if (isInstallmentTransaction && handleDeleteInstallmentTransaction) {
+      await handleDeleteInstallmentTransaction(
+        openModal.transaction.id,
+        installmentEditMode,
         currentMonth,
         setCurrentMonth,
         from,
@@ -77,7 +94,7 @@ const ModalDelete = ({
         })
       }
     }}>
-      <div className={`bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl p-8 relative transition-colors ${isRecurringTransaction ? 'w-[600px] max-w-[90vw]' : 'w-96'}`}>
+      <div className={`bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl p-8 relative transition-colors ${(isRecurringTransaction || isInstallmentTransaction) ? 'w-[600px] max-w-[90vw]' : 'w-96'}`}>
         <h2 className="text-xl font-bold mb-6 text-center text-zinc-700 dark:text-zinc-200">
           Deseja realmente excluir o item?
         </h2>
@@ -88,6 +105,18 @@ const ModalDelete = ({
               value={editMode}
               onChange={setEditMode}
               action="delete"
+            />
+          </div>
+        )}
+
+        {isInstallmentTransaction && !isRecurringTransaction && (
+          <div className="mb-6">
+            <InstallmentTransactionOptions
+              value={installmentEditMode}
+              onChange={setInstallmentEditMode}
+              action="delete"
+              currentInstallment={openModal.transaction.installment_count}
+              totalInstallments={openModal.transaction.installment_all}
             />
           </div>
         )}

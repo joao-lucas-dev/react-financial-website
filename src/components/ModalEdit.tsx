@@ -1,26 +1,30 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Edit3, X } from 'lucide-react'
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { ICategory } from '../types/categories.ts'
+import { ICreditCard } from '../types/creditCards.ts'
 import {
+  EditMode,
+  IHandleDeleteInstallmentTransaction,
+  IHandleUpdateInstallmentTransaction,
   IHandleUpdateTransaction,
+  InstallmentEditMode,
   IOpenModal,
   ISetCurrentMonth,
   ISetOpenModal,
   ITransaction,
   RecurrenceType,
 } from '../types/transactions.ts'
+import CategoryIcon from './CategoryIcon/index.tsx'
 import Input from './Input.tsx'
+import InstallmentTransactionOptions from './InstallmentTransactionOptions.tsx'
 import ModernDatePicker from './ModernDatePicker.tsx'
 import ModernSelect, { SelectOption } from './ModernSelectRadix.tsx'
+import PaymentStatusIcon from './PaymentStatusIcon.tsx'
 import RecurrenceOptions, { RecurrenceConfig } from './RecurrenceOptions.tsx'
 import RecurringTransactionOptions from './RecurringTransactionOptions.tsx'
-import { EditMode } from '../types/transactions.ts'
-import PaymentStatusIcon from './PaymentStatusIcon.tsx'
-import CategoryIcon from './CategoryIcon/index.tsx'
-import { X, Edit3 } from 'lucide-react'
-import { Controller, useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { ICategory } from '../types/categories.ts'
-import { ICreditCard } from '../types/creditCards.ts'
 
 interface IParams {
   openModal: IOpenModal
@@ -33,6 +37,8 @@ interface IParams {
     setCurrentMonth: ISetCurrentMonth,
     from: string,
   ) => Promise<void>
+  handleUpdateInstallmentTransaction?: IHandleUpdateInstallmentTransaction
+  handleDeleteInstallmentTransaction?: IHandleDeleteInstallmentTransaction
   currentMonth: number
   setCurrentMonth: ISetCurrentMonth
   categories: ICategory[]
@@ -51,12 +57,14 @@ const modalEditSchema = z.object({
   card_id: z.string().optional(),
   recurrence_config: z.object({
     mode: z.enum(['single', 'fixed', 'installment']),
-    frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'semiannual', 'annual']).optional(),
+    frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'semiannual', 'annual']).nullable().optional(),
     installmentCount: z.number().optional(),
     installmentPeriod: z.enum(['months', 'years']).optional(),
   }).optional(),
   is_paid: z.boolean(),
   edit_mode: z.enum(['instance_only', 'instance_and_future', 'all_instances']).optional(),
+  installment_edit_mode: z.enum(['installment_only', 'installment_and_future', 'all_installments']).optional(),
+  installments: z.number().optional(),
 })
 
 type ModalEditData = z.infer<typeof modalEditSchema>
@@ -66,6 +74,8 @@ const ModalEdit = ({
   setOpenModal,
   handleUpdateTransaction,
   handleUpdateRecurringTransaction,
+  handleUpdateInstallmentTransaction,
+  handleDeleteInstallmentTransaction,
   currentMonth,
   setCurrentMonth,
   categories,
@@ -76,8 +86,10 @@ const ModalEdit = ({
   const [isAnimating, setIsAnimating] = useState(false)
   const [isPaidManuallyOverridden, setIsPaidManuallyOverridden] = useState(false)
   const [showRecurringModal, setShowRecurringModal] = useState(false)
+  const [showInstallmentModal, setShowInstallmentModal] = useState(false)
   const [pendingUpdateData, setPendingUpdateData] = useState<ModalEditData | null>(null)
   const [selectedEditMode, setSelectedEditMode] = useState<EditMode>('instance_only')
+  const [selectedInstallmentEditMode, setSelectedInstallmentEditMode] = useState<InstallmentEditMode>('installment_only')
 
   const { 
     register, 
@@ -107,6 +119,8 @@ const ModalEdit = ({
                                 openModal.transaction.recurrence_pattern !== null && 
                                 openModal.transaction.recurrence_pattern !== undefined &&
                                 openModal.transaction.recurrence_pattern !== '')
+
+  const isInstallmentTransaction = openModal.transaction.isinstallment
 
   useEffect(() => {
     setValue('description', openModal.transaction.description || '')
@@ -150,9 +164,13 @@ const ModalEdit = ({
 
     const recurrenceConfig = {
       mode: openModal.transaction.recurrence_pattern ? 'fixed' as const : 'single' as const,
-      frequency: openModal.transaction.recurrence_pattern as RecurrenceType,
+      frequency: openModal.transaction.recurrence_pattern as RecurrenceType || null,
     }
-    setValue('recurrence_config', recurrenceConfig)
+    
+    // Para transações parceladas, não definir recurrence_config
+    if (!isInstallmentTransaction) {
+      setValue('recurrence_config', recurrenceConfig)
+    }
 
     if (isRecurringTransaction) {
       setValue('edit_mode', 'instance_only')
@@ -160,8 +178,10 @@ const ModalEdit = ({
 
     // Reset recurring modal state when modal opens
     setShowRecurringModal(false)
+    setShowInstallmentModal(false)
     setPendingUpdateData(null)
     setSelectedEditMode('instance_only')
+    setSelectedInstallmentEditMode('installment_only')
 
   }, [openModal.transaction, setValue, isRecurringTransaction, setIsPaidManuallyOverridden])
 
@@ -209,9 +229,17 @@ const ModalEdit = ({
   const handleUpdate = useCallback(
     async (data: ModalEditData) => {
       try {
+        console.log('=== HANDLE UPDATE CALLED ===')
+        console.log('Updating transaction with data:', data)
         if (isRecurringTransaction) {
           setPendingUpdateData(data)
           setShowRecurringModal(true)
+          return
+        }
+
+        if (isInstallmentTransaction) {
+          setPendingUpdateData(data)
+          setShowInstallmentModal(true)
           return
         }
 
@@ -258,6 +286,7 @@ const ModalEdit = ({
       setCurrentMonth,
       from,
       isRecurringTransaction,
+      isInstallmentTransaction,
     ],
   )
 
@@ -315,6 +344,58 @@ const ModalEdit = ({
       from,
       setOpenModal,
       selectedEditMode,
+    ],
+  )
+
+  const handleInstallmentUpdate = useCallback(
+    async () => {
+      console.log('=== HANDLE INSTALLMENT UPDATE CALLED ===')
+      console.log(pendingUpdateData)
+      console.log(handleUpdateInstallmentTransaction)
+      if (!pendingUpdateData || !handleUpdateInstallmentTransaction) return
+
+      try {
+        const data = pendingUpdateData
+        const updatedTransaction = {
+          ...openModal.transaction,
+          description: data.description,
+          price: Number(data.price.replace(/\D/g, '')) / 100,
+          category_id: Number(data.category),
+          transaction_day: new Date(`${data.transaction_day}T00:00:00`),
+          is_paid: data.is_paid,
+          card_id: data.card_id === 'account' ? null : data.card_id,
+          installments: data.installments,
+        } as unknown as ITransaction
+
+        await handleUpdateInstallmentTransaction(
+          updatedTransaction,
+          selectedInstallmentEditMode,
+          currentMonth,
+          setCurrentMonth,
+          from,
+        )
+
+        setShowInstallmentModal(false)
+        setPendingUpdateData(null)
+        setSelectedInstallmentEditMode('installment_only')
+        setOpenModal({
+          isOpen: false,
+          transaction: {} as ITransaction,
+          type: '',
+        })
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    [
+      pendingUpdateData,
+      handleUpdateInstallmentTransaction,
+      openModal.transaction,
+      currentMonth,
+      setCurrentMonth,
+      from,
+      setOpenModal,
+      selectedInstallmentEditMode,
     ],
   )
 
@@ -385,8 +466,25 @@ const ModalEdit = ({
           </button>
         </div>
 
+        {/* Indicador de transação parcelada */}
+        {isInstallmentTransaction && openModal.transaction.installment_count && openModal.transaction.installment_all && (
+          <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+            <div className="flex items-center gap-2 text-orange-700 dark:text-orange-300">
+              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+              <span className="font-medium text-sm">
+                Transação Parcelada - Parcela {openModal.transaction.installment_count} de {openModal.transaction.installment_all}
+              </span>
+            </div>
+            <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+              Esta é uma transação parcelada. As alterações podem afetar outras parcelas dependendo da opção escolhida.
+            </p>
+          </div>
+        )}
+
         <form
-          onSubmit={handleSubmit(handleUpdate)}
+          onSubmit={handleSubmit(handleUpdate, (errors) => {
+            console.log('Validation errors:', errors)
+          })}
           className="flex flex-col h-full"
         >
           <div
@@ -504,22 +602,24 @@ const ModalEdit = ({
                 )}
               />
             </div>
-
-            <Controller
-              name="recurrence_config"
-              control={control}
-              render={({ field }) => (
-                <RecurrenceOptions
-                  value={field.value as RecurrenceConfig}
-                  onChange={(config) => field.onChange(config)}
-                  error={errors.recurrence_config?.message}
-                  hideFixedOption={cardId !== 'account'}
-                  totalAmount={getTotalAmount()}
-                  selectedCardId={cardId}
-                  creditCards={creditCards}
-                />
-              )}
-            />
+            
+            {!openModal.transaction.isinstallment && (
+              <Controller
+                name="recurrence_config"
+                control={control}
+                render={({ field }) => (
+                  <RecurrenceOptions
+                    value={field.value as RecurrenceConfig}
+                    onChange={(config) => field.onChange(config)}
+                    error={errors.recurrence_config?.message}
+                    hideFixedOption={false}
+                    totalAmount={getTotalAmount()}
+                    selectedCardId={cardId}
+                    creditCards={creditCards}
+                  />
+                )}
+              />
+            )}
 
           </div>
 
@@ -539,6 +639,7 @@ const ModalEdit = ({
             </button>
             <button
               type="submit"
+              onClick={() => console.log('Submit button clicked')}
               className="flex-1 px-6 py-3 rounded-lg text-white font-medium transition-colors bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
             >
               Atualizar Transação
@@ -574,6 +675,55 @@ const ModalEdit = ({
               </button>
               <button
                 onClick={handleRecurringUpdate}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-lg text-white font-medium transition-colors"
+              >
+                Confirmar Atualização
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal separado para opções de transação parcelada */}
+      {showInstallmentModal && (
+        <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-[60]">
+          <div className="bg-white dark:bg-zinc-800 w-[600px] max-w-[90vw] rounded-2xl shadow-2xl p-8 relative transition-colors">
+            <h2 className="text-xl font-bold mb-6 text-center text-zinc-700 dark:text-zinc-200">
+              Como deseja editar esta transação parcelada?
+            </h2>
+            
+            {/* Mostrar informações da parcela */}
+            {openModal.transaction.installment_count && openModal.transaction.installment_all && (
+              <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div className="text-center text-sm text-blue-700 dark:text-blue-300">
+                  <span className="font-medium">
+                    Parcela {openModal.transaction.installment_count} de {openModal.transaction.installment_all}
+                  </span>
+                </div>
+              </div>
+            )}
+            
+            <InstallmentTransactionOptions
+              value={selectedInstallmentEditMode}
+              onChange={setSelectedInstallmentEditMode}
+              action="edit"
+              currentInstallment={openModal.transaction.installment_count}
+              totalInstallments={openModal.transaction.installment_all}
+            />
+
+            <div className="flex justify-center gap-4 mt-6">
+              <button
+                onClick={() => {
+                  setShowInstallmentModal(false)
+                  setPendingUpdateData(null)
+                  setSelectedInstallmentEditMode('installment_only')
+                }}
+                className="px-6 py-3 border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors font-medium"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleInstallmentUpdate}
                 className="px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-lg text-white font-medium transition-colors"
               >
                 Confirmar Atualização

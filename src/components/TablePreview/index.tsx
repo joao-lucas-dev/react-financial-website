@@ -15,7 +15,9 @@ import { ICreditCard } from "../../types/creditCards.ts";
 import {
   IHandleCreateCompleteTransaction,
   IHandleCreateTransaction,
+  IHandleDeleteInstallmentTransaction,
   IHandleDeleteTransaction,
+  IHandleUpdateInstallmentTransaction,
   IHandleUpdateTransaction,
   IOpenModal,
   IRow,
@@ -54,6 +56,8 @@ interface IParams {
     setCurrentMonth: ISetCurrentMonth,
     from: string,
   ) => Promise<void>;
+  handleUpdateInstallmentTransaction?: IHandleUpdateInstallmentTransaction;
+  handleDeleteInstallmentTransaction?: IHandleDeleteInstallmentTransaction;
   currentMonth: number;
   setCurrentMonth: ISetCurrentMonth;
   openModal: IOpenModal;
@@ -78,6 +82,8 @@ const TablePreview = ({
   handleUpdateTransaction,
   handleUpdateRecurringTransaction,
   handleDeleteRecurringTransaction,
+  handleUpdateInstallmentTransaction,
+  handleDeleteInstallmentTransaction,
   currentMonth,
   setCurrentMonth,
   openModal,
@@ -766,6 +772,7 @@ const TablePreview = ({
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 handleUpdateTransaction={handleUpdateTransaction}
+                handleUpdateInstallmentTransaction={handleUpdateInstallmentTransaction}
                 handleUpdateRecurringTransaction={handleUpdateRecurringTransaction}
                 currentMonth={currentMonth}
                 setCurrentMonth={setCurrentMonth}
@@ -780,6 +787,7 @@ const TablePreview = ({
                 openModal={openModal}
                 handleDeleteTransaction={handleDeleteTransaction}
                 handleDeleteRecurringTransaction={handleDeleteRecurringTransaction}
+                handleDeleteInstallmentTransaction={handleDeleteInstallmentTransaction}
                 currentMonth={currentMonth}
                 setCurrentMonth={setCurrentMonth}
                 from={from}
