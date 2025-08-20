@@ -25,6 +25,7 @@ import ModernSelect, { SelectOption } from './ModernSelectRadix.tsx'
 import PaymentStatusIcon from './PaymentStatusIcon.tsx'
 import RecurrenceOptions, { RecurrenceConfig } from './RecurrenceOptions.tsx'
 import RecurringTransactionOptions from './RecurringTransactionOptions.tsx'
+import InvoiceSelector from './InvoiceSelector.tsx'
 
 interface IParams {
   openModal: IOpenModal
@@ -55,6 +56,7 @@ const modalEditSchema = z.object({
   }),
   category: z.string().min(1, 'Categoria é obrigatória'),
   card_id: z.string().optional(),
+  invoice_date: z.string().optional(),
   recurrence_config: z.object({
     mode: z.enum(['single', 'fixed', 'installment']),
     frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'semiannual', 'annual']).nullable().optional(),
@@ -107,12 +109,16 @@ const ModalEdit = ({
   const editMode = watch('edit_mode')
   const cardId = watch('card_id')
   const price = watch('price')
+  const invoiceDate = watch('invoice_date')
 
   // Converter preço formatado para número
   const getTotalAmount = () => {
     if (!price) return 0
     return Number(price.replace(/\D/g, '')) / 100
   }
+
+  // Encontrar cartão selecionado
+  const selectedCard = creditCards.find(card => card.id === cardId)
 
   const isRecurringTransaction = openModal.transaction.is_recurring === true ||
                                 (openModal.transaction.recurrence_pattern && 
@@ -145,6 +151,11 @@ const ModalEdit = ({
 
     setValue('category', openModal.transaction.category?.id ? String(openModal.transaction.category.id) : '')
     setValue('card_id', openModal.transaction.card_id || 'account')
+    
+    // Carregar invoice_date se existir
+    if (openModal.transaction.invoice?.invoice_date) {
+      setValue('invoice_date', openModal.transaction.invoice.invoice_date)
+    }
     // Definir is_paid: se existe valor na transação, usar ele; senão usar lógica de data
     const transactionIsPaid = openModal.transaction.is_paid
     if (transactionIsPaid !== undefined && transactionIsPaid !== null) {
@@ -260,6 +271,7 @@ const ModalEdit = ({
           installments: recurrenceConfig.mode === 'installment' ? recurrenceConfig.installmentCount : undefined,
           is_paid: data.is_paid,
           card_id: data.card_id === 'account' ? null : data.card_id,
+          invoice_date: data.invoice_date,
         } as unknown as ITransaction
 
         await handleUpdateTransaction(
@@ -313,6 +325,7 @@ const ModalEdit = ({
           installments: recurrenceConfig.mode === 'installment' ? recurrenceConfig.installmentCount : undefined,
           is_paid: data.is_paid,
           card_id: data.card_id === 'account' ? null : data.card_id,
+          invoice_date: data.invoice_date,
         } as unknown as ITransaction
 
         await handleUpdateRecurringTransaction(
@@ -364,6 +377,7 @@ const ModalEdit = ({
           transaction_day: new Date(`${data.transaction_day}T00:00:00`),
           is_paid: data.is_paid,
           card_id: data.card_id === 'account' ? null : data.card_id,
+          invoice_date: data.invoice_date,
           installments: data.installments,
         } as unknown as ITransaction
 
@@ -588,19 +602,36 @@ const ModalEdit = ({
                   </button>
                 )}
               </div>
-              <Controller
-                name="card_id"
-                control={control}
-                render={({ field }) => (
-                  <ModernSelect
-                    label="Método de Pagamento"
-                    options={paymentMethodOptions}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Selecione um método..."
+              <div>
+                <Controller
+                  name="card_id"
+                  control={control}
+                  render={({ field }) => (
+                    <ModernSelect
+                      label="Método de Pagamento"
+                      options={paymentMethodOptions}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Selecione um método..."
+                    />
+                  )}
+                />
+                
+                {/* Seletor de fatura para cartões de crédito */}
+                {cardId && cardId !== 'account' && (
+                  <Controller
+                    name="invoice_date"
+                    control={control}
+                    render={({ field }) => (
+                      <InvoiceSelector
+                        selectedCard={selectedCard}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
                   />
                 )}
-              />
+              </div>
             </div>
             
             {!openModal.transaction.isinstallment && (

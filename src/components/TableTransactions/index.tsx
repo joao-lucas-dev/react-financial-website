@@ -9,6 +9,7 @@ import ModalEdit from '../ModalEdit.tsx'
 import ModalDelete from '../ModalDelete.tsx'
 import { ITransaction } from '../../types/transactions'
 import { ICreditCard } from '../../types/creditCards'
+import { formatInvoiceDisplay } from '../../utils/invoiceCalculations.ts'
 
 interface TableRecentTransactionsProps {
   recentTransactions: ITransaction[]
@@ -225,6 +226,11 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                   {recentTransaction.is_recurring && (
                     <span className="ml-2 px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 text-xs rounded-full">
                       ↻
+                    </span>
+                  )}
+                  {recentTransaction.invoice && (
+                    <span className="ml-2 px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 text-xs rounded-full">
+                      {formatInvoiceDisplay(recentTransaction.invoice.invoice_date).monthYear}
                     </span>
                   )}
                 </div>

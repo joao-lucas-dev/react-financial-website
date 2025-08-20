@@ -20,6 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ICategory } from '../types/categories.ts'
 import { ICreditCard } from '../types/creditCards.ts'
 import { DateTime } from 'luxon'
+import InvoiceSelector from './InvoiceSelector.tsx'
 
 interface IParams {
   openModal: IOpenModal
@@ -43,6 +44,7 @@ const modalCreateSchema = z.object({
   }),
   category: z.string().min(1, 'Categoria é obrigatória'),
   card_id: z.string().optional(),
+  invoice_date: z.string().optional(),
   recurrence_config: z.object({
     mode: z.enum(['single', 'fixed', 'installment']),
     frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'semiannual', 'annual']).optional(),
@@ -90,12 +92,16 @@ const ModalCreate = ({
   const isPaid = watch('is_paid')
   const cardId = watch('card_id')
   const price = watch('price')
+  const invoiceDate = watch('invoice_date')
 
   // Converter preço formatado para número
   const getTotalAmount = () => {
     if (!price) return 0
     return Number(price.replace(/\D/g, '')) / 100
   }
+
+  // Encontrar cartão selecionado
+  const selectedCard = creditCards.find(card => card.id === cardId)
 
   useEffect(() => {
     const transactionDate = openModal.transaction?.transaction_day
@@ -255,6 +261,7 @@ const ModalCreate = ({
             is_paid: data.is_paid,
             card_id: data.card_id === 'account' ? null : data.card_id,
             fromCreditCard: data.card_id !== 'account',
+            invoice_date: data.invoice_date,
           } as unknown as ITransaction
 
           console.log('📝 ModalCreate - Single transaction is_paid value:', data.is_paid);
@@ -469,19 +476,36 @@ const ModalCreate = ({
                   </button>
                 )}
               </div>
-              <Controller
-                name="card_id"
-                control={control}
-                render={({ field }) => (
-                  <ModernSelect
-                    label="Método de Pagamento"
-                    options={paymentMethodOptions}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Selecione um método..."
+              <div>
+                <Controller
+                  name="card_id"
+                  control={control}
+                  render={({ field }) => (
+                    <ModernSelect
+                      label="Método de Pagamento"
+                      options={paymentMethodOptions}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Selecione um método..."
+                    />
+                  )}
+                />
+                
+                {/* Seletor de fatura para cartões de crédito */}
+                {cardId && cardId !== 'account' && (
+                  <Controller
+                    name="invoice_date"
+                    control={control}
+                    render={({ field }) => (
+                      <InvoiceSelector
+                        selectedCard={selectedCard}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
                   />
                 )}
-              />
+              </div>
             </div>
 
             <Controller

@@ -45,6 +45,14 @@ export interface SimpleInstallmentConfig {
 // Tipos para sistema de pagamento
 export type PaymentStatus = 'paid' | 'unpaid' | 'pending'
 
+// Tipos para faturas de cartão de crédito
+export interface IInvoice {
+  id: string
+  invoice_date: string
+  is_paid: boolean
+  paid_date?: string
+}
+
 export type ITransaction = {
   id?: string | undefined
   category_id: string
@@ -69,6 +77,7 @@ export type ITransaction = {
   parent_transaction_id?: string
   installment_count?: number
   installment_all?: number
+  invoice?: IInvoice | null
 }
 
 interface IColumn {
