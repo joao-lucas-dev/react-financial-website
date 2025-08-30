@@ -44,11 +44,15 @@ import {
   useCreateRecurringTransaction,
   useCreateTransaction,
   useDeleteTransaction,
+  useDeleteInstallmentTransaction,
+  useDeleteRecurringTransaction,
   usePeriodsSummary,
   useRecentTransactions,
   useTransactionsBalance,
   useTransactionsOverview,
   useTransactionsPreview,
+  useUpdateInstallmentTransaction,
+  useUpdateRecurringTransaction,
   useUpdateTransaction,
 } from "../../queries/transactionsQueries";
 import { useDashboardStore } from "../../stores/dashboardStore";
@@ -99,6 +103,10 @@ export default function Dashboard() {
   const createRecurringTransactionMutation = useCreateRecurringTransaction();
   const deleteTransactionMutation = useDeleteTransaction();
   const updateTransactionMutation = useUpdateTransaction();
+  const updateRecurringTransactionMutation = useUpdateRecurringTransaction();
+  const deleteRecurringTransactionMutation = useDeleteRecurringTransaction();
+  const updateInstallmentTransactionMutation = useUpdateInstallmentTransaction();
+  const deleteInstallmentTransactionMutation = useDeleteInstallmentTransaction();
 
   // Refs and constants
   const menuRef = useRef<HTMLDivElement>(null);
@@ -179,7 +187,7 @@ export default function Dashboard() {
 
   // Função para carregar mais transações
   const handleLoadMore = () => {
-    setItemsToShow(prev => prev + itemsPerLoad);
+    setItemsToShow(itemsToShow + itemsPerLoad);
   };
 
   // Reset itemsToShow when filters change
@@ -227,9 +235,8 @@ export default function Dashboard() {
         description: 'Insira uma descrição',
         price: value.originalValue,
         category_id: type === 'incomes' ? "10" : "4",
-        type: type.substring(0, type.length - 1),
-        shared_id: null,
-        transaction_day: transactionDay.toISO(),
+        type: type.substring(0, type.length - 1) as 'income' | 'outcome',
+        transaction_day: transactionDay.toISO() || '',
       });
 
       setValue({ formattedValue: '', originalValue: 0 });
@@ -284,27 +291,48 @@ export default function Dashboard() {
   };
 
   // Legacy handlers for backward compatibility
-  const handleUpdateRecurringTransaction = async (transaction: ITransaction) => {
+  const handleUpdateRecurringTransaction = async (
+    transaction: ITransaction,
+    editMode: 'instance_only' | 'instance_and_future' | 'all_instances' = 'instance_only'
+  ) => {
     try {
-      await updateRe.mutateAsync(transaction);
+      await updateRecurringTransactionMutation.mutateAsync({ transaction, editMode });
     } catch (err) {
-      console.error('Error updating transaction:', err);
+      console.error('Error updating recurring transaction:', err);
     }
   };
 
-  const handleDeleteRecurringTransaction = async (id: string) => {
-    // TODO: Implement recurring transaction delete
-    console.log('Delete recurring transaction:', id);
+  const handleDeleteRecurringTransaction = async (
+    id: string,
+    editMode: 'instance_only' | 'instance_and_future' | 'all_instances' = 'instance_only'
+  ) => {
+    try {
+      await deleteRecurringTransactionMutation.mutateAsync({ id, editMode });
+    } catch (err) {
+      console.error('Error deleting recurring transaction:', err);
+    }
   };
 
-  const handleUpdateInstallmentTransaction = async (transaction: ITransaction) => {
-    // TODO: Implement installment transaction update
-    console.log('Update installment transaction:', transaction);
+  const handleUpdateInstallmentTransaction = async (
+    transaction: ITransaction,
+    editMode: 'installment_only' | 'installment_and_future' | 'all_installments' = 'installment_only'
+  ) => {
+    try {
+      await updateInstallmentTransactionMutation.mutateAsync({ transaction, editMode });
+    } catch (err) {
+      console.error('Error updating installment transaction:', err);
+    }
   };
 
-  const handleDeleteInstallmentTransaction = async (id: string) => {
-    // TODO: Implement installment transaction delete
-    console.log('Delete installment transaction:', id);
+  const handleDeleteInstallmentTransaction = async (
+    id: string,
+    editMode: 'installment_only' | 'installment_and_future' | 'all_installments' = 'installment_only'
+  ) => {
+    try {
+      await deleteInstallmentTransactionMutation.mutateAsync({ id, editMode });
+    } catch (err) {
+      console.error('Error deleting installment transaction:', err);
+    }
   };
 
   // Default values for undefined data
@@ -920,7 +948,7 @@ export default function Dashboard() {
                         {/* Menu de Ações */}
                         <div className="relative ml-2" ref={activeMenuId === transaction.id ? menuRef : null}>
                           <button
-                            onClick={() => setActiveMenuId(activeMenuId === transaction.id ? null : transaction.id)}
+                            onClick={() => setActiveMenuId(activeMenuId === transaction.id ? null : (transaction.id || null))}
                             className="p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-all"
                           >
                             <MoreHorizontal size={16} className="text-zinc-500 dark:text-zinc-400" />

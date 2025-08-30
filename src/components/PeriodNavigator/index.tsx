@@ -10,6 +10,7 @@ interface PeriodNavigatorProps {
   onYearChange: (year: number) => void;
   onQuickPeriod?: (type: 'today' | 'thisWeek' | 'thisMonth' | 'custom') => void;
   onPeriodChange?: (startDate: string, endDate: string, type: PeriodType) => Promise<void>;
+  onCustomPeriod?: (startDate: string, endDate: string) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -20,6 +21,7 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
   onYearChange,
   onQuickPeriod,
   onPeriodChange,
+  onCustomPeriod,
   isLoading = false
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -248,16 +250,17 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
       case 'thisWeek':
         setPeriodType('week');
         const now = new Date();
-        const dayOfWeek = now.getDay();
-        const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-        const monday = new Date(now.setDate(diff));
-        setCurrentWeekStart(monday);
+        // Calculate today - 3 days to today + 3 days (7 days total)
+        const startDate = new Date(now);
+        startDate.setDate(now.getDate() - 3);
+        const endDate = new Date(now);
+        endDate.setDate(now.getDate() + 3);
+        
+        setCurrentWeekStart(startDate);
         
         if (onPeriodChange) {
-          const endDate = new Date(monday);
-          endDate.setDate(monday.getDate() + 6);
           await onPeriodChange(
-            monday.toISOString().split('T')[0],
+            startDate.toISOString().split('T')[0],
             endDate.toISOString().split('T')[0],
             'week'
           );
@@ -282,7 +285,9 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
     setCustomStartDate(startDate);
     setCustomEndDate(endDate);
     
-    if (onPeriodChange) {
+    if (onCustomPeriod) {
+      await onCustomPeriod(startDate, endDate);
+    } else if (onPeriodChange) {
       await onPeriodChange(startDate, endDate, 'custom');
     }
   };

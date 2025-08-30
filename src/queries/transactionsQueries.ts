@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { DateTime } from 'luxon'
 import useAxiosPrivate from '../hooks/useAxiosPrivate'
-import { IOverview, IRow, ITransaction } from '../types/transactions'
+import { IOverview, IRow, ITransaction, EditMode, InstallmentEditMode } from '../types/transactions'
 import { EnhancedTransaction, enhanceTransactionsWithMockData } from '../utils/mockTransactionEnhancer'
 
 export const QUERY_KEYS = {
@@ -261,6 +261,90 @@ export const useDeleteMultipleTransactions = () => {
     mutationFn: async (ids: string[]) => {
       const { data } = await axiosPrivate.delete('/transactions/delete-multiple', { 
         data: { ids } 
+      })
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+    },
+  })
+}
+
+export const useUpdateRecurringTransaction = () => {
+  const axiosPrivate = useAxiosPrivate()
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async ({ transaction, editMode }: { transaction: ITransaction, editMode: EditMode }) => {
+      const payload = {
+        ...transaction,
+        edit_mode: editMode,
+      }
+      
+      const { data } = await axiosPrivate.put(
+        `/transactions/recurring/update/${transaction.id}`,
+        payload
+      )
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+    },
+  })
+}
+
+export const useDeleteRecurringTransaction = () => {
+  const axiosPrivate = useAxiosPrivate()
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async ({ id, editMode }: { id: string, editMode: EditMode }) => {
+      const { data } = await axiosPrivate.delete(`/transactions/recurring/delete/${id}`, {
+        data: { edit_mode: editMode }
+      })
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+    },
+  })
+}
+
+export const useUpdateInstallmentTransaction = () => {
+  const axiosPrivate = useAxiosPrivate()
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async ({ transaction, editMode }: { transaction: ITransaction, editMode: InstallmentEditMode }) => {
+      const payload = {
+        ...transaction,
+        edit_mode: editMode,
+      }
+      
+      const { data } = await axiosPrivate.put(
+        `/transactions/update/${transaction.id}`,
+        payload
+      )
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+    },
+  })
+}
+
+export const useDeleteInstallmentTransaction = () => {
+  const axiosPrivate = useAxiosPrivate()
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async ({ id, editMode }: { id: string, editMode: InstallmentEditMode }) => {
+      const { data } = await axiosPrivate.delete(`/transactions/delete/${id}`, {
+        data: { edit_mode: editMode }
       })
       return data
     },

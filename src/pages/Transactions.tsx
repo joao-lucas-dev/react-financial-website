@@ -1,17 +1,30 @@
 import Header from "../components/Header.tsx";
 import MenuAside from "../components/MenuAside.tsx";
-import Skeleton from "react-loading-skeleton";
-import { BarChart3, Calendar, ChevronLeft, ChevronRight, List, Grid3X3 } from "lucide-react";
+import { BarChart3, Calendar, List, Grid3X3 } from "lucide-react";
 import TablePreview from "../components/TablePreview";
 import TransactionsListView from "../components/TransactionsListView";
 import PeriodNavigator, { PeriodType } from "../components/PeriodNavigator";
 import CustomPeriodModal from "../components/CustomPeriodModal";
 import { useState } from "react";
+import { DateTime } from "luxon";
 import { ITransaction } from "../types/transactions.ts";
-import useCategories from "../hooks/useCategories.ts";
-import useTransactions from "../hooks/useTransactions.ts";
-import useDashboard from "../hooks/useDashboard.ts";
-import useCreditCards from "../hooks/useCreditCards";
+
+// React Query imports
+import { useCategories, useCategoriesChart } from "../queries/categoriesQueries";
+import { useCreditCards } from "../queries/creditCardsQueries";
+import {
+  useCreateCompleteTransaction,
+  useCreateInstallmentTransaction,
+  useCreateRecurringTransaction,
+  useCreateTransaction,
+  useDeleteTransaction,
+  useDeleteInstallmentTransaction,
+  useDeleteRecurringTransaction,
+  useTransactionsPreview,
+  useUpdateInstallmentTransaction,
+  useUpdateRecurringTransaction,
+  useUpdateTransaction,
+} from "../queries/transactionsQueries";
 
 const Transactions = () => {
   const [openModal, setOpenModal] = useState({
@@ -24,67 +37,224 @@ const Transactions = () => {
   const [isCustomPeriodModalOpen, setIsCustomPeriodModalOpen] = useState(false);
   const [currentPeriodType, setCurrentPeriodType] = useState<PeriodType>('month');
   const [currentPeriodRange, setCurrentPeriodRange] = useState<{start: string, end: string} | null>(null);
+  const [currentDate, setCurrentDate] = useState<DateTime>(DateTime.now());
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { handleGetChartCategories, categories, retryCategories } = useCategories();
-  const { creditCards } = useCreditCards();
+  // React Query hooks
+  const { data: rows = [], refetch: refetchRows } = useTransactionsPreview(currentDate);
+  const { data: categories = [], refetch: retryCategories } = useCategories();
+  const { data: creditCards = [] } = useCreditCards();
 
-  const {
-    rows,
-    handleCreateTransaction,
-    handleCreateCompleteTransaction,
-    handleCreateInstallmentTransaction,
-    handleCreateRecurringTransaction,
-    handleDeleteTransaction,
-    handleUpdateTransaction,
-    handleUpdateRecurringTransaction,
-    handleDeleteRecurringTransaction,
-    handleUpdateInstallmentTransaction,
-    handleDeleteInstallmentTransaction,
-    handleGetOverviewTransactions,
-    handleGetBalance,
-    handleGetTransactionsMonth,
-    handleGetRecentTransactions,
-    handleGetPeriodsSummary,
-  } = useTransactions(handleGetChartCategories);
-  const {
-    getMonth,
-    getToday,
-    hasToday,
-    currentMonth,
-    currentYear,
-    setCurrentMonth,
-    setCurrentYear,
-    getNextWeek,
-    handleDateRangeChange,
-    isLoading,
-  } = useDashboard(
-    rows,
-    handleGetChartCategories,
-    handleGetOverviewTransactions,
-    handleGetBalance,
-    handleGetTransactionsMonth,
-    handleGetRecentTransactions,
-    handleGetPeriodsSummary,
-  );
+  // Mutations
+  const createTransactionMutation = useCreateTransaction();
+  const createCompleteTransactionMutation = useCreateCompleteTransaction();
+  const createInstallmentTransactionMutation = useCreateInstallmentTransaction();
+  const createRecurringTransactionMutation = useCreateRecurringTransaction();
+  const deleteTransactionMutation = useDeleteTransaction();
+  const updateTransactionMutation = useUpdateTransaction();
+  const updateRecurringTransactionMutation = useUpdateRecurringTransaction();
+  const deleteRecurringTransactionMutation = useDeleteRecurringTransaction();
+  const updateInstallmentTransactionMutation = useUpdateInstallmentTransaction();
+  const deleteInstallmentTransactionMutation = useDeleteInstallmentTransaction();
 
-  const handleNextWeek = async (isBeforeWeek: boolean) => {
-    setResetScroll(true);
-    await getNextWeek(isBeforeWeek);
-    // Reset the flag after a short delay to allow the scroll to complete
-    setTimeout(() => setResetScroll(false), 100);
+  // Current month and year for UI
+  const currentMonth = currentDate.month;
+  const currentYear = currentDate.year;
+
+  // Function to handle date range changes
+  const handleDateRangeChange = async (startDate: string, endDate: string, type: PeriodType) => {
+    setIsLoading(true);
+    try {
+      const luxonStartDate = DateTime.fromISO(startDate);
+      setCurrentDate(luxonStartDate);
+      
+      // Set the period type and range
+      setCurrentPeriodType(type);
+      setCurrentPeriodRange({ start: startDate, end: endDate });
+      
+      // Refetch data with new date
+      await refetchRows();
+      
+      console.log(`Period changed to ${type}:`, { startDate, endDate });
+    } catch (error) {
+      console.error('Error changing period:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleToday = async () => {
-    // Only trigger scroll reset in table view
-    if (viewMode === 'table') {
-      setResetScroll(true);
+  // Function to handle month/year changes
+  const handleMonthChange = async (month: number | ((prevState: number) => number)) => {
+    setIsLoading(true);
+    try {
+      const monthValue = typeof month === 'function' ? month(currentMonth) : month;
+      const newDate = currentDate.set({ month: monthValue }) as DateTime<true>;
+      setCurrentDate(newDate);
+      setCurrentPeriodType('month');
+      setCurrentPeriodRange(null);
+      await refetchRows();
+    } catch (error) {
+      console.error('Error changing month:', error);
+    } finally {
+      setIsLoading(false);
     }
-    
-    await getToday();
-    
-    // Reset the flag after a short delay to allow the scroll to complete (only in table view)
-    if (viewMode === 'table') {
-      setTimeout(() => setResetScroll(false), 100);
+  };
+
+  // Wrapper function for compatibility with ISetCurrentMonth type
+  const setCurrentMonth = (month: number | ((prevState: number) => number)) => {
+    handleMonthChange(month);
+  };
+
+  const handleYearChange = async (year: number) => {
+    setIsLoading(true);
+    try {
+      const newDate = currentDate.set({ year });
+      setCurrentDate(newDate);
+      setCurrentPeriodType('month');
+      setCurrentPeriodRange(null);
+      await refetchRows();
+    } catch (error) {
+      console.error('Error changing year:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to handle today
+  const handleToday = async () => {
+    setIsLoading(true);
+    try {
+      const today = DateTime.now();
+      setCurrentDate(today);
+      setCurrentPeriodType('month');
+      setCurrentPeriodRange(null);
+      await refetchRows();
+    } catch (error) {
+      console.error('Error going to today:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Check if today is available
+  const hasToday = () => {
+    const today = DateTime.now();
+    return currentDate.hasSame(today, 'day');
+  };
+
+  // Transaction handlers using mutations
+  const handleCreateTransaction = async (
+    type: 'incomes' | 'outcomes',
+    row: any,
+    value: any,
+    setValue: any,
+  ) => {
+    try {
+      const now = DateTime.now();
+      const transactionDay = DateTime.fromISO(row.date).set({
+        hour: now.hour,
+        minute: now.minute,
+        second: now.second,
+        millisecond: now.millisecond,
+      });
+
+      await createTransactionMutation.mutateAsync({
+        description: 'Insira uma descrição',
+        price: value.originalValue,
+        category_id: type === 'incomes' ? "10" : "4",
+        type: type.substring(0, type.length - 1) as 'income' | 'outcome',
+        transaction_day: transactionDay.toISO() || '',
+      });
+
+      setValue({ formattedValue: '', originalValue: 0 });
+    } catch (err) {
+      console.error('Error creating transaction:', err);
+    }
+  };
+
+  const handleCreateCompleteTransaction = async (transaction: ITransaction) => {
+    try {
+      await createCompleteTransactionMutation.mutateAsync(transaction);
+    } catch (err) {
+      console.error('Error creating complete transaction:', err);
+    }
+  };
+
+  const handleCreateInstallmentTransaction = async (transaction: ITransaction) => {
+    try {
+      await createInstallmentTransactionMutation.mutateAsync(transaction);
+    } catch (err) {
+      console.error('Error creating installment transaction:', err);
+    }
+  };
+
+  const handleCreateRecurringTransaction = async (transaction: ITransaction) => {
+    try {
+      await createRecurringTransactionMutation.mutateAsync(transaction);
+    } catch (err) {
+      console.error('Error creating recurring transaction:', err);
+    }
+  };
+
+  const handleDeleteTransaction = async (id?: string) => {
+    if (!id) return;
+    try {
+      await deleteTransactionMutation.mutateAsync(id);
+    } catch (err) {
+      console.error('Error deleting transaction:', err);
+    }
+  };
+
+  const handleUpdateTransaction = async (transaction: ITransaction) => {
+    try {
+      await updateTransactionMutation.mutateAsync(transaction);
+    } catch (err) {
+      console.error('Error updating transaction:', err);
+    }
+  };
+
+  // Legacy handlers for backward compatibility
+  const handleUpdateRecurringTransaction = async (
+    transaction: ITransaction,
+    editMode: 'instance_only' | 'instance_and_future' | 'all_instances' = 'instance_only'
+  ) => {
+    try {
+      await updateRecurringTransactionMutation.mutateAsync({ transaction, editMode });
+    } catch (err) {
+      console.error('Error updating recurring transaction:', err);
+    }
+  };
+
+  const handleDeleteRecurringTransaction = async (
+    id: string,
+    editMode: 'instance_only' | 'instance_and_future' | 'all_instances' = 'instance_only'
+  ) => {
+    try {
+      await deleteRecurringTransactionMutation.mutateAsync({ id, editMode });
+    } catch (err) {
+      console.error('Error deleting recurring transaction:', err);
+    }
+  };
+
+  const handleUpdateInstallmentTransaction = async (
+    transaction: ITransaction,
+    editMode: 'installment_only' | 'installment_and_future' | 'all_installments' = 'installment_only'
+  ) => {
+    try {
+      await updateInstallmentTransactionMutation.mutateAsync({ transaction, editMode });
+    } catch (err) {
+      console.error('Error updating installment transaction:', err);
+    }
+  };
+
+  const handleDeleteInstallmentTransaction = async (
+    id: string,
+    editMode: 'installment_only' | 'installment_and_future' | 'all_installments' = 'installment_only'
+  ) => {
+    try {
+      await deleteInstallmentTransactionMutation.mutateAsync({ id, editMode });
+    } catch (err) {
+      console.error('Error deleting installment transaction:', err);
     }
   };
 
@@ -193,49 +363,37 @@ const Transactions = () => {
           <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors mb-6">
             <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
               {/* Period Navigator */}
-              <PeriodNavigator
-                currentMonth={currentMonth}
-                currentYear={currentYear}
-                onMonthChange={setCurrentMonth}
-                onYearChange={setCurrentYear}
-                onQuickPeriod={(type) => {
-                  switch (type) {
-                    case 'today':
-                      handleToday();
-                      setCurrentPeriodType('month');
-                      setCurrentPeriodRange(null);
-                      break;
-                    case 'thisWeek':
-                      // This will be handled by onPeriodChange
-                      break;
-                    case 'thisMonth':
-                      const now = new Date();
-                      setCurrentMonth(now.getMonth() + 1);
-                      setCurrentYear(now.getFullYear());
-                      setCurrentPeriodType('month');
-                      setCurrentPeriodRange(null);
-                      break;
-                    case 'custom':
-                      setIsCustomPeriodModalOpen(true);
-                      break;
-                  }
-                }}
-                onPeriodChange={async (startDate, endDate, type) => {
-                  setCurrentPeriodType(type);
-                  setCurrentPeriodRange({ start: startDate, end: endDate });
-                  
-                  // Update the month/year for UI consistency
-                  const start = new Date(startDate);
-                  setCurrentMonth(start.getMonth() + 1);
-                  setCurrentYear(start.getFullYear());
-                  
-                  // Fetch data for the new date range
-                  await handleDateRangeChange(startDate, endDate, type);
-                  
-                  console.log(`Period changed to ${type}:`, { startDate, endDate });
-                }}
-                isLoading={isLoading}
-              />
+                             <PeriodNavigator
+                 currentMonth={currentMonth}
+                 currentYear={currentYear}
+                 onMonthChange={handleMonthChange}
+                 onYearChange={handleYearChange}
+                 onQuickPeriod={(type) => {
+                   switch (type) {
+                     case 'today':
+                       handleToday();
+                       break;
+                     case 'thisWeek':
+                       // This will be handled by onPeriodChange
+                       break;
+                     case 'thisMonth':
+                       const now = new Date();
+                       handleMonthChange(now.getMonth() + 1);
+                       handleYearChange(now.getFullYear());
+                       setCurrentPeriodType('month');
+                       setCurrentPeriodRange(null);
+                       break;
+                     case 'custom':
+                       setIsCustomPeriodModalOpen(true);
+                       break;
+                   }
+                 }}
+                 onPeriodChange={handleDateRangeChange}
+                 onCustomPeriod={async (startDate, endDate) => {
+                   await handleDateRangeChange(startDate, endDate, 'custom');
+                 }}
+                 isLoading={isLoading}
+               />
 
               {/* Right side controls */}
               <div className="flex items-center gap-3">
@@ -295,7 +453,7 @@ const Transactions = () => {
                 handleUpdateInstallmentTransaction={handleUpdateInstallmentTransaction}
                 handleDeleteInstallmentTransaction={handleDeleteInstallmentTransaction}
                 currentMonth={currentMonth}
-                setCurrentMonth={setCurrentMonth}
+                setCurrentMonth={setCurrentMonth as any}
                 openModal={openModal}
                 setOpenModal={setOpenModal}
                 categories={categories}
@@ -310,36 +468,27 @@ const Transactions = () => {
               rows={rows}
               setOpenModal={setOpenModal}
               categories={categories}
-              handleCreateTransaction={handleCreateTransaction}
+              handleCreateTransaction={handleCreateTransaction as any}
               handleUpdateTransaction={handleUpdateTransaction}
               handleDeleteTransaction={handleDeleteTransaction}
               currentMonth={currentMonth}
-              setCurrentMonth={setCurrentMonth}
+              setCurrentMonth={setCurrentMonth as any}
             />
           )}
           
-          {/* Custom Period Modal */}
-          <CustomPeriodModal
-            isOpen={isCustomPeriodModalOpen}
-            onClose={() => setIsCustomPeriodModalOpen(false)}
-            onApply={async (startDate, endDate) => {
-              // Set custom period
-              setCurrentPeriodType('custom');
-              setCurrentPeriodRange({ start: startDate, end: endDate });
-              
-              // Update month/year for UI consistency
-              const start = new Date(startDate);
-              setCurrentMonth(start.getMonth() + 1);
-              setCurrentYear(start.getFullYear());
-              
-              // Fetch data for the custom date range
-              await handleDateRangeChange(startDate, endDate, 'custom');
-              
-              console.log('Custom period selected:', { startDate, endDate });
-            }}
-            currentMonth={currentMonth}
-            currentYear={currentYear}
-          />
+                     {/* Custom Period Modal */}
+           <CustomPeriodModal
+             isOpen={isCustomPeriodModalOpen}
+             onClose={() => setIsCustomPeriodModalOpen(false)}
+             onApply={async (startDate, endDate) => {
+               // Fetch data for the custom date range
+               await handleDateRangeChange(startDate, endDate, 'custom');
+               
+               console.log('Custom period selected:', { startDate, endDate });
+             }}
+             currentMonth={currentMonth}
+             currentYear={currentYear}
+           />
         </main>
       </div>
     </div>
