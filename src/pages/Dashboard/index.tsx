@@ -15,101 +15,93 @@ import {
   TrendingUp,
   X,
 } from "lucide-react";
+import { DateTime } from "luxon";
+import { useEffect, useRef, useState } from "react";
+import "react-loading-skeleton/dist/skeleton.css";
 import { Link } from "react-router-dom";
 
+import CategoryIcon from "../../components/CategoryIcon/index.tsx";
+import CountUp from "../../components/CountUp.tsx";
 import CreditCardCarousel from "../../components/CreditCardCarousel";
 import CreditCardEmptyState from "../../components/CreditCardEmptyState";
 import EmptyChartState from "../../components/EmptyChartState";
 import FloatingButton from "../../components/FloatingButton.tsx";
+import MenuAside from "../../components/MenuAside.tsx";
+import ModalCreate from "../../components/ModalCreate.tsx";
+import ModalDelete from "../../components/ModalDelete";
+import ModalEdit from "../../components/ModalEdit";
+import ModernDonutChart from "../../components/ModernDonutChart.tsx";
+import PaymentStatusIcon from "../../components/PaymentStatusIcon.tsx";
 import SavingsGoalsSimple from "../../components/SavingsGoalsSimple";
 import TablePreview from "../../components/TablePreview";
 
-import { useEffect, useRef, useState } from "react";
-import "react-loading-skeleton/dist/skeleton.css";
-import CategoryIcon from "../../components/CategoryIcon/index.tsx";
-import CountUp from "../../components/CountUp.tsx";
-import MenuAside from "../../components/MenuAside.tsx";
-import ModernDonutChart from "../../components/ModernDonutChart.tsx";
-import PaymentStatusIcon from "../../components/PaymentStatusIcon.tsx";
-import useCategories from "../../hooks/useCategories.ts";
-import useCreditCards from "../../hooks/useCreditCards";
-import useDashboard from "../../hooks/useDashboard.ts";
-import useTransactions from "../../hooks/useTransactions.ts";
-import { ITransaction } from "../../types/transactions.ts";
+// New imports
+import { useCategories, useCategoriesChart } from "../../queries/categoriesQueries";
+import { useCreditCards } from "../../queries/creditCardsQueries";
+import {
+  useCreateCompleteTransaction,
+  useCreateInstallmentTransaction,
+  useCreateRecurringTransaction,
+  useCreateTransaction,
+  useDeleteTransaction,
+  usePeriodsSummary,
+  useRecentTransactions,
+  useTransactionsBalance,
+  useTransactionsOverview,
+  useTransactionsPreview,
+  useUpdateTransaction,
+} from "../../queries/transactionsQueries";
+import { useDashboardStore } from "../../stores/dashboardStore";
+import { IHandleDeleteTransaction } from "../../types/queryTypes.ts";
+import { IHandleUpdateTransaction, ITransaction } from "../../types/transactions.ts";
 import "./styles.css";
 
 export default function Dashboard() {
-  const [openModal, setOpenModal] = useState({
-    isOpen: false,
-    transaction: {} as ITransaction,
-    type: "",
-  });
-
-  // Credit Cards Hook
+  // Zustand store for UI state
   const {
-    creditCards,
-    summary: creditCardSummary,
-    isLoading: creditCardsLoading,
-    error: creditCardsError,
-    fetchCreditCards,
-    fetchCreditCardSummary
-  } = useCreditCards();
+    openModal,
+    setOpenModal,
+    recentSearchTerm,
+    setRecentSearchTerm,
+    paymentStatusFilter,
+    setPaymentStatusFilter,
+    recentTypeFilter,
+    setRecentTypeFilter,
+    filtersExpanded,
+    setFiltersExpanded,
+    searchExpanded,
+    setSearchExpanded,
+    activeMenuId,
+    setActiveMenuId,
+    itemsToShow,
+    setItemsToShow,
+    getActiveFiltersCount,
+  } = useDashboardStore();
 
-  const { chartCategories, handleGetChartCategories, categories, isLoadingCategories, categoriesError, retryCategories } =
-    useCategories();
+  // Current date for queries
+  const [currentDate] = useState(DateTime.now());
+  const [currentMonth, setCurrentMonth] = useState(currentDate.month);
 
-  const {
-    rows,
-    handleCreateTransaction,
-    handleCreateCompleteTransaction,
-    handleCreateInstallmentTransaction,
-    handleCreateRecurringTransaction,
-    handleDeleteTransaction,
-    handleUpdateTransaction,
-    handleGetOverviewTransactions,
-    overview,
-    handleGetBalance,
-    balance,
-    handleGetPreviewTransactions,
-    handleGetRecentTransactions,
-    recentTransactions,
-    handleGetPeriodsSummary,
-    periodsSummary,
-    handleUpdateRecurringTransaction,
-    handleDeleteRecurringTransaction,
-    handleUpdateInstallmentTransaction,
-    handleDeleteInstallmentTransaction
-  } = useTransactions(handleGetChartCategories);
-  const { getGreeting, currentMonth, setCurrentMonth } = useDashboard(
-    rows,
-    handleGetChartCategories,
-    handleGetOverviewTransactions,
-    handleGetBalance,
-    handleGetPreviewTransactions,
-    handleGetRecentTransactions,
-    handleGetPeriodsSummary,
-  );
+  // React Query hooks with loading states
+  const { data: overview, isLoading: overviewLoading } = useTransactionsOverview(currentDate);
+  const { data: balance } = useTransactionsBalance(currentDate);
+  const { data: recentTransactions = [] } = useRecentTransactions();
+  const { data: rows = [] } = useTransactionsPreview(currentDate);
+  const { data: periodsSummary } = usePeriodsSummary();
+  const { data: chartCategories, isLoading: chartLoading } = useCategoriesChart(currentDate);
+  const { data: categories = [], refetch: retryCategories } = useCategories();
+  const { data: creditCards = [], isLoading: creditCardsLoading } = useCreditCards();
 
-  const [filter, setFilter] = useState<"before" | "after" | "both">("both");
-  const [typeFilter, setTypeFilter] = useState<"income" | "outcome" | "all">(
-    "all",
-  );
-  
-  // Recent Transactions Filters
-  const [recentSearchTerm, setRecentSearchTerm] = useState("");
-  const [paymentStatusFilter, setPaymentStatusFilter] = useState<"all" | "paid" | "unpaid">("all");
-  const [recentTypeFilter, setRecentTypeFilter] = useState<"all" | "income" | "outcome">("all");
-  
-  // Action Menu State
-  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+  // Mutations
+  const createTransactionMutation = useCreateTransaction();
+  const createCompleteTransactionMutation = useCreateCompleteTransaction();
+  const createInstallmentTransactionMutation = useCreateInstallmentTransaction();
+  const createRecurringTransactionMutation = useCreateRecurringTransaction();
+  const deleteTransactionMutation = useDeleteTransaction();
+  const updateTransactionMutation = useUpdateTransaction();
+
+  // Refs and constants
   const menuRef = useRef<HTMLDivElement>(null);
-  
-  // Filter UI State
-  const [filtersExpanded, setFiltersExpanded] = useState(false);
-  const [searchExpanded, setSearchExpanded] = useState(false);
-  
-  // Pagination State  
-  const [itemsToShow, setItemsToShow] = useState(5);
   const itemsPerLoad = 5;
 
   // Função para determinar se uma transação está paga
@@ -144,12 +136,8 @@ export default function Dashboard() {
     return searchMatch && typeMatch && paymentMatch;
   });
 
-  // Contar filtros ativos
-  const activeFiltersCount = [
-    recentSearchTerm !== "",
-    recentTypeFilter !== "all",
-    paymentStatusFilter !== "all"
-  ].filter(Boolean).length;
+  // Get active filters count from store
+  const activeFiltersCount = getActiveFiltersCount();
 
   // Calcular transações visíveis e restantes
   const visibleTransactions = filteredRecentTransactions.slice(0, itemsToShow);
@@ -183,7 +171,7 @@ export default function Dashboard() {
   const handleDeleteRecentTransaction = (transaction: any) => {
     setOpenModal({
       isOpen: true,
-      transaction: { ...transaction } as ITransaction,
+      transaction: { ...transaction },
       type: 'delete',
     });
     setActiveMenuId(null);
@@ -194,21 +182,161 @@ export default function Dashboard() {
     setItemsToShow(prev => prev + itemsPerLoad);
   };
 
-  // Reset itemsToShow quando os filtros mudarem
+  // Reset itemsToShow when filters change
   useEffect(() => {
     setItemsToShow(5);
-  }, [recentSearchTerm, recentTypeFilter, paymentStatusFilter]);
-
-  // Load credit cards on component mount
-  useEffect(() => {
-    fetchCreditCards();
-    fetchCreditCardSummary();
-  }, [fetchCreditCards, fetchCreditCardSummary]);
+  }, [recentSearchTerm, recentTypeFilter, paymentStatusFilter, setItemsToShow]);
   
+  // Helper functions
+  const getGreeting = () => {
+    const now = new Date();
+    const hour = now.getHours();
+
+    if (hour >= 5 && hour <= 12) {
+      return 'Bom dia';
+    } else if (hour > 12 && hour <= 18) {
+      return 'Boa tarde';
+    } else {
+      return 'Boa noite';
+    }
+  };
+
   // Credit Card Handlers
   const handleCardClick = (card: any) => {
     console.log("Cartão clicado:", card);
     // TODO: Implementar navegação para detalhes do cartão ou ações
+  };
+
+  // Transaction handlers using mutations
+  const handleCreateTransaction = async (
+    type: 'incomes' | 'outcomes',
+    row: any,
+    value: any,
+    setValue: any,
+  ) => {
+    try {
+      const now = DateTime.now();
+      const transactionDay = DateTime.fromISO(row.date).set({
+        hour: now.hour,
+        minute: now.minute,
+        second: now.second,
+        millisecond: now.millisecond,
+      });
+
+      await createTransactionMutation.mutateAsync({
+        description: 'Insira uma descrição',
+        price: value.originalValue,
+        category_id: type === 'incomes' ? "10" : "4",
+        type: type.substring(0, type.length - 1),
+        shared_id: null,
+        transaction_day: transactionDay.toISO(),
+      });
+
+      setValue({ formattedValue: '', originalValue: 0 });
+    } catch (err) {
+      console.error('Error creating transaction:', err);
+    }
+  };
+
+  const handleCreateCompleteTransaction = async (transaction: ITransaction) => {
+    try {
+      await createCompleteTransactionMutation.mutateAsync(transaction);
+    } catch (err) {
+      console.error('Error creating complete transaction:', err);
+    }
+  };
+
+  const handleCreateInstallmentTransaction = async (transaction: ITransaction) => {
+    try {
+      await createInstallmentTransactionMutation.mutateAsync(transaction);
+    } catch (err) {
+      console.error('Error creating installment transaction:', err);
+    }
+  };
+
+  const handleCreateRecurringTransaction = async (transaction: ITransaction) => {
+    try {
+      await createRecurringTransactionMutation.mutateAsync(transaction);
+    } catch (err) {
+      console.error('Error creating recurring transaction:', err);
+    }
+  };
+
+  const handleDeleteTransaction: IHandleDeleteTransaction = async (
+    id?: string, 
+  ) => {
+    if (!id) return;
+    try {
+      await deleteTransactionMutation.mutateAsync(id);
+    } catch (err) {
+      console.error('Error deleting transaction:', err);
+    }
+  };
+
+  const handleUpdateTransaction: IHandleUpdateTransaction = async (
+    transaction: ITransaction,
+  ) => {
+    try {
+      await updateTransactionMutation.mutateAsync(transaction);
+    } catch (err) {
+      console.error('Error updating transaction:', err);
+    }
+  };
+
+  // Legacy handlers for backward compatibility
+  const handleUpdateRecurringTransaction = async (transaction: ITransaction) => {
+    try {
+      await updateRe.mutateAsync(transaction);
+    } catch (err) {
+      console.error('Error updating transaction:', err);
+    }
+  };
+
+  const handleDeleteRecurringTransaction = async (id: string) => {
+    // TODO: Implement recurring transaction delete
+    console.log('Delete recurring transaction:', id);
+  };
+
+  const handleUpdateInstallmentTransaction = async (transaction: ITransaction) => {
+    // TODO: Implement installment transaction update
+    console.log('Update installment transaction:', transaction);
+  };
+
+  const handleDeleteInstallmentTransaction = async (id: string) => {
+    // TODO: Implement installment transaction delete
+    console.log('Delete installment transaction:', id);
+  };
+
+  // Default values for undefined data
+  const defaultChartCategories = {
+    notIncome: {
+      config: [],
+      total: 0,
+      chartConfig: {
+        labels: ['sem valor'],
+        datasets: [{ data: [0], backgroundColor: ['#000'], hoverBackgroundColor: ['#000'] }],
+      },
+    },
+    income: {
+      config: [],
+      total: 0,
+      chartConfig: {
+        labels: ['sem valor'],
+        datasets: [{ data: [0], backgroundColor: ['#000'], hoverBackgroundColor: ['#000'] }],
+      },
+    },
+  };
+
+  const defaultPeriodsSummary = {
+    today: { balance: 0 },
+    thisWeek: { balance: 0 },
+    thisMonth: { balance: 0 },
+  };
+
+  const defaultOverview = {
+    income: { total: 0, type: 'income' as const, percentage: 0, isPositive: false },
+    outcome: { total: 0, type: 'outcome' as const, percentage: 0, isPositive: false },
+    remaining: { total: 0, type: 'remaining' as const, percentage: 0, isPositive: false },
   };
 
   return (
@@ -236,7 +364,7 @@ export default function Dashboard() {
                     Saldo Hoje
                   </p>
                   <div className="text-2xl font-bold text-teal-600 dark:text-teal-400">
-                    <CountUp valueNumber={balance} />
+                    <CountUp valueNumber={balance || 0} />
                   </div>
                 </div>
               </div>
@@ -250,18 +378,6 @@ export default function Dashboard() {
                     <div className="animate-pulse">
                       <div className="h-6 bg-zinc-200 dark:bg-zinc-700 rounded mb-4"></div>
                       <div className="h-40 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
-                    </div>
-                  </div>
-                ) : creditCardsError ? (
-                  <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl">
-                    <div className="text-center text-red-500 dark:text-red-400">
-                      <p className="mb-2">Erro ao carregar cartões de crédito</p>
-                      <button 
-                        onClick={() => fetchCreditCards()}
-                        className="text-sm text-teal-600 dark:text-teal-400 hover:underline"
-                      >
-                        Tentar novamente
-                      </button>
                     </div>
                   </div>
                 ) : creditCards.length > 0 ? (
@@ -294,7 +410,7 @@ export default function Dashboard() {
                   </div>
                   <div className="space-y-2">
                     <p className="text-2xl font-bold text-teal-600 dark:text-teal-400">
-                      <CountUp valueNumber={overview?.income?.total} />
+                      <CountUp valueNumber={(overview || defaultOverview).income.total} />
                     </p>
                     {overview?.income?.percentage !== undefined && (
                       <div className="flex items-center gap-1">
@@ -344,7 +460,7 @@ export default function Dashboard() {
                   </div>
                   <div className="space-y-2">
                     <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-                      <CountUp valueNumber={overview?.outcome?.total} />
+                      <CountUp valueNumber={(overview || defaultOverview).outcome.total} />
                     </p>
                     {overview?.outcome?.percentage !== undefined && (
                       <div className="flex items-center gap-1">
@@ -454,7 +570,12 @@ export default function Dashboard() {
                       </div>
                     </div>
                   </div>
-                  {chartCategories.notIncome.config.length === 0 ? (
+                  {chartLoading ? (
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded mb-4"></div>
+                      <div className="h-32 bg-zinc-200 dark:bg-zinc-700 rounded"></div>
+                    </div>
+                  ) : (chartCategories || defaultChartCategories).notIncome.config.length === 0 ? (
                     <EmptyChartState
                       type="despesas"
                       onAddTransaction={() =>
@@ -469,12 +590,12 @@ export default function Dashboard() {
                     <div className="flex">
                       {/* Lista de categorias centralizadas - metade esquerda */}
                       <div className="w-1/2 pr-4 flex flex-col justify-center">
-                        {chartCategories.notIncome.config
+                        {(chartCategories || defaultChartCategories).notIncome.config
                           .slice(0, 5)
                           .map((item, index) => (
                             <div
                               key={item.id}
-                              className={`flex items-center justify-start py-3 ${index !== chartCategories.notIncome.config.slice(0, 5).length - 1 ? "border-b border-zinc-100 dark:border-zinc-700" : ""}`}
+                              className={`flex items-center justify-start py-3 ${index !== (chartCategories || defaultChartCategories).notIncome.config.slice(0, 5).length - 1 ? "border-b border-zinc-100 dark:border-zinc-700" : ""}`}
                             >
                               <div className="flex justify-between items-center gap-3 w-full">
                                 <div className="flex items-center gap-3">
@@ -494,7 +615,7 @@ export default function Dashboard() {
                       {/* Chart e botão - metade direita */}
                       <div className="w-1/2 flex flex-col items-center">
                         <div className="w-full">
-                          <ModernDonutChart data={chartCategories.notIncome.config} />
+                          <ModernDonutChart data={(chartCategories || defaultChartCategories).notIncome.config} />
                         </div>
                         <Link
                           to={{
@@ -865,7 +986,7 @@ export default function Dashboard() {
                     Hoje
                   </div>
                   <div className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                    <CountUp valueNumber={periodsSummary.today.balance} />
+                    <CountUp valueNumber={(periodsSummary || defaultPeriodsSummary).today.balance} />
                   </div>
                 </div>
                 <div className="text-center">
@@ -873,7 +994,7 @@ export default function Dashboard() {
                     Esta Semana
                   </div>
                   <div className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                    <CountUp valueNumber={periodsSummary.thisWeek.balance} />
+                    <CountUp valueNumber={(periodsSummary || defaultPeriodsSummary).thisWeek.balance} />
                   </div>
                 </div>
                 <div className="text-center">
@@ -881,7 +1002,7 @@ export default function Dashboard() {
                     Este Mês
                   </div>
                   <div className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
-                    <CountUp valueNumber={periodsSummary.thisMonth.balance} />
+                    <CountUp valueNumber={(periodsSummary || defaultPeriodsSummary).thisMonth.balance} />
                   </div>
                 </div>
               </div>
@@ -891,6 +1012,53 @@ export default function Dashboard() {
       </div>
 
       <FloatingButton setOpenModal={setOpenModal} />
+      
+      {/* Modais para transações recentes */}
+      {openModal.isOpen && (
+        <>
+          {openModal.type === "edit" ? (
+            <ModalEdit
+              openModal={openModal}
+              setOpenModal={setOpenModal}
+              handleUpdateTransaction={handleUpdateTransaction}
+              handleUpdateInstallmentTransaction={handleUpdateInstallmentTransaction}
+              handleUpdateRecurringTransaction={handleUpdateRecurringTransaction}
+              handleDeleteInstallmentTransaction={handleDeleteInstallmentTransaction}
+              currentMonth={currentMonth}
+              setCurrentMonth={setCurrentMonth}
+              categories={categories}
+              creditCards={creditCards}
+              from="dashboard"
+              retryCategories={retryCategories}
+            />
+          ) : openModal.type === "delete" ? (
+            <ModalDelete
+              setOpenModal={setOpenModal}
+              openModal={openModal}
+              handleDeleteTransaction={handleDeleteTransaction}
+              handleDeleteRecurringTransaction={handleDeleteRecurringTransaction}
+              handleDeleteInstallmentTransaction={handleDeleteInstallmentTransaction}
+              currentMonth={currentMonth}
+              setCurrentMonth={setCurrentMonth}
+              from="dashboard"
+            />
+          ) : (
+            <ModalCreate
+              openModal={openModal}
+              setOpenModal={setOpenModal}
+              handleCreateRecurringTransaction={handleCreateRecurringTransaction}
+              handleCreateInstallmentTransaction={handleCreateInstallmentTransaction}
+              handleCreateCompleteTransaction={handleCreateCompleteTransaction}
+              creditCards={creditCards}
+              currentMonth={currentMonth}
+              setCurrentMonth={setCurrentMonth}
+              categories={categories}
+              from="dashboard"
+              retryCategories={retryCategories}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }

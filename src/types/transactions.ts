@@ -73,7 +73,8 @@ export type ITransaction = {
   is_recurring?: boolean
   recurrence_pattern?: RecurrenceType
   recurrence_interval?: number
-  end_date?: string
+  start_date?: string
+  end_date?: string | Date
   parent_transaction_id?: string
   installment_count?: number
   installment_all?: number
