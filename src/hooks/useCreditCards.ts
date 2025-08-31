@@ -113,20 +113,16 @@ const useCreditCards = () => {
     setError(null)
 
     try {
-      console.log('Fetching credit cards...')
       const response = await axiosPrivate.get('/credit-cards')
-      console.log('Credit cards response:', response.data)
       
       if (!Array.isArray(response.data)) {
         throw new Error('Invalid response format: expected array')
       }
       
       const transformedCards = response.data.map(transformCreditCard)
-      console.log('Transformed cards:', transformedCards)
       setCreditCards(transformedCards)
     } catch (err: any) {
       console.error('Error fetching credit cards:', err)
-      console.error('Error response:', err.response?.data)
       setError(err.response?.data?.message || err.message || 'Erro ao carregar cartões de crédito')
       setCreditCards([])
     } finally {

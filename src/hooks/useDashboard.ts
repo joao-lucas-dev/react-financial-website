@@ -215,7 +215,7 @@ export default function useDashboard(
       await Promise.all(promises);
       setCurrentDate(referenceDate);
       
-      console.log(`Data fetched for ${periodType} period:`, { startDate, endDate, referenceDate: referenceDate.toISODate() });
+
     } finally {
       setIsLoading(false);
     }

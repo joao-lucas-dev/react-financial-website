@@ -7,11 +7,8 @@ let interceptorsSetup = false
 export const setupAxiosInterceptors = () => {
   // Evita configurar múltiplas vezes
   if (interceptorsSetup) {
-    console.log('🔐 [Interceptors] Already setup, skipping...')
     return
   }
-
-  console.log('🔐 [Interceptors] Setting up global auth interceptors...')
 
   // Request interceptor - adiciona token automaticamente
   axiosPrivate.interceptors.request.use(
@@ -50,8 +47,6 @@ export const setupAxiosInterceptors = () => {
         originalRequest.url !== '/auth/refresh-token' &&
         !(originalRequest as any).skipAuthInterceptor
       ) {
-        console.log('🔐 [Interceptors] 401 detected, handling token refresh...')
-
         // Cria uma Promise que será resolvida quando o token for refreshed
         return new Promise((resolve, reject) => {
           // Adiciona à queue de requests pendentes
@@ -64,7 +59,6 @@ export const setupAxiosInterceptors = () => {
           // Se não está fazendo refresh, inicia o processo
           if (!authManager.isRefreshing()) {
             authManager.refreshToken().catch((refreshError) => {
-              console.error('🔐 [Interceptors] Token refresh failed:', refreshError)
               // Se o refresh falhou, remove a request da queue e rejeita
               authManager.removePendingRequest(requestId)
               reject(refreshError)
@@ -80,7 +74,6 @@ export const setupAxiosInterceptors = () => {
   )
 
   interceptorsSetup = true
-  console.log('✅ [Interceptors] Global auth interceptors setup complete')
 }
 
 // Função para resetar (útil para testes)
@@ -88,5 +81,4 @@ export const resetInterceptors = () => {
   axiosPrivate.interceptors.request.clear()
   axiosPrivate.interceptors.response.clear()
   interceptorsSetup = false
-  console.log('🔄 [Interceptors] Interceptors reset')
 }

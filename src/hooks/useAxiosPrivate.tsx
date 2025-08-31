@@ -5,20 +5,18 @@ import authManager from '../api/authManager'
 import { setupAxiosInterceptors } from '../api/setupInterceptors'
 
 const useAxiosPrivate = () => {
-  const { accessToken, setAccessToken } = useAuthContext()
+  const { accessToken } = useAuthContext()
 
   useEffect(() => {
     // Configura os interceptors globais (apenas uma vez)
     setupAxiosInterceptors()
     
-    // Configura callback para sincronização do token no contexto
-    authManager.setTokenUpdateCallback(setAccessToken)
-    
-    // Sincroniza o token atual com o authManager
+    // Sincroniza o token atual com o authManager se necessário
+    // O callback já foi configurado no AuthProvider, não precisamos duplicar aqui
     if (accessToken !== authManager.getAccessToken()) {
-      authManager.setAccessToken(accessToken)
+      authManager.setAccessToken(accessToken, true) // skipCallback = true para evitar loop
     }
-  }, [accessToken, setAccessToken])
+  }, [accessToken])
 
   return axiosPrivate
 }

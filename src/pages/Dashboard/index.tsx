@@ -211,7 +211,6 @@ export default function Dashboard() {
 
   // Credit Card Handlers
   const handleCardClick = (card: any) => {
-    console.log("Cartão clicado:", card);
     // TODO: Implementar navegação para detalhes do cartão ou ações
   };
 

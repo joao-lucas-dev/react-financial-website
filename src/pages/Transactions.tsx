@@ -75,7 +75,7 @@ const Transactions = () => {
       // Refetch data with new date
       await refetchRows();
       
-      console.log(`Period changed to ${type}:`, { startDate, endDate });
+
     } catch (error) {
       console.error('Error changing period:', error);
     } finally {
@@ -484,7 +484,7 @@ const Transactions = () => {
                // Fetch data for the custom date range
                await handleDateRangeChange(startDate, endDate, 'custom');
                
-               console.log('Custom period selected:', { startDate, endDate });
+
              }}
              currentMonth={currentMonth}
              currentYear={currentYear}

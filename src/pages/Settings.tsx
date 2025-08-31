@@ -140,7 +140,7 @@ const Settings: React.FC = () => {
     };
 
     const handleSave = () => {
-        console.log('Saving settings:', formData);
+
         // Implementar salvamento
     };
 
