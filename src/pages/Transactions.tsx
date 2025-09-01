@@ -10,7 +10,7 @@ import { DateTime } from "luxon";
 import { ITransaction } from "../types/transactions.ts";
 
 // React Query imports
-import { useCategories, useCategoriesChart } from "../queries/categoriesQueries";
+import { useCategories } from "../queries/categoriesQueries";
 import { useCreditCards } from "../queries/creditCardsQueries";
 import {
   useCreateCompleteTransaction,
@@ -32,16 +32,21 @@ const Transactions = () => {
     transaction: {} as ITransaction,
     type: "",
   });
-  const [resetScroll, setResetScroll] = useState(false);
+  const [resetScroll] = useState(false);
   const [viewMode, setViewMode] = useState<'table' | 'list'>('table');
   const [isCustomPeriodModalOpen, setIsCustomPeriodModalOpen] = useState(false);
   const [currentPeriodType, setCurrentPeriodType] = useState<PeriodType>('month');
   const [currentPeriodRange, setCurrentPeriodRange] = useState<{start: string, end: string} | null>(null);
   const [currentDate, setCurrentDate] = useState<DateTime>(DateTime.now());
   const [isLoading, setIsLoading] = useState(false);
+  const [customDateRange, setCustomDateRange] = useState<{startDate?: DateTime, endDate?: DateTime}>({});
 
-  // React Query hooks
-  const { data: rows = [], refetch: refetchRows } = useTransactionsPreview(currentDate);
+  // React Query hooks - Por padrão sempre pega o mês atual
+  const { data: rows = [], refetch: refetchRows } = useTransactionsPreview(
+    currentDate, 
+    customDateRange.startDate, 
+    customDateRange.endDate
+  );
   const { data: categories = [], refetch: retryCategories } = useCategories();
   const { data: creditCards = [] } = useCreditCards();
 
@@ -61,21 +66,21 @@ const Transactions = () => {
   const currentMonth = currentDate.month;
   const currentYear = currentDate.year;
 
-  // Function to handle date range changes
+  // Function to handle date range changes (para períodos customizados)
   const handleDateRangeChange = async (startDate: string, endDate: string, type: PeriodType) => {
     setIsLoading(true);
     try {
-      const luxonStartDate = DateTime.fromISO(startDate);
-      setCurrentDate(luxonStartDate);
+      const luxonStartDate = DateTime.fromISO(startDate).startOf('day');
+      const luxonEndDate = DateTime.fromISO(endDate).endOf('day');
       
-      // Set the period type and range
+      setCurrentDate(luxonStartDate);
       setCurrentPeriodType(type);
       setCurrentPeriodRange({ start: startDate, end: endDate });
+      setCustomDateRange({ startDate: luxonStartDate, endDate: luxonEndDate });
       
-      // Refetch data with new date
+      // Refetch data with new date range
       await refetchRows();
       
-
     } catch (error) {
       console.error('Error changing period:', error);
     } finally {
@@ -92,6 +97,7 @@ const Transactions = () => {
       setCurrentDate(newDate);
       setCurrentPeriodType('month');
       setCurrentPeriodRange(null);
+      setCustomDateRange({}); // Remove custom range para usar o padrão
       await refetchRows();
     } catch (error) {
       console.error('Error changing month:', error);
@@ -112,6 +118,7 @@ const Transactions = () => {
       setCurrentDate(newDate);
       setCurrentPeriodType('month');
       setCurrentPeriodRange(null);
+      setCustomDateRange({}); // Remove custom range para usar o padrão
       await refetchRows();
     } catch (error) {
       console.error('Error changing year:', error);
@@ -120,14 +127,22 @@ const Transactions = () => {
     }
   };
 
-  // Function to handle today
+  // Function to handle today - startDate: hoje, endDate: hoje
   const handleToday = async () => {
     setIsLoading(true);
     try {
       const today = DateTime.now();
+      const startDate = today.startOf('day'); // 00:00:00.000
+      const endDate = today.endOf('day');     // 23:59:59.999
+      
       setCurrentDate(today);
-      setCurrentPeriodType('month');
-      setCurrentPeriodRange(null);
+      setCurrentPeriodType('today' as PeriodType);
+      setCurrentPeriodRange({ 
+        start: startDate.toISODate() || '', 
+        end: endDate.toISODate() || '' 
+      });
+      setCustomDateRange({ startDate, endDate });
+      
       await refetchRows();
     } catch (error) {
       console.error('Error going to today:', error);
@@ -136,10 +151,51 @@ const Transactions = () => {
     }
   };
 
+  // Function to handle this week - hoje -3 para startDate, hoje +3 para endDate
+  const handleThisWeek = async () => {
+    setIsLoading(true);
+    try {
+      const today = DateTime.now();
+      const startDate = today.minus({ days: 3 }).startOf('day'); // hoje -3 às 00:00:00.000
+      const endDate = today.plus({ days: 3 }).endOf('day');       // hoje +3 às 23:59:59.999
+      
+      setCurrentDate(today);
+      setCurrentPeriodType('week');
+      setCurrentPeriodRange({ 
+        start: startDate.toISODate() || '', 
+        end: endDate.toISODate() || '' 
+      });
+      setCustomDateRange({ startDate, endDate });
+      
+      await refetchRows();
+    } catch (error) {
+      console.error('Error going to this week:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to handle this month - volta para o padrão (mês atual)
+  const handleThisMonth = async () => {
+    setIsLoading(true);
+    try {
+      const now = DateTime.now();
+      setCurrentDate(now);
+      setCurrentPeriodType('month');
+      setCurrentPeriodRange(null);
+      setCustomDateRange({}); // Remove custom range para usar o padrão
+      
+      await refetchRows();
+    } catch (error) {
+      console.error('Error going to this month:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Check if today is available
   const hasToday = () => {
-    const today = DateTime.now();
-    return currentDate.hasSame(today, 'day');
+    return currentPeriodType === 'today' || (currentPeriodType === 'month' && currentDate.hasSame(DateTime.now(), 'day'));
   };
 
   // Transaction handlers using mutations
@@ -322,7 +378,7 @@ const Transactions = () => {
                       Total de Receitas
                     </div>
                     <div className="text-lg font-bold text-green-600 dark:text-green-400">
-                      {rows.reduce((total, row) => total + (row.incomes?.transactions?.length || 0), 0)} transações
+                      {rows.reduce((total: number, row: any) => total + (row.incomes?.transactions?.length || 0), 0)} transações
                     </div>
                   </div>
                 </div>
@@ -336,7 +392,7 @@ const Transactions = () => {
                       Total de Despesas
                     </div>
                     <div className="text-lg font-bold text-red-600 dark:text-red-400">
-                      {rows.reduce((total, row) => total + (row.outcomes?.transactions?.length || 0), 0)} transações
+                      {rows.reduce((total: number, row: any) => total + (row.outcomes?.transactions?.length || 0), 0)} transações
                     </div>
                   </div>
                 </div>
@@ -350,7 +406,7 @@ const Transactions = () => {
                       Total Geral
                     </div>
                     <div className="text-lg font-bold text-zinc-600 dark:text-zinc-400">
-                      {rows.reduce((total, row) => 
+                      {rows.reduce((total: number, row: any) => 
                         total + (row.incomes?.transactions?.length || 0) + (row.outcomes?.transactions?.length || 0), 0
                       )} transações
                     </div>
@@ -374,14 +430,10 @@ const Transactions = () => {
                        handleToday();
                        break;
                      case 'thisWeek':
-                       // This will be handled by onPeriodChange
+                       handleThisWeek();
                        break;
                      case 'thisMonth':
-                       const now = new Date();
-                       handleMonthChange(now.getMonth() + 1);
-                       handleYearChange(now.getFullYear());
-                       setCurrentPeriodType('month');
-                       setCurrentPeriodRange(null);
+                       handleThisMonth();
                        break;
                      case 'custom':
                        setIsCustomPeriodModalOpen(true);

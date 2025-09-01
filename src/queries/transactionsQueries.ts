@@ -10,7 +10,13 @@ export const QUERY_KEYS = {
     balance: (date: DateTime) => ['transactions', 'balance', date.toISODate()],
     recent: (filter: string, sort: string, direction: string, type: string) => 
       ['transactions', 'recent', filter, sort, direction, type],
-    preview: (date: DateTime) => ['transactions', 'preview', date.toISODate()],
+    preview: (date: DateTime, startDate?: DateTime, endDate?: DateTime) => [
+      'transactions', 
+      'preview', 
+      date.toISODate(),
+      startDate?.toISODate(),
+      endDate?.toISODate()
+    ],
     month: (date: DateTime) => ['transactions', 'month', date.year, date.month],
     periodsSummary: () => ['transactions', 'periods-summary'],
   }
@@ -64,17 +70,18 @@ export const useRecentTransactions = (
   })
 }
 
-export const useTransactionsPreview = (date: DateTime = DateTime.now()) => {
+export const useTransactionsPreview = (date: DateTime = DateTime.now(), startDate?: DateTime, endDate?: DateTime) => {
   const axiosPrivate = useAxiosPrivate()
   
   return useQuery({
-    queryKey: QUERY_KEYS.transactions.preview(date),
+    queryKey: QUERY_KEYS.transactions.preview(date, startDate, endDate),
     queryFn: async () => {
-      const startDate = date.minus({ days: 1 })
-      const endDate = date.plus({ days: 1 })
+      // Se startDate e endDate forem fornecidos, use-os; caso contrário, use a lógica padrão
+      const start = startDate || date.minus({ days: 1 })
+      const end = endDate || date.plus({ days: 1 })
       
       const { data } = await axiosPrivate.get<IRow[]>(
-        `/transactions/preview?startDate=${startDate}&endDate=${endDate}`
+        `/transactions/preview?startDate=${start.toISO()}&endDate=${end.toISO()}`
       )
       return data
     },

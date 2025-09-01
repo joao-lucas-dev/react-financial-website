@@ -1,7 +1,7 @@
 import { Calendar, ChevronDown, ChevronLeft, ChevronRight, Clock, Settings, Zap } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
-type PeriodType = 'month' | 'week' | 'custom';
+export type PeriodType = 'month' | 'week' | 'custom' | 'today';
 
 interface PeriodNavigatorProps {
   currentMonth: number;
