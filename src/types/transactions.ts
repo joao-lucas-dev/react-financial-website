@@ -5,7 +5,7 @@ export type IType = {
   total: number
   type: 'income' | 'outcome' | 'remaining'
   percentage: number
-  isPositive: boolean
+  status: 'positive' | 'negative' | 'zero'
 }
 
 export interface IOverview {

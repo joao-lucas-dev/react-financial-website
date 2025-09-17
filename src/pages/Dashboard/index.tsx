@@ -15,6 +15,7 @@ import {
   TrendingUp,
   X,
 } from "lucide-react";
+import { Minus } from "lucide-react";
 import { DateTime } from "luxon";
 import { useEffect, useRef, useState } from "react";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -333,9 +334,9 @@ export default function Dashboard() {
   };
 
   const defaultOverview = {
-    income: { total: 0, type: 'income' as const, percentage: 0, isPositive: false },
-    outcome: { total: 0, type: 'outcome' as const, percentage: 0, isPositive: false },
-    remaining: { total: 0, type: 'remaining' as const, percentage: 0, isPositive: false },
+    income: { total: 0, type: 'income' as const, percentage: 0, status: 'zero' as const },
+    outcome: { total: 0, type: 'outcome' as const, percentage: 0, status: 'zero' as const },
+    remaining: { total: 0, type: 'remaining' as const, percentage: 0, status: 'zero' as const },
   };
 
   return (
@@ -416,18 +417,35 @@ export default function Dashboard() {
                         {(() => {
                           const percentage = Number(overview.income.percentage)
                           if (isNaN(percentage)) return null
-                          
-                          return overview?.income?.isPositive ? (
+                          const incomeAny: any = overview?.income as any
+                          const status = incomeAny?.status ?? (typeof incomeAny?.isPositive === 'boolean' ? (incomeAny.isPositive ? 'positive' : 'negative') : 'zero')
+
+                          if (status === 'positive') {
+                            return (
+                              <>
+                                <ChevronUp className="w-4 h-4 text-green-500" />
+                                <span className="text-sm font-medium text-green-500">
+                                  {percentage.toFixed(1)}%
+                                </span>
+                              </>
+                            )
+                          }
+
+                          if (status === 'negative') {
+                            return (
+                              <>
+                                <ChevronDown className="w-4 h-4 text-red-500" />
+                                <span className="text-sm font-medium text-red-500">
+                                  {percentage.toFixed(1)}%
+                                </span>
+                              </>
+                            )
+                          }
+
+                          return (
                             <>
-                              <ChevronUp className="w-4 h-4 text-green-500" />
-                              <span className="text-sm font-medium text-green-500">
-                                {percentage.toFixed(1)}%
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <ChevronDown className="w-4 h-4 text-red-500" />
-                              <span className="text-sm font-medium text-red-500">
+                              <Minus className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
+                              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
                                 {percentage.toFixed(1)}%
                               </span>
                             </>
@@ -466,18 +484,35 @@ export default function Dashboard() {
                         {(() => {
                           const percentage = Number(overview.outcome.percentage)
                           if (isNaN(percentage)) return null
-                          
-                          return overview?.outcome?.isPositive ? (
+                          const outcomeAny: any = overview?.outcome as any
+                          const status = outcomeAny?.status ?? (typeof outcomeAny?.isPositive === 'boolean' ? (outcomeAny.isPositive ? 'positive' : 'negative') : 'zero')
+
+                          if (status === 'positive') {
+                            return (
+                              <>
+                                <ChevronDown className="w-4 h-4 text-green-500 dark:text-green-400" />
+                                <span className="text-sm font-medium text-green-500 dark:text-green-400">
+                                  {percentage.toFixed(1)}%
+                                </span>
+                              </>
+                            )
+                          }
+
+                          if (status === 'negative') {
+                            return (
+                              <>
+                                <ChevronUp className="w-4 h-4 text-red-500 dark:text-red-400" />
+                                <span className="text-sm font-medium text-red-500 dark:text-red-400">
+                                  {percentage.toFixed(1)}%
+                                </span>
+                              </>
+                            )
+                          }
+
+                          return (
                             <>
-                              <ChevronDown className="w-4 h-4 text-green-500 dark:text-green-400" />
-                              <span className="text-sm font-medium text-green-500 dark:text-green-400">
-                                {percentage.toFixed(1)}%
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <ChevronUp className="w-4 h-4 text-red-500 dark:text-red-400" />
-                              <span className="text-sm font-medium text-red-500 dark:text-red-400">
+                              <Minus className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
+                              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
                                 {percentage.toFixed(1)}%
                               </span>
                             </>

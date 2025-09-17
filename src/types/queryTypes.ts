@@ -23,9 +23,9 @@ export type IOpenModal = {
 // Query result types with fallbacks
 export interface IDashboardData {
   overview?: {
-    income: { total: number; type: 'income'; percentage?: number; isPositive?: boolean }
-    outcome: { total: number; type: 'outcome'; percentage?: number; isPositive?: boolean }
-    remaining: { total: number; type: 'remaining'; percentage?: number }
+    income: { total: number; type: 'income'; percentage?: number; status?: 'positive' | 'negative' | 'zero' }
+    outcome: { total: number; type: 'outcome'; percentage?: number; status?: 'positive' | 'negative' | 'zero' }
+    remaining: { total: number; type: 'remaining'; percentage?: number; status?: 'positive' | 'negative' | 'zero' }
   }
   balance?: number
   periodsSummary?: {
