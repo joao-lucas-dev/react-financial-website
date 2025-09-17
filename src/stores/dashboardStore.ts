@@ -6,8 +6,9 @@ interface DashboardState {
     isOpen: boolean
     transaction: any
     type: string
+    button?: 'income' | 'outcome'
   }
-  setOpenModal: (modal: { isOpen: boolean; transaction: any; type: string }) => void
+  setOpenModal: (modal: { isOpen: boolean; transaction: any; type: string; button?: 'income' | 'outcome' }) => void
 
   // Filters for recent transactions
   recentSearchTerm: string

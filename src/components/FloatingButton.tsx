@@ -7,15 +7,10 @@ import {
   TrendingUp,
   TrendingDown,
 } from 'lucide-react'
-import { ITransaction } from '../types/transactions.ts'
+import { ISetOpenModal, ITransaction } from '../types/transactions.ts'
 
 interface IParams {
-  setOpenModal: React.Dispatch<{
-    isOpen: boolean
-    transaction: ITransaction
-    type: string
-    button?: string
-  }>
+  setOpenModal: ISetOpenModal
 }
 
 const FloatingButton = ({ setOpenModal }: IParams) => {

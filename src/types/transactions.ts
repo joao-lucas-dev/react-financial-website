@@ -198,4 +198,5 @@ export type ISetOpenModal = React.Dispatch<{
   isOpen: boolean
   transaction: ITransaction
   type: string
+  button?: 'income' | 'outcome'
 }>

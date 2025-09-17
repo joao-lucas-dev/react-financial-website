@@ -24,7 +24,7 @@ const QuickAddModal: React.FC<QuickAddModalProps> = ({
         category_id: '',
         description: '',
         price: '',
-        category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type },
+        category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type },
         transaction_day: date,
         type
       } as ITransaction,

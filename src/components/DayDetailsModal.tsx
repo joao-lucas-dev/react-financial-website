@@ -67,11 +67,12 @@ const DayDetailsModal: React.FC<DayDetailsModalProps> = ({
         category_id: '',
         description: '',
         price: '',
-        category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type: type },
+        category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: type },
         transaction_day: dayData.date,
         type: type
       } as ITransaction,
-      type: 'create'
+      type: 'create',
+      button: type,
     })
     handleClose()
   }

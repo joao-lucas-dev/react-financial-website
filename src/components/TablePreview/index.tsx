@@ -270,7 +270,7 @@ const TablePreview = ({
                           category_id: '',
                           description: '',
                           price: '',
-                          category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'income' },
+                          category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'income' },
                           transaction_day: row.date,
                           type: 'income'
                         } as any,
@@ -338,7 +338,7 @@ const TablePreview = ({
                           category_id: '',
                           description: '',
                           price: '',
-                          category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'outcome' },
+                          category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'outcome' },
                           transaction_day: row.date,
                           type: 'outcome'
                         } as any,
@@ -602,7 +602,7 @@ const TablePreview = ({
                       category_id: '',
                       description: '',
                       price: '',
-                      category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'income' },
+                      category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'income' },
                       transaction_day: row.date,
                       type: 'income'
                     } as any,
@@ -661,7 +661,7 @@ const TablePreview = ({
                       category_id: '',
                       description: '',
                       price: '',
-                      category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'outcome' },
+                      category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'outcome' },
                       transaction_day: row.date,
                       type: 'outcome'
                     } as any,

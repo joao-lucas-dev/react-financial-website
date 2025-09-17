@@ -73,8 +73,8 @@ const ModalCreate = ({
   const [isPaidManuallyOverridden, setIsPaidManuallyOverridden] = useState(false)
 
   const getType = useCallback(() => {
-    if (openModal.button === 'income') return 'receita'
-    if (openModal.button === 'outcome') return 'despesa'
+    if (openModal.button === 'income') return 'Receita'
+    if (openModal.button === 'outcome') return 'Despesa'
   }, [openModal.button])
 
   const {

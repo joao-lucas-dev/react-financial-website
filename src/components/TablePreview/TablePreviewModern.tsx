@@ -310,7 +310,21 @@ const TablePreviewModern = ({
                 {/* Income */}
                 <div 
                   className="group/income-v relative p-2.5 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 transition-all duration-200 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 hover:scale-105 hover:shadow-md"
-                  onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'income' })}
+                  onClick={() => {
+                    setOpenModal({
+                      isOpen: true,
+                      transaction: {
+                        category_id: '',
+                        description: '',
+                        price: '',
+                        category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'income' },
+                        transaction_day: row.date,
+                        type: 'income'
+                      } as any,
+                      type: 'create',
+                      button: 'income',
+                    });
+                  }}
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
@@ -359,11 +373,12 @@ const TablePreviewModern = ({
                           category_id: '',
                           description: '',
                           price: '',
-                          category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'income' },
+                          category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'income' },
                           transaction_day: row.date,
                           type: 'income'
                         } as any,
                         type: 'create',
+                        button: 'income',
                       });
                     }}
                     title="Adicionar receita"
@@ -378,7 +393,21 @@ const TablePreviewModern = ({
                 {/* Outcome */}
                 <div 
                   className="group/outcome-v relative p-2.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 transition-all duration-200 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/30 hover:scale-105 hover:shadow-md"
-                  onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'outcome' })}
+                  onClick={() => {
+                    setOpenModal({
+                      isOpen: true,
+                      transaction: {
+                        category_id: '',
+                        description: '',
+                        price: '',
+                        category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'outcome' },
+                        transaction_day: row.date,
+                        type: 'outcome'
+                      } as any,
+                      type: 'create',
+                      button: 'outcome',
+                    });
+                  }}
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
@@ -427,11 +456,12 @@ const TablePreviewModern = ({
                           category_id: '',
                           description: '',
                           price: '',
-                          category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'outcome' },
+                          category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'outcome' },
                           transaction_day: row.date,
                           type: 'outcome'
                         } as any,
                         type: 'create',
+                        button: 'outcome',
                       });
                     }}
                     title="Adicionar despesa"
@@ -444,7 +474,10 @@ const TablePreviewModern = ({
                 </div>
 
                 {/* Balance */}
-                <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-600">
+                <div 
+                  className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-600 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all duration-200 hover:shadow-md"
+                  onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'all' })}
+                >
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <BarChart3
@@ -469,7 +502,7 @@ const TablePreviewModern = ({
                       Total: {((row.incomes?.transactions?.length || 0) + (row.outcomes?.transactions?.length || 0))} transações
                     </span>
                     <button
-                      onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'all' })}
+                      onClick={(e) => { e.stopPropagation(); setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'all' }); }}
                       className="text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
                       title="Ver todas"
                     >

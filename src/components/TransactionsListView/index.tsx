@@ -65,7 +65,7 @@ const TransactionsListView: React.FC<TransactionsListViewProps> = ({
         category_id: '',
         description: '',
         price: '',
-        category: { id: '', name: '', color: '', icon: '', iconName: '', icon_name: '', type: type },
+        category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: type },
         transaction_day: new Date().toISOString().split('T')[0],
         type: type
       } as ITransaction,
