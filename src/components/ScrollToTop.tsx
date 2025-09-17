@@ -2,12 +2,17 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const location = useLocation();
 
   useEffect(() => {
-    // Scroll to top whenever the route changes
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    // If a restoreScroll value was provided via navigation state, use it; otherwise scroll to top
+    const restore = (location.state as any)?.restoreScroll;
+    if (typeof restore === 'number') {
+      window.scrollTo({ top: restore, behavior: 'auto' });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
 
   return null;
 };

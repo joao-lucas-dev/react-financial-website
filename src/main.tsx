@@ -14,6 +14,7 @@ import Settings from './pages/Settings'
 import CreditCardBillsPage from './pages/CreditCardBills'
 import CreditCardDetailsPage from './pages/CreditCardDetails'
 import SavingsPage from './pages/Savings'
+import DayDetailsPage from './pages/DayDetails'
 import AuthTestPage from './pages/AuthTestPage'
 import ThemeProvider from './context/ThemeProvider.tsx'
 import ScrollToTop from './components/ScrollToTop'
@@ -67,6 +68,7 @@ if (rootElement) {
                   <Route path="/transacoes" element={<Transactions />} />
                   <Route path="/cartoes" element={<CreditCardBillsPage />} />
                   <Route path="/cartoes/:cardId" element={<CreditCardDetailsPage />} />
+                  <Route path="/dia/:date" element={<DayDetailsPage />} />
                   <Route path="/relatorios" element={<CategoryReports />} />
                   <Route path="/caixinhas" element={<SavingsPage />} />
                   <Route path="/configuracoes" element={<Settings />} />

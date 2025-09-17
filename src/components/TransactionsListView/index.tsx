@@ -1,5 +1,5 @@
-import { BarChart3, CreditCard, Eye, PieChart, Plus, Target, TrendingDown, TrendingUp } from 'lucide-react'
-import React, { useState } from 'react'
+import { BarChart3, CreditCard, Edit3, Eye, MoreHorizontal, PieChart, Plus, Target, Trash2, TrendingDown, TrendingUp } from 'lucide-react'
+import React, { useRef, useState } from 'react'
 import { IRow, ISetOpenModal, ITransaction } from '../../types/transactions'
 import CategoryIcon from '../CategoryIcon'
 
@@ -17,15 +17,22 @@ interface TransactionsListViewProps {
 const TransactionsListView: React.FC<TransactionsListViewProps> = ({
   rows,
   setOpenModal,
-  categories,
-  handleCreateTransaction,
-  handleUpdateTransaction,
-  handleDeleteTransaction,
-  currentMonth,
-  setCurrentMonth
 }) => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'income' | 'outcome'>('all')
-  const [selectedDay, setSelectedDay] = useState<string | null>(null)
+  const [menuState, setMenuState] = useState<{ open: boolean; x: number; y: number; transaction: ITransaction | null }>({ open: false, x: 0, y: 0, transaction: null })
+  const closeTimer = useRef<any>(null)
+
+  const openMenu = (e: React.MouseEvent<HTMLButtonElement>, transaction: ITransaction) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    setMenuState({ open: true, x: rect.right, y: rect.bottom + 6, transaction })
+  }
+  const scheduleCloseMenu = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    closeTimer.current = setTimeout(() => setMenuState(s => ({ ...s, open: false, transaction: null })), 150)
+  }
+  const cancelCloseMenu = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+  }
 
   // Función para calcular status de pagamento automático baseado na data
   const getAutoPaymentStatus = (transaction: ITransaction) => {
@@ -59,48 +66,52 @@ const TransactionsListView: React.FC<TransactionsListViewProps> = ({
   }
 
   const handleAddTransaction = (type: 'income' | 'outcome') => {
+    const defaultDate = (rows && rows.length === 1 && rows[0]?.date)
+      ? rows[0].date
+      : new Date().toISOString().split('T')[0]
+
     setOpenModal({
       isOpen: true,
       transaction: {
         category_id: '',
         description: '',
         price: '',
-        category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: type },
-        transaction_day: new Date().toISOString().split('T')[0],
-        type: type
+        category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type },
+        transaction_day: defaultDate,
+        type
       } as ITransaction,
-      type: 'create'
+      type: 'create',
+      button: type,
     })
   }
 
   // Calcular estatísticas gerais
   const allTransactions: (ITransaction & { type: 'income' | 'outcome', dayData: IRow })[] = []
-  let totalIncome = 0
-  let totalOutcome = 0
-  let totalBalance = 0
+  const totalsFromRows = rows.reduce(
+    (acc, row) => {
+      // Build flattened list used by the UI
+      if (row.incomes?.transactions) {
+        row.incomes.transactions.forEach(t => allTransactions.push({ ...t, type: 'income', dayData: row }))
+      }
+      if (row.outcomes?.transactions) {
+        row.outcomes.transactions.forEach(t => allTransactions.push({ ...t, type: 'outcome', dayData: row }))
+      }
 
-  rows.forEach(row => {
-    if (row.incomes?.transactions) {
-      row.incomes.transactions.forEach(t => {
-        allTransactions.push({ ...t, type: 'income', dayData: row })
-        const price = Number(t.price)
-        if (!isNaN(price) && t.price !== undefined && t.price !== null) {
-          totalIncome += price
-        }
-      })
-    }
-    if (row.outcomes?.transactions) {
-      row.outcomes.transactions.forEach(t => {
-        allTransactions.push({ ...t, type: 'outcome', dayData: row })
-        const price = Number(t.price)
-        if (!isNaN(price) && t.price !== undefined && t.price !== null) {
-          totalOutcome += Math.abs(price)
-        }
-      })
-    }
-  })
+      // Use the numeric aggregates provided by the API row
+      const inc = Number((row as any).incomes?.value ?? 0)
+      const out = Number((row as any).outcomes?.value ?? 0)
+      const tot = Number((row as any).total?.value ?? 0)
+      acc.income += isNaN(inc) ? 0 : inc
+      acc.outcome += isNaN(out) ? 0 : Math.abs(out)
+      acc.balance += isNaN(tot) ? 0 : tot
+      return acc
+    },
+    { income: 0, outcome: 0, balance: 0 }
+  )
 
-  totalBalance = totalIncome - totalOutcome
+  const totalIncome = totalsFromRows.income
+  const totalOutcome = totalsFromRows.outcome
+  const totalBalance = totalsFromRows.balance
 
   const filteredTransactions = activeFilter === 'all' 
     ? allTransactions 
@@ -122,29 +133,6 @@ const TransactionsListView: React.FC<TransactionsListViewProps> = ({
       const maxPrice = max ? Math.abs(Number(max.price)) : 0
       return currentPrice > maxPrice ? t : max
     }, null as (ITransaction & { type: 'income' | 'outcome', dayData: IRow }) | null)
-
-  // Categoria principal
-  const mainCategory = (() => {
-    const categoryMap = new Map<string, { count: number, total: number, name: string }>()
-    
-    allTransactions.forEach(t => {
-      const key = t.category?.name || 'Sem categoria'
-      const current = categoryMap.get(key) || { count: 0, total: 0, name: key }
-      const price = Number(t.price)
-      const validPrice = !isNaN(price) && t.price !== undefined && t.price !== null ? Math.abs(price) : 0
-      
-      categoryMap.set(key, {
-        count: current.count + 1,
-        total: current.total + validPrice,
-        name: key
-      })
-    })
-
-    const categories = Array.from(categoryMap.values())
-    return categories.length > 0 
-      ? categories.reduce((max, current) => current.total > max.total ? current : max)
-      : { count: 0, total: 0, name: 'Nenhuma' }
-  })()
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
@@ -218,27 +206,6 @@ const TransactionsListView: React.FC<TransactionsListViewProps> = ({
                 </div>
                 <div className="text-sm text-zinc-600 dark:text-zinc-400">
                   {largestExpense.description}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Main Category */}
-          {mainCategory.name !== 'Nenhuma' && (
-            <div className="p-4 bg-white dark:bg-zinc-800 rounded-lg">
-              <div className="flex items-center gap-3 mb-3">
-                <Eye size={16} className="text-purple-600 dark:text-purple-400" />
-                <span className="font-medium text-zinc-900 dark:text-zinc-100">Categoria Principal</span>
-              </div>
-              <div className="space-y-2">
-                <div className="font-medium text-zinc-900 dark:text-zinc-100">
-                  {mainCategory.name}
-                </div>
-                <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                  {mainCategory.count} transações • {mainCategory.total.toLocaleString('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                  })}
                 </div>
               </div>
             </div>
@@ -360,18 +327,17 @@ const TransactionsListView: React.FC<TransactionsListViewProps> = ({
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => {
-                        setOpenModal({
-                          isOpen: true,
-                          transaction,
-                          type: 'edit'
-                        })
-                      }}
-                      className="opacity-0 group-hover:opacity-100 p-2 hover:bg-zinc-200 dark:hover:bg-zinc-600 rounded-lg transition-all duration-200"
-                    >
-                      <Eye size={16} className="text-zinc-600 dark:text-zinc-400" />
-                    </button>
+                    <div className="relative">
+                      <button
+                        onMouseEnter={(e) => openMenu(e, transaction)}
+                        onMouseLeave={scheduleCloseMenu}
+                        onClick={(e) => openMenu(e as any, transaction)}
+                        className="opacity-0 group-hover:opacity-100 p-2 hover:bg-zinc-200 dark:hover:bg-zinc-600 rounded-lg transition-all duration-200"
+                        title="Opções"
+                      >
+                        <MoreHorizontal size={16} className="text-zinc-600 dark:text-zinc-400" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -392,6 +358,39 @@ const TransactionsListView: React.FC<TransactionsListViewProps> = ({
           </div>
         )}
       </div>
+      {menuState.open && menuState.transaction && (
+        <div
+          className="fixed z-50"
+          style={{ top: menuState.y, left: menuState.x - 160 }}
+          onMouseEnter={cancelCloseMenu}
+          onMouseLeave={scheduleCloseMenu}
+        >
+          <div className="w-40 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-600 shadow-lg">
+            <button
+              onClick={() => {
+                setOpenModal({ isOpen: true, transaction: menuState.transaction as ITransaction, type: 'edit' })
+                setMenuState({ open: false, x: 0, y: 0, transaction: null })
+              }}
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+            >
+              <Edit3 size={14} />
+              Editar
+            </button>
+            <button
+              onClick={() => {
+                if ((menuState.transaction as ITransaction)?.id) {
+                  setOpenModal({ isOpen: true, transaction: menuState.transaction as ITransaction, type: 'delete' })
+                }
+                setMenuState({ open: false, x: 0, y: 0, transaction: null })
+              }}
+              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              <Trash2 size={14} />
+              Excluir
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "react-loading-skeleton/dist/skeleton.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ICreditCard } from "../../types/creditCards.ts";
 import {
   IHandleCreateCompleteTransaction,
@@ -142,6 +142,9 @@ const TablePreview = ({
   const limitedRows = useMemo(() => {
     return maxDays ? rows.slice(0, maxDays) : rows;
   }, [rows, maxDays]);
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const memoizedTransactions = useMemo(() => {
     return limitedRows.map((row: IRow) => {
@@ -275,6 +278,7 @@ const TablePreview = ({
                           type: 'income'
                         } as any,
                         type: 'create',
+                        button: 'income',
                       });
                     }}
                     title="Adicionar receita"
@@ -343,6 +347,7 @@ const TablePreview = ({
                           type: 'outcome'
                         } as any,
                         type: 'create',
+                        button: 'outcome',
                       });
                     }}
                     title="Adicionar despesa"
@@ -380,7 +385,7 @@ const TablePreview = ({
                       Total: {((row.incomes?.transactions?.length || 0) + (row.outcomes?.transactions?.length || 0))} transações
                     </span>
                     <button
-                      onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'all' })}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/dia/${row.date}`, { state: { dayData: row, initialFilter: 'all', from: { path: location.pathname, scrollY: window.scrollY } } }) }}
                       className="text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
                       title="Ver todas"
                     >
@@ -397,7 +402,7 @@ const TablePreview = ({
                         Última Transação
                       </span>
                       <button
-                        onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'all' })}
+                        onClick={() => navigate(`/dia/${row.date}`, { state: { dayData: row, initialFilter: 'all', from: { path: location.pathname, scrollY: window.scrollY } } })}
                         className="text-xs text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
                       >
                         Ver todas
@@ -562,7 +567,21 @@ const TablePreview = ({
             {/* Income */}
             <div 
               className="group/income relative p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 transition-all duration-200 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 hover:scale-105 hover:shadow-md"
-              onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'income' })}
+              onClick={() => {
+                setOpenModal({
+                  isOpen: true,
+                  transaction: {
+                    category_id: '',
+                    description: '',
+                    price: '',
+                    category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'income' },
+                    transaction_day: row.date,
+                    type: 'income'
+                  } as any,
+                  type: 'create',
+                  button: 'income',
+                });
+              }}
             >
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp
@@ -607,6 +626,7 @@ const TablePreview = ({
                       type: 'income'
                     } as any,
                     type: 'create',
+                    button: 'income',
                   });
                 }}
                 title="Adicionar receita"
@@ -621,7 +641,21 @@ const TablePreview = ({
             {/* Outcome */}
             <div 
               className="group/outcome relative p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 transition-all duration-200 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/30 hover:scale-105 hover:shadow-md"
-              onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'outcome' })}
+              onClick={() => {
+                setOpenModal({
+                  isOpen: true,
+                  transaction: {
+                    category_id: '',
+                    description: '',
+                    price: '',
+                    category: { id: 0, name: '', color: '', icon: '', iconName: '', icon_name: '', type: 'outcome' },
+                    transaction_day: row.date,
+                    type: 'outcome'
+                  } as any,
+                  type: 'create',
+                  button: 'outcome',
+                });
+              }}
             >
               <div className="flex items-center gap-2 mb-1">
                 <TrendingDown
@@ -666,6 +700,7 @@ const TablePreview = ({
                       type: 'outcome'
                     } as any,
                     type: 'create',
+                    button: 'outcome',
                   });
                 }}
                 title="Adicionar despesa"
@@ -678,7 +713,10 @@ const TablePreview = ({
             </div>
 
             {/* Balance */}
-            <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-600">
+            <div
+              className="group/balance relative p-3 rounded-lg bg-zinc-50 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-600 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all duration-200 hover:scale-105 hover:shadow-md"
+              onClick={() => navigate(`/dia/${row.date}`, { state: { dayData: row, initialFilter: 'all', from: { path: location.pathname, scrollY: window.scrollY } } })}
+            >
               <div className="flex items-center gap-2 mb-1">
                 <BarChart3
                   size={14}

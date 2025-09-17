@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 import "react-loading-skeleton/dist/skeleton.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { DateTime } from "luxon";
 
 // Hooks and Stores
@@ -32,7 +32,6 @@ import { useCreditCards } from "../../queries/creditCardsQueries";
 
 // Components
 import CardSkeleton from "../CardSkeleton";
-import DayDetailsModal from "../DayDetailsModal";
 import ModalCreate from "../ModalCreate";
 import ModalDelete from "../ModalDelete";
 import ModalEdit from "../ModalEdit";
@@ -69,8 +68,6 @@ const TablePreviewModern = ({
 
   // Zustand stores
   const {
-    dayDetailsModal,
-    setDayDetailsModal,
     quickAddModal,
     setQuickAddModal,
     currentMonth,
@@ -121,6 +118,9 @@ const TablePreviewModern = ({
       setResetScroll(false);
     }
   }, [resetScroll, setResetScroll]);
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Memoized data
   const limitedRows = useMemo(() => {
@@ -475,8 +475,8 @@ const TablePreviewModern = ({
 
                 {/* Balance */}
                 <div 
-                  className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-600 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all duration-200 hover:shadow-md"
-                  onClick={() => setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'all' })}
+                  className="group/balance-v p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-700/50 border border-zinc-200 dark:border-zinc-600 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-all duration-200 hover:shadow-md hover:scale-105"
+                  onClick={() => navigate(`/dia/${row.date}`, { state: { dayData: row, initialFilter: 'all', from: { path: location.pathname, scrollY: window.scrollY } } })}
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
@@ -502,8 +502,8 @@ const TablePreviewModern = ({
                       Total: {((row.incomes?.transactions?.length || 0) + (row.outcomes?.transactions?.length || 0))} transações
                     </span>
                     <button
-                      onClick={(e) => { e.stopPropagation(); setDayDetailsModal({ isOpen: true, dayData: row, initialFilter: 'all' }); }}
-                      className="text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
+                      onClick={(e) => { e.stopPropagation(); navigate(`/dia/${row.date}`, { state: { dayData: row, initialFilter: 'all', from: { path: location.pathname, scrollY: window.scrollY } } }); }}
+                      className="opacity-0 group-hover/balance-v:opacity-100 text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-all duration-200 transform hover:scale-110"
                       title="Ver todas"
                     >
                       <Eye size={11} />
@@ -525,7 +525,7 @@ const TablePreviewModern = ({
         </div>
       );
     });
-  }, [limitedRows, rowsLoading, variant, maxDays, targetRowRef, setDayDetailsModal, setOpenModal]);
+  }, [limitedRows, rowsLoading, variant, maxDays, targetRowRef, setOpenModal, navigate]);
 
   return (
     <>
@@ -609,16 +609,7 @@ const TablePreviewModern = ({
         </div>
       )}
 
-      {/* Day Details Modal */}
-      {dayDetailsModal.isOpen && dayDetailsModal.dayData && (
-        <DayDetailsModal
-          isOpen={dayDetailsModal.isOpen}
-          onClose={() => setDayDetailsModal({ isOpen: false, dayData: null })}
-          dayData={dayDetailsModal.dayData}
-          setOpenModal={setOpenModal}
-          initialFilter={dayDetailsModal.initialFilter}
-        />
-      )}
+
 
       {/* Quick Add Modal */}
       <QuickAddModal
