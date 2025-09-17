@@ -530,9 +530,9 @@ export default function Dashboard() {
               </div>
 
               {/* Right Column: Categories */}
-              <div className="space-y-6 h-full flex flex-col">
+              <div className="h-full flex flex-col gap-6">
                 {/* Outcome Categories - Now on Top */}
-                <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl flex-1 transition-colors">
+                <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
@@ -610,7 +610,10 @@ export default function Dashboard() {
                   )}
                 </div>
 
-                <SavingsGoalsSimple />
+                {/* Make Savings fill remaining space */}
+                <div className="flex-1 flex flex-col min-h-0">
+                  <SavingsGoalsSimple />
+                </div>
               </div>
             </div>
 

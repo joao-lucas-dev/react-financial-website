@@ -57,7 +57,7 @@ const SavingsGoalsSimple: React.FC = () => {
 
   if (goals.length === 0) {
     return (
-      <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors">
+      <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors h-full flex flex-col">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
@@ -72,13 +72,6 @@ const SavingsGoalsSimple: React.FC = () => {
               </p>
             </div>
           </div>
-          <Link
-            to="/caixinhas"
-            className="flex items-center gap-2 text-sm text-teal-600 dark:text-teal-400 hover:underline"
-          >
-            Ver todas
-            <ArrowRight size={16} />
-          </Link>
         </div>
 
         {/* Empty State */}
@@ -100,6 +93,16 @@ const SavingsGoalsSimple: React.FC = () => {
             Criar Primeira Caixinha
           </Link>
         </div>
+        {/* Bottom primary button: Ver todas */}
+        <div className="mt-6 mt-auto flex justify-center">
+          <Link
+            to="/caixinhas"
+            className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg active:scale-95"
+          >
+            Ver todas
+            <ArrowRight size={16} />
+          </Link>
+        </div>
       </div>
     )
   }
@@ -109,7 +112,7 @@ const SavingsGoalsSimple: React.FC = () => {
   const overallProgress = (totalSaved / totalTarget) * 100
 
   return (
-    <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors">
+    <div className="bg-white dark:bg-zinc-800 rounded-xl p-6 shadow-2xl transition-colors h-full flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
@@ -124,13 +127,6 @@ const SavingsGoalsSimple: React.FC = () => {
             </p>
           </div>
         </div>
-        <Link
-          to="/caixinhas"
-          className="flex items-center gap-2 text-sm text-teal-600 dark:text-teal-400 hover:underline"
-        >
-          Ver todas
-          <ArrowRight size={16} />
-        </Link>
       </div>
 
       {/* Resumo Geral */}
@@ -188,6 +184,16 @@ const SavingsGoalsSimple: React.FC = () => {
             </div>
           )
         })}
+      </div>
+      {/* Bottom primary button: Ver todas */}
+      <div className="mt-6 mt-auto flex justify-center">
+        <Link
+          to="/caixinhas"
+          className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg active:scale-95"
+        >
+          Ver todas
+          <ArrowRight size={16} />
+        </Link>
       </div>
     </div>
   )
