@@ -242,38 +242,27 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
     
     switch (type) {
       case 'today':
-        setPeriodType('month');
-        const today = new Date();
-        onMonthChange(today.getMonth() + 1);
-        onYearChange(today.getFullYear());
+        // Delegar ao pai para filtrar somente o dia atual
+        setPeriodType('today');
+        onQuickPeriod?.('today');
         break;
       case 'thisWeek':
+        // Atualiza estado local para navegação semanal e delega ao pai
         setPeriodType('week');
         const now = new Date();
-        // Calculate today - 3 days to today + 3 days (7 days total)
         const startDate = new Date(now);
         startDate.setDate(now.getDate() - 3);
-        const endDate = new Date(now);
-        endDate.setDate(now.getDate() + 3);
-        
         setCurrentWeekStart(startDate);
-        
-        if (onPeriodChange) {
-          await onPeriodChange(
-            startDate.toISOString().split('T')[0],
-            endDate.toISOString().split('T')[0],
-            'week'
-          );
-        }
+        onQuickPeriod?.('thisWeek');
         break;
       case 'thisMonth':
+        // Delegar ao pai para voltar ao modo mensal padrão
         setPeriodType('month');
-        const currentDate = new Date();
-        onMonthChange(currentDate.getMonth() + 1);
-        onYearChange(currentDate.getFullYear());
+        onQuickPeriod?.('thisMonth');
         break;
       case 'custom':
-        // This will be handled by the modal
+        // Este caso é tratado pelo modal no pai
+        setPeriodType('custom');
         onQuickPeriod?.(type);
         break;
     }

@@ -94,6 +94,10 @@ export default function Dashboard() {
   const { data: categories = [], refetch: retryCategories } = useCategories();
   const { data: creditCards = [], isLoading: creditCardsLoading } = useCreditCards();
 
+  // Date range for Financial View: yesterday, today, tomorrow
+  const yesterday = currentDate.minus({ days: 1 }).startOf('day');
+  const tomorrow = currentDate.plus({ days: 1 }).endOf('day');
+
   // Mutations (apenas as necessárias para a seção de transações recentes)
   const deleteTransactionMutation = useDeleteTransaction();
   const updateTransactionMutation = useUpdateTransaction();
@@ -506,7 +510,7 @@ export default function Dashboard() {
                         Visão Financeira
                       </h3>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        Últimos dias
+                        Ontem, hoje e amanhã
                       </p>
                     </div>
                   </div>
@@ -519,6 +523,8 @@ export default function Dashboard() {
                     showViewAllButton={true}
                     variant="vertical"
                     date={currentDate}
+                    startDate={yesterday}
+                    endDate={tomorrow}
                   />
                 </div>
               </div>
@@ -559,9 +565,9 @@ export default function Dashboard() {
                       }
                     />
                   ) : (
-                    <div className="flex">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch">
                       {/* Lista de categorias centralizadas - metade esquerda */}
-                      <div className="w-1/2 pr-4 flex flex-col justify-center">
+                      <div className="flex-1 lg:w-1/2 lg:pr-6 flex flex-col justify-center">
                         {(chartCategories || defaultChartCategories).notIncome.config
                           .slice(0, 5)
                           .map((item: any, index: number) => (
@@ -572,7 +578,7 @@ export default function Dashboard() {
                               <div className="flex justify-between items-center gap-3 w-full">
                                 <div className="flex items-center gap-3">
                                   <CategoryIcon size="small" category={item} />
-                                  <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-24">
+                                  <span className="text-sm text-zinc-700 dark:text-zinc-200 min-w-0 truncate max-w-[160px]">
                                     {item.name}
                                   </span>
                                 </div>
@@ -585,16 +591,16 @@ export default function Dashboard() {
                       </div>
 
                       {/* Chart e botão - metade direita */}
-                      <div className="w-1/2 flex flex-col items-center">
-                        <div className="w-full">
-                          <ModernDonutChart data={(chartCategories || defaultChartCategories).notIncome.config} />
+                      <div className="flex-1 lg:w-1/2 flex flex-col items-center justify-center gap-4">
+                        <div className="w-full max-w-[360px] sm:max-w-[420px]">
+                          <ModernDonutChart data={(chartCategories || defaultChartCategories).notIncome.config} height={260} />
                         </div>
                         <Link
                           to={{
                             pathname: "/relatorios",
                             search: `?type=incomes&date=${currentDate.toFormat('yyyy-MM')}`,
                           }}
-                          className="mt-4 flex items-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
+                          className="flex w-full max-w-[220px] items-center justify-center px-6 py-2 rounded-lg border border-teal-600 text-teal-600 dark:border-teal-400 dark:text-teal-400 transition-all text-sm font-medium hover:bg-teal-600 hover:text-white dark:hover:bg-teal-400 dark:hover:text-zinc-900"
                         >
                           Ver relatório
                           <ArrowRight size={16} className="ml-2" />

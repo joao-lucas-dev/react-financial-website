@@ -76,9 +76,9 @@ export const useTransactionsPreview = (date: DateTime = DateTime.now(), startDat
   return useQuery({
     queryKey: QUERY_KEYS.transactions.preview(date, startDate, endDate),
     queryFn: async () => {
-      // Se startDate e endDate forem fornecidos, use-os; caso contrário, use a lógica padrão
-      const start = startDate || date.minus({ days: 1 })
-      const end = endDate || date.plus({ days: 1 })
+      // Se startDate e endDate forem fornecidos, use-os; caso contrário, use o mês inteiro da data atual
+      const start = startDate || date.startOf('month')
+      const end = endDate || date.endOf('month')
       
       const { data } = await axiosPrivate.get<IRow[]>(
         `/transactions/preview?startDate=${start.toISO()}&endDate=${end.toISO()}`

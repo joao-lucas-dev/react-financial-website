@@ -51,6 +51,8 @@ interface TablePreviewModernProps {
   showViewAllButton?: boolean;
   variant?: "horizontal" | "vertical";
   date?: DateTime;
+  startDate?: DateTime;
+  endDate?: DateTime;
 }
 
 const TablePreviewModern = ({
@@ -59,6 +61,8 @@ const TablePreviewModern = ({
   showViewAllButton = false,
   variant = "horizontal",
   date = DateTime.now(),
+  startDate,
+  endDate,
 }: TablePreviewModernProps) => {
   const targetRowRef = useRef<HTMLDivElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -78,7 +82,7 @@ const TablePreviewModern = ({
   const { openModal, setOpenModal } = useDashboardStore();
 
   // React Query hooks
-  const { data: rows = [], isLoading: rowsLoading } = useTransactionsPreview(date);
+  const { data: rows = [], isLoading: rowsLoading } = useTransactionsPreview(date, startDate, endDate);
   const { data: categories = [], refetch: retryCategories } = useCategories();
   const { data: creditCards = [] } = useCreditCards();
 
