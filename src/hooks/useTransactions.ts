@@ -62,7 +62,7 @@ export default function useTransactions(
         const enhancedData = enhanceTransactionsWithMockData(response.data)
         setRecentTransactions(enhancedData)
       } catch (err) {
-        console.log(err)
+        console.error(err)
       } finally {
         loadingRef.current[key] = false;
       }
@@ -80,7 +80,7 @@ export default function useTransactions(
 
       setBalance(data.balance)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }, [setBalance, axiosPrivate])
 
@@ -89,7 +89,7 @@ export default function useTransactions(
       const { data } = await axiosPrivate.get('/transactions/summary-periods')
       setPeriodsSummary(data)
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }, [axiosPrivate])
 
@@ -109,7 +109,7 @@ export default function useTransactions(
         )
         setOverview(data)
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
     [axiosPrivate],
@@ -220,7 +220,7 @@ export default function useTransactions(
           originalValue: 0,
         })
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
     [
@@ -249,6 +249,7 @@ export default function useTransactions(
           installments: createTransaction.installments,
           is_paid: createTransaction.is_paid,
           card_id: createTransaction.card_id,
+          invoice_date: (createTransaction as any).invoice_date,
         })
 
         const promises = []
@@ -278,7 +279,7 @@ export default function useTransactions(
 
         await Promise.all(promises)
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
     [
@@ -304,6 +305,7 @@ export default function useTransactions(
           shared_id: null,
           is_paid: createTransaction.is_paid,
           card_id: createTransaction.card_id,
+          invoice_date: (createTransaction as any).invoice_date,
         })
 
         const promises = []
@@ -333,7 +335,7 @@ export default function useTransactions(
 
         await Promise.all(promises)
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
     [
@@ -389,7 +391,7 @@ export default function useTransactions(
 
         await Promise.all(promises)
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
     [
@@ -449,7 +451,7 @@ export default function useTransactions(
 
         await Promise.all(promises)
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
     [
@@ -506,7 +508,7 @@ export default function useTransactions(
 
         await Promise.all(promises)
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
     [
@@ -648,7 +650,7 @@ export default function useTransactions(
 
         await Promise.all(promises)
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
     [
@@ -708,7 +710,7 @@ export default function useTransactions(
 
         await Promise.all(promises)
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
     [
@@ -774,7 +776,7 @@ export default function useTransactions(
 
         await Promise.all(promises)
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
     [
@@ -834,7 +836,7 @@ export default function useTransactions(
 
         await Promise.all(promises)
       } catch (err) {
-        console.log(err)
+        console.error(err)
       }
     },
     [

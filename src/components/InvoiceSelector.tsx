@@ -55,8 +55,7 @@ const InvoiceSelector = ({ selectedCard, value, onChange, disabled }: InvoiceSel
     ? selectedDate.year 
     : DateTime.now().year
   
-  // Debug log
-  console.log('InvoiceSelector - value:', value, 'selectedDate:', selectedDate.isValid ? selectedDate.toFormat('yyyy-MM-dd') : 'invalid', 'month:', selectedMonthName)
+  // Debug log removido
 
   // Inicializar valor padrão quando o cartão muda
   useEffect(() => {
@@ -76,7 +75,6 @@ const InvoiceSelector = ({ selectedCard, value, onChange, disabled }: InvoiceSel
       const transactionDate = selectedDateTime.toISO()
       
       if (transactionDate) {
-        console.log('InvoiceSelector - Enviando nova data:', transactionDate, 'Mês:', month, 'Ano:', year)
         // Usar diretamente a data selecionada em vez de calcular fatura
         onChange(transactionDate)
       }

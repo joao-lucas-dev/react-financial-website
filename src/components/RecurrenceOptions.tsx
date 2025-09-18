@@ -40,14 +40,20 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
 }) => {
   const [selectedMode, setSelectedMode] = useState<RecurrenceMode>(value.mode)
   const [frequency, setFrequency] = useState<RecurrenceFrequency>(value.frequency || 'monthly')
-  const [installmentCount, setInstallmentCount] = useState<number>(value.installmentCount || 2)
+  const [installmentCount, setInstallmentCount] = useState<string>(
+    value.installmentCount !== undefined && value.installmentCount !== null
+      ? String(value.installmentCount)
+      : '2'
+  )
   const [installmentPeriod, setInstallmentPeriod] = useState<InstallmentPeriod>(value.installmentPeriod || 'months')
 
   // Sincronizar com o valor externo quando ele mudar
   useEffect(() => {
     setSelectedMode(value.mode)
     if (value.frequency) setFrequency(value.frequency)
-    if (value.installmentCount) setInstallmentCount(value.installmentCount)
+    if (value.installmentCount !== undefined && value.installmentCount !== null) {
+      setInstallmentCount(String(value.installmentCount))
+    }
     if (value.installmentPeriod) setInstallmentPeriod(value.installmentPeriod)
   }, [value])
 
@@ -68,7 +74,9 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
     const selectedCard = creditCards.find(card => card.id === selectedCardId)
     if (!selectedCard) return null
 
-    const monthlyAmount = totalAmount / installmentCount
+    const countNum = parseInt(installmentCount, 10)
+    if (!countNum || Number.isNaN(countNum) || countNum <= 0) return null
+    const monthlyAmount = totalAmount / countNum
     
     return {
       monthlyAmount,
@@ -134,7 +142,8 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
     if (mode === 'fixed') {
       config.frequency = frequency
     } else if (mode === 'installment') {
-      config.installmentCount = installmentCount
+      const parsed = parseInt(installmentCount, 10)
+      config.installmentCount = Number.isNaN(parsed) ? undefined : parsed
       config.installmentPeriod = installmentPeriod
     }
     
@@ -153,14 +162,47 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
     }
   }
 
-  const handleInstallmentCountChange = (count: number) => {
-    setInstallmentCount(count)
-    
+  const handleInstallmentCountChange = (raw: string) => {
+    if (raw === '') {
+      setInstallmentCount('')
+      if (selectedMode === 'installment') {
+        onChange?.({
+          mode: 'installment',
+          installmentCount: undefined,
+          installmentPeriod,
+        })
+      }
+      return
+    }
+
+    const digits = raw.replace(/\D/g, '')
+    setInstallmentCount(digits)
+
+    if (selectedMode === 'installment') {
+      const parsed = parseInt(digits, 10)
+      onChange?.({
+        mode: 'installment',
+        installmentCount: Number.isNaN(parsed) ? undefined : parsed,
+        installmentPeriod,
+      })
+    }
+  }
+
+  const clampInstallmentCountOnBlur = () => {
+    if (installmentCount === '') return
+    let parsed = parseInt(installmentCount, 10)
+    if (Number.isNaN(parsed)) {
+      setInstallmentCount('')
+      return
+    }
+    if (parsed < 2) parsed = 2
+    if (parsed > 240) parsed = 240
+    setInstallmentCount(String(parsed))
     if (selectedMode === 'installment') {
       onChange?.({
         mode: 'installment',
-        installmentCount: count,
-        installmentPeriod
+        installmentCount: parsed,
+        installmentPeriod,
       })
     }
   }
@@ -170,9 +212,10 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
     setInstallmentPeriod(installmentPer)
     
     if (selectedMode === 'installment') {
+      const parsed = parseInt(installmentCount, 10)
       onChange?.({
         mode: 'installment',
-        installmentCount,
+        installmentCount: Number.isNaN(parsed) ? undefined : parsed,
         installmentPeriod: installmentPer
       })
     }
@@ -262,7 +305,8 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
                 min="2"
                 max="240"
                 value={installmentCount}
-                onChange={(e) => handleInstallmentCountChange(Number(e.target.value))}
+                onChange={(e) => handleInstallmentCountChange(e.target.value)}
+                onBlur={clampInstallmentCountOnBlur}
                 disabled={disabled}
                 className="
                   w-full h-10 px-3 py-2 rounded-lg border transition-colors
@@ -315,7 +359,7 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
                 <div className="flex justify-between">
                   <span className="text-zinc-600 dark:text-zinc-400">Parcelas:</span>
                   <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                    {installmentCount}x {installmentPeriod === 'months' ? 'mensais' : 'anuais'}
+                    {installmentCount || '—'}x {installmentPeriod === 'months' ? 'mensais' : 'anuais'}
                   </span>
                 </div>
                 <div className="pt-2 border-t border-blue-200 dark:border-blue-700">
@@ -336,7 +380,7 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
               <div className="flex items-center gap-2">
                 <Calculator size={16} className="text-blue-600 dark:text-blue-400" />
                 <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                  Dividir em {installmentCount} parcelas {installmentPeriod === 'months' ? 'mensais' : 'anuais'}
+                  Dividir em {installmentCount || '—'} parcelas {installmentPeriod === 'months' ? 'mensais' : 'anuais'}
                 </span>
               </div>
             </div>

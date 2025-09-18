@@ -84,12 +84,11 @@ const AuthTestPage: React.FC = () => {
           url += '?month=1&year=2024'
         }
         
-        console.log(`🚀 [Test] Starting request ${result.id} to ${url}`)
+        // Log removido
         
         await axiosPrivate.get(url)
         
         const duration = Date.now() - startTime
-        console.log(`✅ [Test] Request ${result.id} completed in ${duration}ms`)
         
         updateResult(result.id, {
           status: 'success',
@@ -109,7 +108,7 @@ const AuthTestPage: React.FC = () => {
 
     await Promise.allSettled(promises)
     setIsRunning(false)
-    console.log('🏁 [Test] All requests completed')
+    // Log removido
   }
 
   const clearResults = () => {

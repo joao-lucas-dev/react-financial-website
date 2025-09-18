@@ -26,6 +26,7 @@ import PaymentStatusIcon from './PaymentStatusIcon.tsx'
 import RecurrenceOptions, { RecurrenceConfig } from './RecurrenceOptions.tsx'
 import RecurringTransactionOptions from './RecurringTransactionOptions.tsx'
 import InvoiceSelector from './InvoiceSelector.tsx'
+import { calculateInvoicePeriod } from '../utils/invoiceCalculations.ts'
 
 interface IParams {
   openModal: IOpenModal
@@ -150,25 +151,27 @@ const ModalEdit = ({
     setValue('transaction_day', formattedDate)
 
     setValue('category', openModal.transaction.category?.id ? String(openModal.transaction.category.id) : '')
-    setValue('card_id', openModal.transaction.card_id || 'account')
+    const initialCardId = openModal.transaction.card_id || 'account'
+    setValue('card_id', initialCardId)
     
     // Carregar invoice_date se existir
     if (openModal.transaction.invoice?.invoice_date) {
       setValue('invoice_date', openModal.transaction.invoice.invoice_date)
     }
-    // Definir is_paid: se existe valor na transação, usar ele; senão usar lógica de data
+    // Definir is_paid: se existe valor na transação, usar ele; senão usar regra (cartão/data)
     const transactionIsPaid = openModal.transaction.is_paid
     if (transactionIsPaid !== undefined && transactionIsPaid !== null) {
       // Existe um valor definido na transação, usar ele
       setValue('is_paid', transactionIsPaid)
       setIsPaidManuallyOverridden(true) // Marcar como manual para não ser sobrescrito
     } else {
-      // Não existe valor, usar lógica de data
+      // Não existe valor, usar regra automática
       const today = new Date()
       today.setHours(0, 0, 0, 0)
       const transactionDate = new Date(transactionDateStr)
       transactionDate.setHours(0, 0, 0, 0)
-      const initialIsPaid = transactionDate <= today
+      const isCard = Boolean(initialCardId && initialCardId !== 'account')
+      const initialIsPaid = isCard ? false : (transactionDate <= today)
       setValue('is_paid', initialIsPaid)
       setIsPaidManuallyOverridden(false) // Permitir mudança automática
     }
@@ -196,21 +199,57 @@ const ModalEdit = ({
 
   }, [openModal.transaction, setValue, isRecurringTransaction, setIsPaidManuallyOverridden])
 
+  // Definir fatura automaticamente quando cartão e data existem e não há valor manual
   useEffect(() => {
-    if (!isPaidManuallyOverridden) {
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      const selectedDate = new Date(transactionDay)
-      selectedDate.setHours(0, 0, 0, 0)
+    const isCard = Boolean(cardId && cardId !== 'account')
+    if (!isCard || !transactionDay) return
+    
+    // Não sobrescrever escolha manual/valor existente
+    if (invoiceDate) return
 
-      const newIsPaid = selectedDate <= today
-      if (newIsPaid !== isPaid) {
-        setValue('is_paid', newIsPaid)
-        setIsAnimating(true)
-        setTimeout(() => setIsAnimating(false), 1000)
+    try {
+      const cardAny: any = selectedCard as any
+      const bestPurchaseDay: number | undefined = cardAny?.best_purchase_day ?? cardAny?.closingDay
+      const paymentDueDay: number | undefined = cardAny?.payment_due_day ?? cardAny?.dueDay
+
+      let computedInvoiceISO: string | null = null
+      if (typeof bestPurchaseDay === 'number' && typeof paymentDueDay === 'number') {
+        const info = calculateInvoicePeriod(transactionDay, bestPurchaseDay, paymentDueDay)
+        computedInvoiceISO = info.invoice_date
+      } else {
+        console.warn('ModalEdit: faltam campos do ciclo (fechamento/vencimento) no cartão para calcular fatura automaticamente.')
+        // Fallback: usar primeiro dia do mês da transação
+        const dt = new Date(`${transactionDay}T00:00:00`)
+        const firstOfMonth = new Date(dt.getFullYear(), dt.getMonth(), 1)
+        computedInvoiceISO = firstOfMonth.toISOString()
       }
+
+      if (computedInvoiceISO) {
+        setValue('invoice_date', computedInvoiceISO)
+      }
+    } catch (e) {
+      console.error('Erro ao calcular fatura automaticamente:', e)
     }
-  }, [transactionDay, isPaid, setValue, isPaidManuallyOverridden])
+  }, [cardId, transactionDay, invoiceDate, selectedCard, setValue])
+
+  useEffect(() => {
+    if (isPaidManuallyOverridden) return
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const selectedDate = new Date(transactionDay)
+    selectedDate.setHours(0, 0, 0, 0)
+
+    // Regra automática: cartão => não pago; caso contrário => pago se hoje/passado, não pago se futuro
+    const isCard = Boolean(cardId && cardId !== 'account')
+    const newIsPaid = isCard ? false : (selectedDate <= today)
+
+    if (newIsPaid !== isPaid) {
+      setValue('is_paid', newIsPaid)
+      setIsAnimating(true)
+      setTimeout(() => setIsAnimating(false), 1000)
+    }
+  }, [transactionDay, cardId, isPaid, setValue, isPaidManuallyOverridden])
 
   const handleToggleIsPaid = () => {
     setIsPaidManuallyOverridden(true)
@@ -240,8 +279,6 @@ const ModalEdit = ({
   const handleUpdate = useCallback(
     async (data: ModalEditData) => {
       try {
-        console.log('=== HANDLE UPDATE CALLED ===')
-        console.log('Updating transaction with data:', data)
         if (isRecurringTransaction) {
           setPendingUpdateData(data)
           setShowRecurringModal(true)
@@ -362,9 +399,6 @@ const ModalEdit = ({
 
   const handleInstallmentUpdate = useCallback(
     async () => {
-      console.log('=== HANDLE INSTALLMENT UPDATE CALLED ===')
-      console.log(pendingUpdateData)
-      console.log(handleUpdateInstallmentTransaction)
       if (!pendingUpdateData || !handleUpdateInstallmentTransaction) return
 
       try {
@@ -496,13 +530,11 @@ const ModalEdit = ({
         )}
 
         <form
-          onSubmit={handleSubmit(handleUpdate, (errors) => {
-            console.log('Validation errors:', errors)
-          })}
+          onSubmit={handleSubmit(handleUpdate, () => {})}
           className="flex flex-col h-full"
         >
           <div
-            className="flex-1 overflow-y-auto space-y-4 pr-2"
+            className="flex-1 overflow-y-auto scrollbar-hide space-y-4 pr-2"
             style={{ maxHeight: 'calc(95vh - 200px)' }}
           >
             <div>
@@ -549,7 +581,6 @@ const ModalEdit = ({
                           value={field.value}
                           onChange={(date) => {
                             field.onChange(date)
-                            setIsPaidManuallyOverridden(false)
                           }}
                           required={true}
                           error={errors.transaction_day?.message}
@@ -670,7 +701,6 @@ const ModalEdit = ({
             </button>
             <button
               type="submit"
-              onClick={() => console.log('Submit button clicked')}
               className="flex-1 px-6 py-3 rounded-lg text-white font-medium transition-colors bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
             >
               Atualizar Transação

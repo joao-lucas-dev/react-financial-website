@@ -193,8 +193,6 @@ const ModernSelect = forwardRef<any, ModernSelectProps>(
           menuShouldScrollIntoView={false}
           noOptionsMessage={() => 'Nenhuma opção encontrada'}
           loadingMessage={() => 'Carregando...'}
-          onMenuOpen={() => console.log('Menu abriu')}
-          onMenuClose={() => console.log('Menu fechou')}
         />
         
         {error && (

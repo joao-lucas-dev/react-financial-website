@@ -1,4 +1,4 @@
-import { Calendar, ChevronDown, ChevronLeft, ChevronRight, Clock, Settings, Zap } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Clock, Settings, Zap } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
 export type PeriodType = 'month' | 'week' | 'custom' | 'today';
@@ -81,6 +81,8 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
   // Get current display based on period type
   const getCurrentDisplay = () => {
     switch (periodType) {
+      case 'today':
+        return 'Dia atual';
       case 'week':
         return getWeekDisplay();
       case 'custom':
@@ -292,12 +294,12 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
       </label>
       
       <div className="relative">
-        <div className="flex items-center bg-white dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 rounded-lg overflow-hidden">
+        <div className="flex items-center overflow-hidden">
           {/* Previous Button */}
           <button
             onClick={navigateToPrevious}
             disabled={isLoading || !canNavigateBack}
-            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-70"
             title="Período anterior"
           >
             <ChevronLeft size={16} className="text-zinc-600 dark:text-zinc-400" />
@@ -305,7 +307,7 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
 
           {/* Current Period Display */}
           <div
-            className="px-4 py-2 min-w-[140px] text-center cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-colors"
+            className="px-4 py-1 rounded-2xl text-center cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-colors"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             onClick={handleClick}
@@ -314,17 +316,6 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
               <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 {getCurrentDisplay()}
               </div>
-              <ChevronDown 
-                size={14} 
-                className={`text-zinc-500 dark:text-zinc-400 transition-transform duration-200 ${
-                  isDropdownOpen ? 'rotate-180' : ''
-                }`} 
-              />
-            </div>
-            <div className="text-xs text-zinc-500 dark:text-zinc-400">
-              {periodType === 'week' ? 'Navegação semanal' : 
-               periodType === 'custom' ? 'Período customizado' : 
-               'Navegação mensal'}
             </div>
           </div>
 
@@ -332,7 +323,7 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
           <button
             onClick={navigateToNext}
             disabled={isLoading || !canNavigateForward}
-            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-70"
             title="Próximo período"
           >
             <ChevronRight size={16} className="text-zinc-600 dark:text-zinc-400" />

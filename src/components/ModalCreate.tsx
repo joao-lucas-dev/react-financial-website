@@ -1,4 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { TrendingDown, TrendingUp, X } from 'lucide-react'
+import { DateTime } from 'luxon'
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { ICategory } from '../types/categories.ts'
+import { ICreditCard } from '../types/creditCards.ts'
 import {
   IHandleCreateCompleteTransaction,
   IOpenModal,
@@ -7,20 +14,13 @@ import {
   ITransaction,
   RecurrenceType,
 } from '../types/transactions.ts'
+import CategoryIcon from './CategoryIcon/index.tsx'
 import Input from './Input.tsx'
+import InvoiceSelector from './InvoiceSelector.tsx'
 import ModernDatePicker from './ModernDatePicker.tsx'
 import ModernSelect, { SelectOption } from './ModernSelectRadix.tsx'
-import RecurrenceOptions, { RecurrenceConfig } from './RecurrenceOptions.tsx'
 import PaymentStatusIcon from './PaymentStatusIcon.tsx'
-import CategoryIcon from './CategoryIcon/index.tsx'
-import { X, TrendingUp, TrendingDown } from 'lucide-react'
-import { Controller, useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { ICategory } from '../types/categories.ts'
-import { ICreditCard } from '../types/creditCards.ts'
-import { DateTime } from 'luxon'
-import InvoiceSelector from './InvoiceSelector.tsx'
+import RecurrenceOptions, { RecurrenceConfig } from './RecurrenceOptions.tsx'
 
 interface IParams {
   openModal: IOpenModal
@@ -126,26 +126,30 @@ const ModalCreate = ({
   }, [setValue, openModal.transaction?.transaction_day])
 
   useEffect(() => {
-    if (!isPaidManuallyOverridden) {
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      const selectedDate = new Date(transactionDay)
-      selectedDate.setHours(0, 0, 0, 0)
+    if (isPaidManuallyOverridden) return
 
-      const newIsPaid = selectedDate <= today
-      if (newIsPaid !== isPaid) {
-        setValue('is_paid', newIsPaid)
-        setIsAnimating(true)
-        setTimeout(() => setIsAnimating(false), 1000)
-      }
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const selectedDate = new Date(transactionDay)
+    selectedDate.setHours(0, 0, 0, 0)
+
+    // Regra:
+    // - Se for cartão -> não pago
+    // - Se não for cartão e o dia for futuro -> não pago
+    // - Caso contrário (hoje ou passado) -> pago
+    const isCard = Boolean(cardId && cardId !== 'account')
+    const newIsPaid = isCard ? false : selectedDate <= today
+
+    if (newIsPaid !== isPaid) {
+      setValue('is_paid', newIsPaid)
+      setIsAnimating(true)
+      setTimeout(() => setIsAnimating(false), 1000)
     }
-  }, [transactionDay, isPaid, setValue, isPaidManuallyOverridden])
+  }, [transactionDay, cardId, isPaid, setValue, isPaidManuallyOverridden])
 
   const handleToggleIsPaid = () => {
-    console.log('🔘 ModalCreate - Manual toggle clicked, current isPaid:', isPaid);
     setIsPaidManuallyOverridden(true)
     setValue('is_paid', !isPaid)
-    console.log('🔘 ModalCreate - New isPaid value:', !isPaid);
     setIsAnimating(true)
     setTimeout(() => setIsAnimating(false), 1000)
   }
@@ -187,10 +191,8 @@ const ModalCreate = ({
         const transactionDate = new Date(`${data.transaction_day}T00:00:00`)
 
         const recurrenceConfig = data.recurrence_config || { mode: 'single' }
-        console.log('🔍 ModalCreate - Recurrence config:', recurrenceConfig)
 
         if (recurrenceConfig.mode === 'installment') {
-          console.log('💳 ModalCreate - Using installment transaction path');
           const createInstallmentTransaction = {
             type: openModal.button,
             description: data.description,
@@ -202,11 +204,9 @@ const ModalCreate = ({
             is_paid: data.is_paid,
             card_id: data.card_id === 'account' ? null : data.card_id,
             fromCreditCard: data.card_id !== 'account',
+            invoice_date: data.invoice_date,
           } as unknown as ITransaction
 
-          console.log('💳 ModalCreate - Final installment transaction object:', createInstallmentTransaction);
-          console.log('💰 ModalCreate - is_paid value:', data.is_paid);
-          console.log('🔄 ModalCreate - isPaidManuallyOverridden:', isPaidManuallyOverridden);
 
           await handleCreateInstallmentTransaction(
             createInstallmentTransaction,
@@ -215,7 +215,6 @@ const ModalCreate = ({
             from,
           )
         } else if (recurrenceConfig.mode === 'fixed') {
-          console.log('🚀 ModalCreate - Using recurring transaction path');
           let recurrencePattern: RecurrenceType = 'monthly'
           let endDate: Date | undefined = undefined
           let adjustedPrice = Number(data.price.replace(/\D/g, '')) / 100
@@ -238,9 +237,6 @@ const ModalCreate = ({
             fromCreditCard: data.card_id !== 'account',
           } as unknown as ITransaction
 
-          console.log('🚀 ModalCreate - Final recurring transaction object:', createRecurringTransaction);
-          console.log('💰 ModalCreate - is_paid value:', data.is_paid);
-          console.log('🔄 ModalCreate - isPaidManuallyOverridden:', isPaidManuallyOverridden);
 
           await handleCreateRecurringTransaction(
             createRecurringTransaction,
@@ -249,7 +245,6 @@ const ModalCreate = ({
             from,
           )
         } else {
-          console.log('📝 ModalCreate - Using single transaction path');
           const createTransaction = {
             type: openModal.button,
             description: data.description,
@@ -264,8 +259,6 @@ const ModalCreate = ({
             invoice_date: data.invoice_date,
           } as unknown as ITransaction
 
-          console.log('📝 ModalCreate - Single transaction is_paid value:', data.is_paid);
-          console.log('🔄 ModalCreate - isPaidManuallyOverridden:', isPaidManuallyOverridden);
 
           await handleCreateCompleteTransaction(
             createTransaction,
@@ -375,7 +368,7 @@ const ModalCreate = ({
           className="flex flex-col h-full"
         >
           <div
-            className="flex-1 overflow-y-auto space-y-4 pr-2"
+            className="flex-1 overflow-y-auto scrollbar-hide space-y-4 pr-2"
             style={{ maxHeight: 'calc(95vh - 200px)' }}
           >
             <div>

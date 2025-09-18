@@ -596,6 +596,7 @@ export default function Dashboard() {
                           isOpen: true,
                           transaction: {} as ITransaction,
                           type: "create",
+                          button: 'outcome',
                         })
                       }
                     />

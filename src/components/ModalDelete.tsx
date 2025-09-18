@@ -39,7 +39,6 @@ const ModalDelete = ({
   setCurrentMonth,
   from,
 }: IParams) => {
-  console.log(openModal.transaction)
   const [editMode, setEditMode] = useState<EditMode>('instance_only')
   const [installmentEditMode, setInstallmentEditMode] = useState<InstallmentEditMode>('installment_only')
   

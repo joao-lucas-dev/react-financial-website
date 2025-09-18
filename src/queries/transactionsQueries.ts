@@ -157,6 +157,7 @@ export const useCreateCompleteTransaction = () => {
         shared_id: null,
         is_paid: transaction.is_paid,
         card_id: transaction.card_id,
+        invoice_date: (transaction as any).invoice_date,
       })
       return data
     },
@@ -183,6 +184,7 @@ export const useCreateInstallmentTransaction = () => {
         installments: transaction.installments,
         is_paid: transaction.is_paid,
         card_id: transaction.card_id,
+        invoice_date: (transaction as any).invoice_date,
       })
       return data
     },

@@ -1,12 +1,12 @@
+import { BarChart3, Grid3X3, List } from "lucide-react";
+import { DateTime } from "luxon";
+import { useState } from "react";
+import CustomPeriodModal from "../components/CustomPeriodModal";
 import Header from "../components/Header.tsx";
 import MenuAside from "../components/MenuAside.tsx";
-import { BarChart3, Calendar, List, Grid3X3 } from "lucide-react";
+import PeriodNavigator, { PeriodType } from "../components/PeriodNavigator";
 import TablePreview from "../components/TablePreview";
 import TransactionsListView from "../components/TransactionsListView";
-import PeriodNavigator, { PeriodType } from "../components/PeriodNavigator";
-import CustomPeriodModal from "../components/CustomPeriodModal";
-import { useState } from "react";
-import { DateTime } from "luxon";
 import { ITransaction } from "../types/transactions.ts";
 
 // React Query imports
@@ -17,9 +17,9 @@ import {
   useCreateInstallmentTransaction,
   useCreateRecurringTransaction,
   useCreateTransaction,
-  useDeleteTransaction,
   useDeleteInstallmentTransaction,
   useDeleteRecurringTransaction,
+  useDeleteTransaction,
   useTransactionsPreview,
   useUpdateInstallmentTransaction,
   useUpdateRecurringTransaction,
@@ -472,17 +472,6 @@ const Transactions = () => {
                     title="Visualização em lista"
                   >
                     <List size={16} />
-                  </button>
-                </div>
-                
-                <div className="hidden sm:block">
-                  <button
-                    disabled={hasToday()}
-                    className="bg-teal-600 px-4 py-1 text-white rounded-lg disabled:opacity-30 dark:disabled:bg-auto flex justify-center items-center active:opacity-50"
-                    onClick={handleToday}
-                  >
-                    <Calendar size={16} className="mr-2" />
-                    Hoje
                   </button>
                 </div>
               </div>
