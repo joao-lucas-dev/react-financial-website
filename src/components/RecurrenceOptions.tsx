@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Calendar, Calculator } from 'lucide-react'
+import { Calculator, Calendar } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import ModernSelect, { SelectOption } from './ModernSelectRadix'
 
 export type RecurrenceMode = 'single' | 'fixed' | 'installment'
@@ -362,17 +362,6 @@ const RecurrenceOptions: React.FC<RecurrenceOptionsProps> = ({
                     {installmentCount || '—'}x {installmentPeriod === 'months' ? 'mensais' : 'anuais'}
                   </span>
                 </div>
-                <div className="pt-2 border-t border-blue-200 dark:border-blue-700">
-                  <div className="text-xs text-blue-600 dark:text-blue-400">
-                    Fechamento: dia {installmentPreview.selectedCard.closingDay} | Vencimento: dia {installmentPreview.selectedCard.dueDay}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : totalAmount > 0 && selectedMode === 'installment' && (selectedCardId === 'account' || !selectedCardId) ? (
-            <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-              <div className="text-sm text-amber-700 dark:text-amber-300">
-                Selecione um cartão de crédito para ver a prévia do parcelamento
               </div>
             </div>
           ) : (

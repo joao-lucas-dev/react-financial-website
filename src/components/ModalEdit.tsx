@@ -176,6 +176,18 @@ const ModalEdit = ({
       setIsPaidManuallyOverridden(false) // Permitir mudança automática
     }
 
+    // Preservar como pago quando a transação tiver payment_status='paid' ou paid_date
+    // mesmo que não exista campo is_paid explícito (evita regressão para "não pago" ao editar)
+    {
+      const paymentStatus = (openModal.transaction as any)?.payment_status as string | undefined
+      const hasPaidDate = Boolean(openModal.transaction.paid_date)
+      const hasExplicitIsPaid = openModal.transaction.is_paid !== undefined && openModal.transaction.is_paid !== null
+      if (!hasExplicitIsPaid && (paymentStatus === 'paid' || hasPaidDate)) {
+        setValue('is_paid', true)
+        setIsPaidManuallyOverridden(true)
+      }
+    }
+
     const recurrenceConfig = {
       mode: openModal.transaction.recurrence_pattern ? 'fixed' as const : 'single' as const,
       frequency: openModal.transaction.recurrence_pattern as RecurrenceType || null,
@@ -233,7 +245,13 @@ const ModalEdit = ({
   }, [cardId, transactionDay, invoiceDate, selectedCard, setValue])
 
   useEffect(() => {
+    // Não aplicar regra automática quando já há status pago conhecido
     if (isPaidManuallyOverridden) return
+    const explicitIsPaid = openModal.transaction.is_paid
+    const paymentStatusAuto = (openModal.transaction as any)?.payment_status as string | undefined
+    const hasPaidDateAuto = Boolean(openModal.transaction.paid_date)
+    if (explicitIsPaid !== undefined && explicitIsPaid !== null) return
+    if (paymentStatusAuto === 'paid' || hasPaidDateAuto) return
 
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -485,7 +503,7 @@ const ModalEdit = ({
         }
       }}
     >
-      <div className="bg-white dark:bg-zinc-800 w-[600px] max-w-[90vw] max-h-[95vh] rounded-2xl shadow-2xl p-8 relative transition-colors overflow-hidden">
+      <div className="bg-white dark:bg-zinc-800 w-[600px] max-w-[90vw] max-h-[95vh] rounded-2xl shadow-2xl p-8 relative transition-colors flex flex-col">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/30">
@@ -531,11 +549,10 @@ const ModalEdit = ({
 
         <form
           onSubmit={handleSubmit(handleUpdate, () => {})}
-          className="flex flex-col h-full"
+          className="flex flex-col flex-1 min-h-0"
         >
           <div
-            className="flex-1 overflow-y-auto scrollbar-hide space-y-4 pr-2"
-            style={{ maxHeight: 'calc(95vh - 200px)' }}
+            className="flex-1 min-h-0 overflow-y-auto scrollbar-hide space-y-4 pr-2"
           >
             <div>
               <Input

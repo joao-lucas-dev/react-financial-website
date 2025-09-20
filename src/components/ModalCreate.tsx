@@ -324,7 +324,7 @@ const ModalCreate = ({
         }
       }}
     >
-      <div className="bg-white dark:bg-zinc-800 w-[600px] max-w-[90vw] max-h-[95vh] rounded-2xl shadow-2xl p-8 relative transition-colors overflow-hidden">
+      <div className="bg-white dark:bg-zinc-800 w-[600px] max-w-[90vw] max-h-[95vh] rounded-2xl shadow-2xl p-8 relative transition-colors flex flex-col">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div
@@ -365,11 +365,10 @@ const ModalCreate = ({
 
         <form
           onSubmit={handleSubmit(handleCreate)}
-          className="flex flex-col h-full"
+          className="flex flex-col flex-1 min-h-0"
         >
           <div
-            className="flex-1 overflow-y-auto scrollbar-hide space-y-4 pr-2"
-            style={{ maxHeight: 'calc(95vh - 200px)' }}
+            className="flex-1 min-h-0 overflow-y-auto scrollbar-hide space-y-4 pr-2"
           >
             <div>
               <Input
