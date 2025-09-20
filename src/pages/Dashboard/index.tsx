@@ -425,7 +425,7 @@ export default function Dashboard() {
                               <>
                                 <ChevronUp className="w-4 h-4 text-green-500" />
                                 <span className="text-sm font-medium text-green-500">
-                                  {percentage.toFixed(1)}%
+                                  <CountUp valueNumber={percentage} isPercentage />%
                                 </span>
                               </>
                             )
@@ -436,7 +436,7 @@ export default function Dashboard() {
                               <>
                                 <ChevronDown className="w-4 h-4 text-red-500" />
                                 <span className="text-sm font-medium text-red-500">
-                                  {percentage.toFixed(1)}%
+                                  <CountUp valueNumber={percentage} isPercentage />%
                                 </span>
                               </>
                             )
@@ -446,7 +446,7 @@ export default function Dashboard() {
                             <>
                               <Minus className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
                               <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                                {percentage.toFixed(1)}%
+                                <CountUp valueNumber={percentage} isPercentage />%
                               </span>
                             </>
                           )
@@ -492,7 +492,7 @@ export default function Dashboard() {
                               <>
                                 <ChevronDown className="w-4 h-4 text-green-500 dark:text-green-400" />
                                 <span className="text-sm font-medium text-green-500 dark:text-green-400">
-                                  {percentage.toFixed(1)}%
+                                  <CountUp valueNumber={percentage} isPercentage />%
                                 </span>
                               </>
                             )
@@ -503,7 +503,7 @@ export default function Dashboard() {
                               <>
                                 <ChevronUp className="w-4 h-4 text-red-500 dark:text-red-400" />
                                 <span className="text-sm font-medium text-red-500 dark:text-red-400">
-                                  {percentage.toFixed(1)}%
+                                  <CountUp valueNumber={percentage} isPercentage />%
                                 </span>
                               </>
                             )
@@ -513,7 +513,7 @@ export default function Dashboard() {
                             <>
                               <Minus className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
                               <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                                {percentage.toFixed(1)}%
+                                <CountUp valueNumber={percentage} isPercentage />%
                               </span>
                             </>
                           )

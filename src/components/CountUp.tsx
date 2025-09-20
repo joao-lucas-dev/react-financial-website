@@ -36,9 +36,7 @@ const CountUp = ({ valueNumber, isPercentage = false }: IParams) => {
   return (
     <>
       {isPercentage
-        ? value >= 0
-          ? `+${value.toFixed(2)}`
-          : value.toFixed(2)
+        ? Math.abs(value).toFixed(2)
         : value.toLocaleString('pt-BR', {
             style: 'currency',
             currency: 'BRL',
