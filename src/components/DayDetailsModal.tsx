@@ -295,7 +295,7 @@ const DayDetailsModal: React.FC<DayDetailsModalProps> = ({
               ].map(tab => (
                 <button
                   key={tab.key}
-                  onClick={() => setActiveTab(tab.key as any)}
+                  onClick={() => setActiveTab(tab.key as 'all' | 'income' | 'outcome')}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     activeTab === tab.key
                       ? 'bg-teal-600 text-white shadow-md'

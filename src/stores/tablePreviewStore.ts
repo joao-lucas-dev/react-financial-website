@@ -4,10 +4,10 @@ interface TablePreviewState {
   // Modal state
   dayDetailsModal: {
     isOpen: boolean
-    dayData: any | null
+    dayData: unknown | null
     initialFilter?: 'all' | 'income' | 'outcome'
   }
-  setDayDetailsModal: (modal: { isOpen: boolean; dayData: any | null; initialFilter?: 'all' | 'income' | 'outcome' }) => void
+  setDayDetailsModal: (modal: { isOpen: boolean; dayData: unknown | null; initialFilter?: 'all' | 'income' | 'outcome' }) => void
 
   quickAddModal: {
     isOpen: boolean

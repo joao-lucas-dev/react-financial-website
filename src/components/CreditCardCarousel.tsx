@@ -38,7 +38,7 @@ const CreditCardCarousel: React.FC<CreditCardCarouselProps> = ({
           
           // Position calculation for stacking effect
           let transform = ''
-          let zIndex = cards.length - Math.abs(offset)
+          const zIndex = cards.length - Math.abs(offset)
           let opacity = 1
           
           if (offset === 0) {

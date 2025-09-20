@@ -1,11 +1,7 @@
 import React from 'react'
 import { CreditCard, Sparkles } from 'lucide-react'
 
-interface CreditCardEmptyStateProps {
-  // No props needed for display-only empty state
-}
-
-const CreditCardEmptyState: React.FC<CreditCardEmptyStateProps> = () => {
+const CreditCardEmptyState = () => {
   return (
     <div className="relative w-full max-w-md mx-auto">
       {/* Empty Card Placeholder */}

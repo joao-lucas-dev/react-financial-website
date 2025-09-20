@@ -27,7 +27,7 @@ export default function useTransactions(
   })
   const [balance, setBalance] = useState(0)
   const [recentTransactions, setRecentTransactions] = useState<EnhancedTransaction[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading] = useState(false)
   const [periodsSummary, setPeriodsSummary] = useState({
     today: { balance: 0 },
     thisWeek: { balance: 0 },
@@ -542,7 +542,7 @@ export default function useTransactions(
           is_paid: createTransaction.is_paid,
         }
         
-        const response = await axiosPrivate.post('/transactions/recurring/create', payload)
+        await axiosPrivate.post('/transactions/recurring/create', payload)
 
         const promises = []
 

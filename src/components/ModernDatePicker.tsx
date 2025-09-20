@@ -34,7 +34,7 @@ const customTheme = {
   }
 }
 
-const ModernDatePicker = forwardRef<any, ModernDatePickerProps>(
+const ModernDatePicker = forwardRef<unknown, ModernDatePickerProps>(
   ({ label, value, onChange, placeholder = 'Selecione uma data', required = false, error, disabled = false }, ref) => {
     // Converter string para dayjs object
     const dayjsValue = value ? dayjs(value, 'YYYY-MM-DD') : null

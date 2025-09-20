@@ -4,11 +4,11 @@ interface DashboardState {
   // Modal state
   openModal: {
     isOpen: boolean
-    transaction: any
+    transaction: unknown
     type: string
     button?: 'income' | 'outcome'
   }
-  setOpenModal: (modal: { isOpen: boolean; transaction: any; type: string; button?: 'income' | 'outcome' }) => void
+  setOpenModal: (modal: { isOpen: boolean; transaction: unknown; type: string; button?: 'income' | 'outcome' }) => void
 
   // Filters for recent transactions
   recentSearchTerm: string

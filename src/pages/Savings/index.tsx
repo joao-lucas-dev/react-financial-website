@@ -1,23 +1,22 @@
-import React, { useState } from 'react'
-import { 
-  Target, 
-  Plus, 
-  Edit3, 
-  Trash2, 
+import {
   Calendar,
-  TrendingUp,
-  PiggyBank,
   Car,
-  Home,
-  Plane,
+  Check,
+  Edit3,
+  Gamepad2,
   Gift,
   GraduationCap,
   Heart,
+  Home,
+  PiggyBank,
+  Plane,
+  Plus,
   Smartphone,
-  Gamepad2,
-  X,
-  Check
+  Target,
+  Trash2,
+  X
 } from 'lucide-react'
+import React, { useState } from 'react'
 import MenuAside from '../../components/MenuAside'
 
 interface SavingsGoal {
@@ -104,7 +103,7 @@ const SavingsPage: React.FC = () => {
 
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showAddMoneyModal, setShowAddMoneyModal] = useState<string | null>(null)
-  const [showEditModal, setShowEditModal] = useState<string | null>(null)
+  const [setShowEditModal] = useState<string | null>(null)
   const [addAmount, setAddAmount] = useState('')
   const [newGoal, setNewGoal] = useState({
     name: '',

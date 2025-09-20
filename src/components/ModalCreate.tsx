@@ -26,8 +26,18 @@ interface IParams {
   openModal: IOpenModal
   setOpenModal: ISetOpenModal
   handleCreateCompleteTransaction: IHandleCreateCompleteTransaction
-  handleCreateInstallmentTransaction: (transaction: ITransaction, currentMonth: number, setCurrentMonth?: any, from?: string) => Promise<void>;
-  handleCreateRecurringTransaction: (transaction: ITransaction, currentMonth: number, setCurrentMonth?: any, from?: string) => Promise<void>;
+  handleCreateInstallmentTransaction: (
+    transaction: ITransaction,
+    currentMonth: number,
+    setCurrentMonth?: (value: number | ((prev: number) => number)) => void,
+    from?: string,
+  ) => Promise<void>
+  handleCreateRecurringTransaction: (
+    transaction: ITransaction,
+    currentMonth: number,
+    setCurrentMonth?: (value: number | ((prev: number) => number)) => void,
+    from?: string,
+  ) => Promise<void>
   currentMonth: number
   setCurrentMonth: ISetCurrentMonth
   categories: ICategory[]
@@ -92,7 +102,7 @@ const ModalCreate = ({
   const isPaid = watch('is_paid')
   const cardId = watch('card_id')
   const price = watch('price')
-  const invoiceDate = watch('invoice_date')
+  // const invoiceDate = watch('invoice_date') // not used directly here
 
   // Converter preço formatado para número
   const getTotalAmount = () => {
@@ -172,18 +182,7 @@ const ModalCreate = ({
     [setValue],
   )
 
-  // Função para calcular data final baseada no parcelamento
-  const calculateEndDate = (startDate: Date, installmentCount: number, installmentPeriod: 'months' | 'years') => {
-    const endDate = new Date(startDate)
-    
-    if (installmentPeriod === 'months') {
-      endDate.setMonth(endDate.getMonth() + installmentCount - 1)
-    } else if (installmentPeriod === 'years') {
-      endDate.setFullYear(endDate.getFullYear() + installmentCount - 1)
-    }
-    
-    return endDate
-  }
+  // Removed unused calculateEndDate helper
 
   const handleCreate = useCallback(
     async (data: ModalCreateData) => {
@@ -216,8 +215,7 @@ const ModalCreate = ({
           )
         } else if (recurrenceConfig.mode === 'fixed') {
           let recurrencePattern: RecurrenceType = 'monthly'
-          let endDate: Date | undefined = undefined
-          let adjustedPrice = Number(data.price.replace(/\D/g, '')) / 100
+          const adjustedPrice = Number(data.price.replace(/\D/g, '')) / 100
 
           recurrencePattern = recurrenceConfig.frequency as RecurrenceType
 
@@ -231,7 +229,7 @@ const ModalCreate = ({
             shared_id: null,
             recurrence_pattern: recurrencePattern,
             recurrence_interval: 1,
-            end_date: endDate,
+            end_date: undefined,
             is_paid: data.is_paid,
             card_id: data.card_id === 'account' ? null : data.card_id,
             fromCreditCard: data.card_id !== 'account',
@@ -285,6 +283,7 @@ const ModalCreate = ({
       setOpenModal,
       currentMonth,
       setCurrentMonth,
+      from,
     ],
   )
 

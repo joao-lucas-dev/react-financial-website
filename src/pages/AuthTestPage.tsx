@@ -1,8 +1,8 @@
+import { PlayCircleOutlined, ReloadOutlined } from '@ant-design/icons'
+import { Alert, Button, Card, Progress, Space, Tag, Typography } from 'antd'
 import React, { useState } from 'react'
-import { Button, Card, Typography, Space, Divider, Alert, Progress, Tag } from 'antd'
-import { ReloadOutlined, PlayCircleOutlined, StopOutlined } from '@ant-design/icons'
-import useAxiosPrivate from '../hooks/useAxiosPrivate'
 import authManager from '../api/authManager'
+import useAxiosPrivate from '../hooks/useAxiosPrivate'
 
 const { Title, Text, Paragraph } = Typography
 

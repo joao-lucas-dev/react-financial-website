@@ -180,7 +180,6 @@ export default function useDashboard(
     setIsLoading(true);
     try {
       const luxonStartDate = DateTime.fromISO(startDate);
-      const luxonEndDate = DateTime.fromISO(endDate);
       
       // Use the start date as reference for data fetching
       const referenceDate = luxonStartDate;

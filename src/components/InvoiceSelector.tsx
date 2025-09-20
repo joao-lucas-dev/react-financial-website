@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { ICreditCard } from '../types/creditCards'
-import { getInvoiceInfoForTransaction } from '../utils/invoiceCalculations'
 import { DateTime } from 'luxon'
 
 interface InvoiceSelectorProps {
@@ -16,16 +15,6 @@ const InvoiceSelector = ({ selectedCard, value, onChange, disabled }: InvoiceSel
   const [currentDate, setCurrentDate] = useState(DateTime.now())
   
   // Inicializar com data padrão se não houver valor
-  const initializeDefaultValue = () => {
-    if (!value && selectedCard && onChange) {
-      const today = DateTime.now()
-      const transactionDate = today.toISO()
-      
-      if (transactionDate) {
-        onChange(transactionDate)
-      }
-    }
-  }
 
   // Calcular data selecionada baseada no value
   const getSelectedDate = () => {
@@ -59,8 +48,14 @@ const InvoiceSelector = ({ selectedCard, value, onChange, disabled }: InvoiceSel
 
   // Inicializar valor padrão quando o cartão muda
   useEffect(() => {
-    initializeDefaultValue()
-  }, [selectedCard])
+    if (!value && selectedCard && onChange) {
+      const today = DateTime.now()
+      const transactionDate = today.toISO()
+      if (transactionDate) {
+        onChange(transactionDate)
+      }
+    }
+  }, [selectedCard, value, onChange])
 
   const handleMonthYearSelect = (month: number, year: number) => {
     try {
@@ -91,14 +86,7 @@ const InvoiceSelector = ({ selectedCard, value, onChange, disabled }: InvoiceSel
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ]
 
-  const generateYears = () => {
-    const currentYear = DateTime.now().year
-    const years = []
-    for (let i = 0; i < 3; i++) {
-      years.push(currentYear + i)
-    }
-    return years
-  }
+  // (geração de anos removida; não utilizada)
 
   if (!selectedCard || disabled) {
     return null

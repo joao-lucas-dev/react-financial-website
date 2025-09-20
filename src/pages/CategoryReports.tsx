@@ -1,27 +1,26 @@
+import {
+    Activity,
+    ArrowDownRight,
+    ArrowUpRight,
+    Calendar,
+    ChevronRight,
+    DollarSign,
+    LineChart,
+    MessageCircleQuestion,
+    PieChart,
+    Target,
+    TrendingDown,
+    TrendingUp
+} from 'lucide-react';
+import { DateTime } from 'luxon';
 import React, { useEffect, useState } from 'react';
-import ModernDonutChart from '../components/ModernDonutChart';
+import { useLocation } from 'react-router-dom';
 import AnimatedLineChart from '../components/AnimatedLineChart';
 import CategoryIcon from '../components/CategoryIcon';
-import useAxiosPrivate from '../hooks/useAxiosPrivate';
-import { DateTime } from 'luxon';
 import MenuAside from '../components/MenuAside';
-import { useLocation } from 'react-router-dom';
+import ModernDonutChart from '../components/ModernDonutChart';
+import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import useCategories from '../hooks/useCategories';
-import { 
-  MessageCircleQuestion, 
-  BarChart3, 
-  TrendingUp, 
-  TrendingDown, 
-  Calendar,
-  PieChart,
-  LineChart,
-  ArrowUpRight,
-  ArrowDownRight,
-  Activity,
-  Target,
-  DollarSign,
-  ChevronRight
-} from 'lucide-react';
 
 interface Transaction {
     id: number;
@@ -103,19 +102,6 @@ const generateMockData = (months: number) => {
     
     return data;
 };
-
-function formatChartData(categories: Category[]) {
-    return {
-        labels: categories.map((c) => c.name),
-        datasets: [
-            {
-                data: categories.map((c) => c.total),
-                backgroundColor: categories.map((c) => `var(--${c.color})`),
-                hoverBackgroundColor: categories.map((c) => `var(--${c.color})`),
-            },
-        ],
-    };
-}
 
 const CategoryReports: React.FC = () => {
     const axiosPrivate = useAxiosPrivate();

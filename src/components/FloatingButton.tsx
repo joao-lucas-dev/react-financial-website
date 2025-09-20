@@ -1,12 +1,5 @@
 import React, { useState } from 'react'
-import {
-  Plus,
-  ChartColumnDecreasing,
-  MoveDownLeft,
-  MoveUpRight,
-  TrendingUp,
-  TrendingDown,
-} from 'lucide-react'
+import { Plus, TrendingUp, TrendingDown } from 'lucide-react'
 import { ISetOpenModal, ITransaction } from '../types/transactions.ts'
 
 interface IParams {

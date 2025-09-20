@@ -10,7 +10,6 @@ interface PeriodNavigatorProps {
   onYearChange: (year: number) => void;
   onQuickPeriod?: (type: 'today' | 'thisWeek' | 'thisMonth' | 'custom') => void;
   onPeriodChange?: (startDate: string, endDate: string, type: PeriodType) => Promise<void>;
-  onCustomPeriod?: (startDate: string, endDate: string) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -21,7 +20,6 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
   onYearChange,
   onQuickPeriod,
   onPeriodChange,
-  onCustomPeriod,
   isLoading = false
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -98,7 +96,7 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
     if (isLoading) return;
     
     switch (periodType) {
-      case 'week':
+      case 'week': {
         const prevWeek = new Date(currentWeekStart);
         prevWeek.setDate(currentWeekStart.getDate() - 7);
         setCurrentWeekStart(prevWeek);
@@ -112,7 +110,8 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
           );
         }
         break;
-      case 'custom':
+      }
+      case 'custom': {
         if (customStartDate && customEndDate) {
           const start = new Date(customStartDate);
           const end = new Date(customEndDate);
@@ -133,6 +132,7 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
           }
         }
         break;
+      }
       case 'month':
       default:
         if (currentMonth === 1) {
@@ -149,7 +149,7 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
     if (isLoading) return;
     
     switch (periodType) {
-      case 'week':
+      case 'week': {
         const nextWeek = new Date(currentWeekStart);
         nextWeek.setDate(currentWeekStart.getDate() + 7);
         setCurrentWeekStart(nextWeek);
@@ -163,7 +163,8 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
           );
         }
         break;
-      case 'custom':
+      }
+      case 'custom': {
         if (customStartDate && customEndDate) {
           const start = new Date(customStartDate);
           const end = new Date(customEndDate);
@@ -184,6 +185,7 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
           }
         }
         break;
+      }
       case 'month':
       default:
         if (currentMonth === 12) {
@@ -243,12 +245,13 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
     setIsDropdownOpen(false);
     
     switch (type) {
-      case 'today':
+      case 'today': {
         // Delegar ao pai para filtrar somente o dia atual
         setPeriodType('today');
         onQuickPeriod?.('today');
         break;
-      case 'thisWeek':
+      }
+      case 'thisWeek': {
         // Atualiza estado local para navegação semanal e delega ao pai
         setPeriodType('week');
         const now = new Date();
@@ -257,31 +260,23 @@ const PeriodNavigator: React.FC<PeriodNavigatorProps> = ({
         setCurrentWeekStart(startDate);
         onQuickPeriod?.('thisWeek');
         break;
-      case 'thisMonth':
+      }
+      case 'thisMonth': {
         // Delegar ao pai para voltar ao modo mensal padrão
         setPeriodType('month');
         onQuickPeriod?.('thisMonth');
         break;
-      case 'custom':
+      }
+      case 'custom': {
         // Este caso é tratado pelo modal no pai
         setPeriodType('custom');
         onQuickPeriod?.(type);
         break;
+      }
     }
   };
   
-  // Handle custom period from modal
-  const handleCustomPeriod = async (startDate: string, endDate: string) => {
-    setPeriodType('custom');
-    setCustomStartDate(startDate);
-    setCustomEndDate(endDate);
-    
-    if (onCustomPeriod) {
-      await onCustomPeriod(startDate, endDate);
-    } else if (onPeriodChange) {
-      await onPeriodChange(startDate, endDate, 'custom');
-    }
-  };
+  // Custom period is triggered by parent via onQuickPeriod('custom')
 
   // Check if navigation buttons should be disabled
   const canNavigateBack = currentYear > 2019 || (currentYear === 2019 && currentMonth > 1);

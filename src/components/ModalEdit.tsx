@@ -7,7 +7,6 @@ import { ICategory } from '../types/categories.ts'
 import { ICreditCard } from '../types/creditCards.ts'
 import {
   EditMode,
-  IHandleDeleteInstallmentTransaction,
   IHandleUpdateInstallmentTransaction,
   IHandleUpdateTransaction,
   InstallmentEditMode,
@@ -40,7 +39,6 @@ interface IParams {
     from: string,
   ) => Promise<void>
   handleUpdateInstallmentTransaction?: IHandleUpdateInstallmentTransaction
-  handleDeleteInstallmentTransaction?: IHandleDeleteInstallmentTransaction
   currentMonth: number
   setCurrentMonth: ISetCurrentMonth
   categories: ICategory[]
@@ -78,7 +76,6 @@ const ModalEdit = ({
   handleUpdateTransaction,
   handleUpdateRecurringTransaction,
   handleUpdateInstallmentTransaction,
-  handleDeleteInstallmentTransaction,
   currentMonth,
   setCurrentMonth,
   categories,
@@ -107,7 +104,7 @@ const ModalEdit = ({
 
   const transactionDay = watch('transaction_day')
   const isPaid = watch('is_paid')
-  const editMode = watch('edit_mode')
+  // const editMode = watch('edit_mode')
   const cardId = watch('card_id')
   const price = watch('price')
   const invoiceDate = watch('invoice_date')
@@ -220,9 +217,15 @@ const ModalEdit = ({
     if (invoiceDate) return
 
     try {
-      const cardAny: any = selectedCard as any
-      const bestPurchaseDay: number | undefined = cardAny?.best_purchase_day ?? cardAny?.closingDay
-      const paymentDueDay: number | undefined = cardAny?.payment_due_day ?? cardAny?.dueDay
+      type CardWithCycle = ICreditCard & {
+        best_purchase_day?: number
+        payment_due_day?: number
+        closingDay?: number
+        dueDay?: number
+      }
+      const cardCycle = selectedCard as CardWithCycle | undefined
+      const bestPurchaseDay: number | undefined = cardCycle?.best_purchase_day ?? cardCycle?.closingDay
+      const paymentDueDay: number | undefined = cardCycle?.payment_due_day ?? cardCycle?.dueDay
 
       let computedInvoiceISO: string | null = null
       if (typeof bestPurchaseDay === 'number' && typeof paymentDueDay === 'number') {
@@ -248,7 +251,7 @@ const ModalEdit = ({
     // Não aplicar regra automática quando já há status pago conhecido
     if (isPaidManuallyOverridden) return
     const explicitIsPaid = openModal.transaction.is_paid
-    const paymentStatusAuto = (openModal.transaction as any)?.payment_status as string | undefined
+    const paymentStatusAuto = (openModal.transaction as { payment_status?: string } | undefined)?.payment_status
     const hasPaidDateAuto = Boolean(openModal.transaction.paid_date)
     if (explicitIsPaid !== undefined && explicitIsPaid !== null) return
     if (paymentStatusAuto === 'paid' || hasPaidDateAuto) return

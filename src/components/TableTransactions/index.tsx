@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import 'react-loading-skeleton/dist/skeleton.css'
 import CategoryIcon from '../CategoryIcon'
-import { EllipsisVertical, Search, MessageCircleQuestion, CheckCircle, XCircle, Clock, CreditCard } from 'lucide-react'
+import { EllipsisVertical, MessageCircleQuestion, CheckCircle, XCircle, Clock, CreditCard } from 'lucide-react'
 import './styles.css'
 import { DateTime } from 'luxon'
 import { typeMap } from '../../common/constants'
@@ -168,7 +168,7 @@ const TableRecentTransactions = ({ recentTransactions, onSort, sortBy, sortOrder
                 .toFormat('dd/MM/yyyy')
             }
             return 'Data não disponível'
-          } catch (error) {
+          } catch (_err) {
             return 'Data inválida'
           }
         })()

@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Calendar, CheckCircle, XCircle, Clock, DollarSign } from 'lucide-react'
-import MenuAside from '../../components/MenuAside'
+import { ArrowLeft, CheckCircle, Clock, DollarSign, XCircle } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import CreditCard from '../../components/CreditCard'
+import MenuAside from '../../components/MenuAside'
 import { mockCreditCards, mockCreditCardTransactions } from '../../types/creditCards'
 import { ITransaction } from '../../types/transactions'
 

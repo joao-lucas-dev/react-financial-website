@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { ArrowRight, Calendar, DollarSign, Edit2, MoreVertical, Plus, Trash2, X } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Calendar, DollarSign, Plus, X, Edit2, Trash2, MoreVertical } from 'lucide-react'
-import MenuAside from '../../components/MenuAside'
 import CreditCard from '../../components/CreditCard'
+import MenuAside from '../../components/MenuAside'
 import { mockCreditCards, mockCreditCardTransactions } from '../../types/creditCards'
 
 const CreditCardBillsPage: React.FC = () => {
@@ -126,7 +126,7 @@ const CreditCardBillsPage: React.FC = () => {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = () => {
       setOpenDropdown(null)
     }
 

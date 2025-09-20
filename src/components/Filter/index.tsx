@@ -181,14 +181,4 @@ export const Filter = ({ onFilterChange, currentFilter, currentType }: FilterPro
   )
 }
 
-const FilterTag = ({
-  filterType,
-  label,
-}: {
-  filterType: string
-  label: string
-}) => (
-  <div className="flex items-center text-xs text-white bg-orange-500 px-3 py-1 rounded-full mr-2 transition-all hover:bg-orange-600">
-    <span>{label}</span>
-  </div>
-)
+// Removed unused FilterTag component to satisfy lint rules

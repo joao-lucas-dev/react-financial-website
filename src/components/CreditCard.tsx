@@ -1,5 +1,5 @@
 import React from 'react'
-import { CreditCard as CreditCardIcon, Wifi, CreditCard as CardIcon } from 'lucide-react'
+import { Wifi } from 'lucide-react'
 import { CreditCard as CreditCardType } from '../types/creditCards'
 
 interface CreditCardProps {

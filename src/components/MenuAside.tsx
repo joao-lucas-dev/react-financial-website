@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
-  House,
-  MessageCircleQuestion,
   Settings,
   Newspaper,
-  ChartColumn,
   CreditCard,
   PiggyBank,
   Menu,
@@ -17,7 +14,6 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useTheme } from "../context/ThemeProvider";
 import useAuthentication from "../hooks/useAutentication";
 
 interface IParams {
@@ -35,7 +31,6 @@ interface NavigationSection {
 }
 
 const MenuAside = ({ activePage }: IParams) => {
-  const { actualTheme } = useTheme();
   const { logout } = useAuthentication();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -237,7 +232,7 @@ const MenuAside = ({ activePage }: IParams) => {
         {/* Navigation with sections */}
         <nav className="flex-1 overflow-y-auto scrollbar-hide">
           <div className="space-y-6 min-h-0">
-            {navigationSections.map((section, sectionIndex) => (
+            {navigationSections.map((section) => (
               <div key={section.title}>
                 <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-zinc-500 dark:text-zinc-400">
                   {section.title}

@@ -1,6 +1,6 @@
 import { ArrowLeft, Calendar } from 'lucide-react'
 import { useEffect } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import Header from '../../components/Header'
 import MenuAside from '../../components/MenuAside'
@@ -36,7 +36,6 @@ type DayDetailsState = {
 const DayDetailsPage = () => {
   const navigate = useNavigate()
   const { state } = useLocation() as { state?: DayDetailsState }
-  const { date } = useParams()
 
   // Default filter is kept in the list view component
 
@@ -78,15 +77,6 @@ const DayDetailsPage = () => {
 
   // Prefer fetched row if available; fallback to navigation state
   const effectiveRow: IRow | undefined = (dayRows && dayRows.length > 0) ? dayRows[0] : dayData
-
-  const formatTransactionDate = (d: string) => {
-    return new Date(`${d}T00:00:00`).toLocaleDateString('pt-BR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
 
   // Transactions and quick actions handled inside TransactionsListView
 

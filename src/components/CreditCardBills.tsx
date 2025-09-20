@@ -4,8 +4,7 @@ import {
   Calendar, 
   Clock, 
   AlertTriangle, 
-  CheckCircle, 
-  DollarSign,
+  CheckCircle,
   Eye,
   Download,
   MoreHorizontal,
@@ -13,7 +12,6 @@ import {
   TrendingUp,
   ArrowRight
 } from 'lucide-react';
-import { useTheme } from '../context/ThemeProvider';
 
 interface CreditCardBill {
   id: string;
@@ -30,7 +28,6 @@ interface CreditCardBill {
 }
 
 const CreditCardBills: React.FC = () => {
-  const { actualTheme } = useTheme();
   const [selectedBill, setSelectedBill] = useState<string | null>(null);
 
   // Mock data - em um caso real, viria de uma API

@@ -193,11 +193,6 @@ const Transactions = () => {
     }
   };
 
-  // Check if today is available
-  const hasToday = () => {
-    return currentPeriodType === 'today' || (currentPeriodType === 'month' && currentDate.hasSame(DateTime.now(), 'day'));
-  };
-
   // Transaction handlers using mutations
   const handleCreateTransaction = async (
     type: 'incomes' | 'outcomes',

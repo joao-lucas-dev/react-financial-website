@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react'
 import Select, { SingleValue, StylesConfig, components } from 'react-select'
+import type { DropdownIndicatorProps, OptionProps, SingleValueProps } from 'react-select'
 import { ChevronDown } from 'lucide-react'
 
 export interface SelectOption {
@@ -22,7 +23,7 @@ interface ModernSelectProps {
 }
 
 // Componente customizado para a seta dropdown
-const DropdownIndicator = (props: any) => {
+const DropdownIndicator = (props: DropdownIndicatorProps<SelectOption, false>) => {
   return (
     <components.DropdownIndicator {...props}>
       <ChevronDown size={16} className="text-zinc-600 dark:text-zinc-400" />
@@ -31,8 +32,8 @@ const DropdownIndicator = (props: any) => {
 }
 
 // Componente customizado para as opções
-const Option = (props: any) => {
-  const { data, isSelected, isFocused } = props
+const Option = (props: OptionProps<SelectOption, false>) => {
+  const { data, isSelected } = props
   
   return (
     <components.Option {...props}>
@@ -51,7 +52,7 @@ const Option = (props: any) => {
 }
 
 // Componente customizado para o valor selecionado
-const CustomSingleValue = (props: any) => {
+const CustomSingleValue = (props: SingleValueProps<SelectOption, false>) => {
   const { data } = props
   
   return (
@@ -68,7 +69,7 @@ const CustomSingleValue = (props: any) => {
   )
 }
 
-const ModernSelect = forwardRef<any, ModernSelectProps>(
+const ModernSelect = forwardRef<unknown, ModernSelectProps>(
   ({ 
     label, 
     options, 

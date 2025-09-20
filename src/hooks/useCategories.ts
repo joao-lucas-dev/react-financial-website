@@ -42,7 +42,7 @@ export default function useCategories() {
   })
 
   const handleGetChartCategories = useCallback(
-    async (date = DateTime.now(), limited = true) => {
+    async (date = DateTime.now()) => {
       try {
         const startDate = date.startOf('month')
         const endDate = date.endOf('month')

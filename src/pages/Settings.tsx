@@ -1,25 +1,24 @@
-import React, { useState } from 'react';
-import { 
-    User, 
-    Bell, 
-    Shield, 
-    CreditCard, 
-    Palette, 
-    Globe, 
-    Eye, 
-    EyeOff,
-    Save,
-    Camera,
-    Moon,
-    Sun,
-    Smartphone,
-    Tags,
+import {
     AlertTriangle,
-    Plus,
+    Bell,
+    Camera,
+    CreditCard,
     Edit2,
+    Eye,
+    EyeOff,
+    Moon,
+    Palette,
+    Plus,
+    Save,
+    Shield,
+    Smartphone,
+    Sun,
+    Tags,
     Trash2,
+    User,
     X
 } from 'lucide-react';
+import React, { useState } from 'react';
 import MenuAside from '../components/MenuAside';
 import { useTheme } from '../context/ThemeProvider';
 
@@ -1639,7 +1638,7 @@ const Settings: React.FC = () => {
                             {/* Sidebar */}
                             <div className="bg-white dark:bg-zinc-800 rounded-2xl p-4 shadow-2xl border border-white border-opacity-20 dark:border-zinc-700 h-fit transition-colors">
                                 <nav className="space-y-6">
-                                    {sectionGroups.map((group, groupIndex) => (
+                                    {sectionGroups.map((group) => (
                                         <div key={group.title}>
                                             <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-zinc-500 dark:text-zinc-400 px-2">
                                                 {group.title}

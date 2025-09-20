@@ -9,14 +9,12 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import LogoutButton from "./LoggoutButton.tsx";
-import { useTheme } from "../context/ThemeProvider";
 
 interface IParams {
   activePage: string;
 }
 
 const MenuAside = ({ activePage }: IParams) => {
-  const { actualTheme } = useTheme();
   const navigationItems = [
     { id: "dashboard", icon: House, label: "Dashboard", path: "/dashboard" },
     {
